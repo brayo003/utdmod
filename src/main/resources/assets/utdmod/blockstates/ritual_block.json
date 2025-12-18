@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "degraded=false": { "model": "utdmod:block/ritual_block" },
+    "degraded=true": { "model": "utdmod:block/ritual_block_degraded" }
+  }
+}

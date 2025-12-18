@@ -1,0 +1,17 @@
+{
+    "schemaVersion": 1,
+    "id": "utdmod",
+    "version": "1.0.0",
+    "name": "UTD Mod",
+    "description": "Internal UTD systems.",
+    "authors": ["brayo"],
+    "environment": "*",
+    "entrypoints": {
+        "main": ["com.utdmod.UTDMod"]
+    },
+    "depends": {
+        "minecraft": "1.20.4",
+        "fabricloader": ">=0.15.10",
+        "fabric-api": "*"
+    }
+}

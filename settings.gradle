@@ -1,0 +1,18 @@
+pluginManagement {
+    repositories {
+        // REQUIRED: Add Fabric Maven to locate the fabric-loom plugin
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        gradlePluginPortal()
+        mavenLocal()
+        // Add additional repositories here
+    }
+}
+
+// Set root project name
+rootProject.name = "utdmod" 
+
+// Include external projects if necessary
+// include "other-project"
