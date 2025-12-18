@@ -1,28 +1,39 @@
-# Tension Mod for Minecraft
+# UTD Mod - DCII Tension System (Minecraft 1.20.4 Fabric)
 
-A DCII-based instability system that introduces dynamic tension mechanics to Minecraft worlds.
+**Status: Technical implementation help needed**
 
-## Features
-- **Real-time Tension Monitoring**: HUD overlay shows current tension level
-- **Dynamic Entities**: Tension serpents and wraiths spawn based on tension
-- **Biome Effects**: Different biomes have unique tension responses
-- **Ritual Mechanics**: Use ritual blocks to manage tension
-- **Multiplayer Sync**: Tension levels synchronized across all players
+A Fabric mod implementing DCII tension mechanics. The foundation works (mod loads, registers items) but needs help with full implementation.
 
-## Installation
-1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 1.20.4
-2. Download `utdmod-1.3.jar`
-3. Place in `.minecraft/mods/` folder
-4. Launch Minecraft
+## Working
+- Mod loads without crashes
+- Basic item registration framework  
+- Clean build system (Gradle/Fabric Loom)
 
-## Mechanics
-- **Tension Sources**: Player activity, mob spawning, weather, time
-- **Tension Effects**: Entity behavior changes, loot adjustments, visual effects
-- **Management**: Use warding crystals, ritual blocks, and consumables
+## Need Help With
+- Tension HUD overlay rendering
+- Entity registration and custom AI (tension serpents/wraiths)
+- Dimension-specific world ticking (Overworld only)
+- Ritual block mechanics
+- Network synchronization for multiplayer
 
 ## Technical Details
-Based on the DCII (Domain-Calibrated Instability Index) framework.
 Implements: T = α|∇ρ| + βE - γF
+- T: Global tension value
+- α|∇ρ|: Player activity gradient
+- βE: Environmental factors
+- γF: Stabilizing forces
 
-## License
-MIT
+## Current Issues
+1. Items not appearing in creative menu
+2. Performance concerns with world ticking
+3. Missing mixin targets causing warnings
+4. Asset loading errors for some models/sounds
+
+## How to Help
+Looking for technical collaborators familiar with:
+- Fabric Mod Loader API
+- Minecraft entity/block systems
+- Java game development
+- Performance optimization
+
+Build: ./gradlew build
