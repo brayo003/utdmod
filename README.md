@@ -30,7 +30,7 @@ The foundation works (mod loads, basic systems) but needs implementation help.
 
 ## For technical Modders
 
-This mod implements a mathematically rigorous tension system based on regularized transport equations. If you appreciate the elegance of AE2's network math or Thaumcraft's aura systems, you'll enjoy this project.
+This mod implements a mathematically rigorous tension system based on regularized transport equations. 
 
 **Quick for developers:**
 ```java
