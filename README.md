@@ -8,7 +8,7 @@ This Minecraft mod implements the **DCII (Domain-Calibrated Instability Index)**
 Part of: **Substrate X: Theory of Information Gravity**
 - Full theory: https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
 - Implements: T = α|∇ρ| + βE - γF tension dynamics
-float calculateTension(float baseStress, float threats, float defenses) {
+-float calculateTension(float baseStress, float threats, float defenses) {
     return baseStress + (threatMultiplier * threats) - (defenseMultiplier * defenses);
 }
 
