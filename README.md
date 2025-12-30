@@ -28,9 +28,20 @@ The foundation works (mod loads, basic systems) but needs implementation help.
 4. Ritual mechanics
 5. Network synchronization
 
+## For technical Modders
+
+This mod implements a mathematically rigorous tension system based on regularized transport equations. If you appreciate the elegance of AE2's network math or Thaumcraft's aura systems, you'll enjoy this project.
+
+**Quick for developers:**
+```java
+// The core tension equation
+float T = alpha * gradientMagnitude(rho) + beta * excitation - gamma * damping;
+```
+
 ## Build
 ```bash
 ./gradlew build
 Collaboration
+```
 
 Looking for Fabric/Java developers to help implement the DCII framework in Minecraft.
