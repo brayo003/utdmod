@@ -1,0 +1,14 @@
+# Lines starting with # are comments
+# Format: PATTERN @USER1 @USER2
+
+# Tension engine files - assign to tension experts
+/src/main/java/com/utdmod/tension/    @YourGitHubUser  # You for now
+
+# Client/HUD files - assign to UI experts  
+/src/main/java/com/utdmod/client/      @YourGitHubUser  # You for now
+
+# Game events files
+/src/main/java/com/utdmod/events/      @YourGitHubUser  # You for now
+
+# API files
+/src/main/java/com/utdmod/api/         @YourGitHubUser  # You for now
