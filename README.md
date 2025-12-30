@@ -36,6 +36,15 @@ This mod implements a mathematically rigorous tension system based on regularize
 ```java
 // The core tension equation
 float T = alpha * gradientMagnitude(rho) + beta * excitation - gamma * damping;
+What it means in Minecraft:
+
+    ∇ρ: Spatial information density gradient (terrain, structures)
+
+    E: Excitation (mobs, player actions, events)
+
+    F: Damping (defenses, stabilizers, player interventions)
+
+    T: System tension (0.0 = stable, 1.0+ = collapse)
 ```
 
 ## Build
