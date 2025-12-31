@@ -1,0 +1,30 @@
+package com.utdmod.network;
+
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
+
+public record TensionSyncPayload(double tension, long worldTime) implements CustomPayload {
+public static final CustomPayload.Id<TensionSyncPayload> ID =
+new CustomPayload.Id<>(new Identifier("utdmod", "tension_sync"));
+
+public static final PacketCodec<PacketByteBuf, TensionSyncPayload> CODEC = 
+    PacketCodec.of(TensionSyncPayload::write, TensionSyncPayload::new);
+
+public TensionSyncPayload(PacketByteBuf buf) {
+    this(buf.readDouble(), buf.readLong());
+}
+
+public void write(PacketByteBuf buf) {
+    buf.writeDouble(tension);
+    buf.writeLong(worldTime);
+}
+
+@Override
+public Id<? extends CustomPayload> getId() {
+    return ID;
+}
+
+
+}

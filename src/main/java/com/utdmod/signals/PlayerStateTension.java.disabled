@@ -1,0 +1,11 @@
+package com.utdmod.signals;
+
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+
+public class PlayerStateTension {
+    public static void updatePlayer(PlayerEntity player) {
+        // Placeholder
+    }
+}

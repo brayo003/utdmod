@@ -1,0 +1,129 @@
+[0;34m[INFO][0m Starting Gradle build check automation
+[0;34m[INFO][0m Build session ID: 20251207_011146
+[0;34m[INFO][0m Project root: /home/lenovo/Projects/mods/new_world
+[0;34m[INFO][0m Detecting major changes since last build...
+[0;34m[INFO][0m Executing step: clean
+[0;34m[INFO][0m Description: Clean previous build artifacts
+[0;32m[SUCCESS][0m Step 'clean' completed successfully in 3136ms
+[1;33m[WARNING][0m Found 2 warnings in step output
+[0;34m[INFO][0m Step output:
+[0;34m[INFO][0m Step output:
+---
+[0;34m[INFO][0m Executing step: compile_java
+[0;34m[INFO][0m Description: Compile Java source code
+[0;31m[ERROR][0m Step 'compile_java' failed with exit code 0 after 5380ms
+[0;31m[ERROR][0m Error output: 
+> Configure project :
+Fabric Loom: 1.6.12
+Not publishing sources jar as it was not found. Use java.withSourcesJar() to fix.
+
+> Task :compileJava FAILED
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol
+import net.minecraft.client.MinecraftClient;
+                           ^
+  symbol:   class MinecraftClient
+  location: package net.minecraft.client
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist
+import net.minecraft.client.util.math.MatrixStack;
+                                     ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol
+import net.minecraft.client.gui.DrawContext;
+                               ^
+  symbol:   class DrawContext
+  location: package net.minecraft.client.gui
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol
+[0;34m[INFO][0m Step output:
+[0;34m[INFO][0m Step output:
+---
+[0;34m[INFO][0m Executing step: process_resources
+[0;34m[INFO][0m Description: Process resource files
+[0;32m[SUCCESS][0m Step 'process_resources' completed successfully in 1932ms
+[1;33m[WARNING][0m Found 2 warnings in step output
+[0;34m[INFO][0m Step output:
+[0;34m[INFO][0m Step output:
+---
+[0;34m[INFO][0m Executing step: classes
+[0;34m[INFO][0m Description: Assemble compiled classes
+[0;31m[ERROR][0m Step 'classes' failed with exit code 0 after 4595ms
+[0;31m[ERROR][0m Error output: 
+> Configure project :
+Fabric Loom: 1.6.12
+Not publishing sources jar as it was not found. Use java.withSourcesJar() to fix.
+
+> Task :compileJava
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol
+import net.minecraft.client.MinecraftClient;
+                           ^
+  symbol:   class MinecraftClient
+  location: package net.minecraft.client
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist
+import net.minecraft.client.util.math.MatrixStack;
+                                     ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol
+import net.minecraft.client.gui.DrawContext;
+                               ^
+  symbol:   class DrawContext
+  location: package net.minecraft.client.gui
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol
+[0;34m[INFO][0m Step output:
+[0;34m[INFO][0m Step output:
+---
+[0;34m[INFO][0m Executing step: jar
+[0;34m[INFO][0m Description: Build JAR file
+[0;31m[ERROR][0m Step 'jar' failed with exit code 0 after 2765ms
+[0;31m[ERROR][0m Error output: 
+> Configure project :
+Fabric Loom: 1.6.12
+Not publishing sources jar as it was not found. Use java.withSourcesJar() to fix.
+
+> Task :compileJava FAILED
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol
+import net.minecraft.client.MinecraftClient;
+                           ^
+  symbol:   class MinecraftClient
+  location: package net.minecraft.client
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist
+import net.minecraft.client.util.math.MatrixStack;
+                                     ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol
+import net.minecraft.client.gui.DrawContext;
+                               ^
+  symbol:   class DrawContext
+  location: package net.minecraft.client.gui
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol
+[0;34m[INFO][0m Step output:
+[0;34m[INFO][0m Step output:
+---
+[0;34m[INFO][0m Executing step: build
+[0;34m[INFO][0m Description: Run full build including tests
+[0;31m[ERROR][0m Step 'build' failed with exit code 0 after 2933ms
+[0;31m[ERROR][0m Error output: 
+> Configure project :
+Fabric Loom: 1.6.12
+Not publishing sources jar as it was not found. Use java.withSourcesJar() to fix.
+
+> Task :compileJava FAILED
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol
+import net.minecraft.client.MinecraftClient;
+                           ^
+  symbol:   class MinecraftClient
+  location: package net.minecraft.client
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist
+import net.minecraft.client.util.math.MatrixStack;
+                                     ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol
+import net.minecraft.client.gui.DrawContext;
+                               ^
+  symbol:   class DrawContext
+  location: package net.minecraft.client.gui
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol
+[0;34m[INFO][0m Step output:
+[0;34m[INFO][0m Step output:
+---
+[0;32m[SUCCESS][0m Build check PASSED after 23257ms
+[0;34m[INFO][0m Summary report generated: /home/lenovo/Projects/mods/new_world/build_json/build_report_20251207_011146.txt
+[0;34m[INFO][0m Build check completed
+[0;34m[INFO][0m Detailed log: /home/lenovo/Projects/mods/new_world/build_logs/gradle_build_20251207_011146.log
+[0;34m[INFO][0m JSON result: /home/lenovo/Projects/mods/new_world/build_json/build_result_20251207_011146.json
+[0;34m[INFO][0m Summary: /home/lenovo/Projects/mods/new_world/build_json/latest_build_summary.json
+[0;32m[SUCCESS][0m Gradle build check automation completed successfully

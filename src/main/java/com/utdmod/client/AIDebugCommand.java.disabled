@@ -1,0 +1,128 @@
+package com.utdmod.client;
+
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.command.ServerCommandSource;
+
+import static net.minecraft.server.command.CommandManager.literal;
+
+/**
+ * AI Debug command for querying debug information and managing AI debugging features.
+ */
+@Environment(EnvType.CLIENT)
+public class AIDebugCommand {
+    
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register(literal("utd_ai_debug")
+            .executes(AIDebugCommand::showDebugSummary)
+            .then(literal("summary")
+                .executes(AIDebugCommand::showDebugSummary))
+            .then(literal("reset")
+                .executes(AIDebugCommand::resetCounters))
+            .then(literal("stats")
+                .executes(AIDebugCommand::showStats))
+            .then(literal("test")
+                .executes(AIDebugCommand::runTest)));
+    }
+    
+    private static int showDebugSummary(CommandContext<ServerCommandSource> context) {
+        try {
+            AIDebugLogger.logEventSummary();
+            
+            context.getSource().sendFeedback(() -> Component.literal("AI Debug summary logged to console. Check logs for detailed information.")
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.GREEN)), true);
+                
+            return 1;
+        } catch (Exception e) {
+            AIDebugLogger.logError("AIDebugCommand", "showDebugSummary", e);
+            context.getSource().sendError(Component.literal("Failed to generate debug summary: " + e.getMessage()));
+            return 0;
+        }
+    }
+    
+    private static int resetCounters(CommandContext<ServerCommandSource> context) {
+        try {
+            AIDebugLogger.resetCounters();
+            
+            context.getSource().sendFeedback(() -> Component.literal("AI Debug counters have been reset.")
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.YELLOW)), true);
+                
+            return 1;
+        } catch (Exception e) {
+            AIDebugLogger.logError("AIDebugCommand", "resetCounters", e);
+            context.getSource().sendError(Component.literal("Failed to reset counters: " + e.getMessage()));
+            return 0;
+        }
+    }
+    
+    private static int showStats(CommandContext<ServerCommandSource> context) {
+        try {
+            var stats = AIDebugLogger.getEventStats();
+            
+            context.getSource().sendFeedback(() -> Component.literal("=== AI Debug Statistics ===\n")
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.AQUA)), false);
+                    
+            context.getSource().sendFeedback(() -> Component.literal("Tension Events: " + stats.get("tension_events"))
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.WHITE)), false);
+                    
+            context.getSource().sendFeedback(() -> Component.literal("Storm Events: " + stats.get("storm_events"))
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.WHITE)), false);
+                    
+            context.getSource().sendFeedback(() -> Component.literal("Error Events: " + stats.get("error_events"))
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.WHITE)), false);
+                    
+            context.getSource().sendFeedback(() -> Component.literal("Ritual Events: " + stats.get("ritual_events"))
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.WHITE)), false);
+                    
+            context.getSource().sendFeedback(() -> Component.literal("Last Tension Threshold: " + stats.get("last_tension_threshold"))
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.WHITE)), false);
+                
+            return 1;
+        } catch (Exception e) {
+            AIDebugLogger.logError("AIDebugCommand", "showStats", e);
+            context.getSource().sendError(Component.literal("Failed to retrieve stats: " + e.getMessage()));
+            return 0;
+        }
+    }
+    
+    private static int runTest(CommandContext<ServerCommandSource> context) {
+        try {
+            context.getSource().sendFeedback(() -> Component.literal("Running AI Debug test sequence...")
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.AQUA)), true);
+            
+            // Test tension logging
+            AIDebugLogger.logTensionChange("TEST_COMMAND", 0.5, 1.5, "Test tension increase");
+            
+            // Test storm logging
+            var world = context.getSource().getWorld();
+            AIDebugLogger.logStormEvent("TEST_STORM", world, 1.5, "Test storm trigger");
+            
+            // Test ritual logging
+            AIDebugLogger.logRitualEvent("TEST_RITUAL", "TEST_ACTION", true,
+                "test_param", "test_value",
+                "timestamp", System.currentTimeMillis());
+            
+            // Test performance logging
+            AIDebugLogger.logPerformance("TEST_COMPONENT", "testOperation", 5,
+                "test_metric", 100,
+                "another_metric", "test_data");
+            
+            // Test error logging (without actual error)
+            AIDebugLogger.logError("TEST_COMPONENT", "testOperation", 
+                new RuntimeException("This is a test error for AI debugging"),
+                "test_context", "test_value");
+            
+            context.getSource().sendFeedback(() -> Component.literal("AI Debug test sequence completed. Check logs for output.")
+                    .withStyle(style -> style.withColor(net.minecraft.ChatFormatting.GREEN)), true);
+                
+            return 1;
+        } catch (Exception e) {
+            AIDebugLogger.logError("AIDebugCommand", "runTest", e);
+            context.getSource().sendError(Component.literal("Test failed: " + e.getMessage()));
+            return 0;
+        }
+    }
+}

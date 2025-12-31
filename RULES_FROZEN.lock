@@ -1,0 +1,4 @@
+UTD MOD RULE FREEZE ACTIVE
+Version: V1.3
+All core design rules are frozen.
+Any modification requires explicit version increment.

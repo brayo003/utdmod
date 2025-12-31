@@ -1,0 +1,6 @@
+package com.utdmod;
+public class UTDAPI {
+    public static double getTension() {
+        return com.utdmod.signals.TensionManager.getTension();
+    }
+}

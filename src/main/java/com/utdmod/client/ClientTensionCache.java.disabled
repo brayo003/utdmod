@@ -1,0 +1,28 @@
+package com.utdmod.client;
+
+import com.utdmod.network.TensionSyncPayload;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+
+@Environment(EnvType.CLIENT)
+public class ClientTensionCache {
+private static double currentTension = 0.5;
+private static long lastWorldTime = 0;
+
+public static void initialize() {
+    ClientPlayNetworking.registerGlobalReceiver(TensionSyncPayload.ID, 
+        (payload, context) -> {
+            currentTension = payload.tension();
+            lastWorldTime = payload.worldTime();
+        });
+}
+
+public static double getCurrentTension() {
+    return currentTension;
+}
+
+public static long getLastWorldTime() {
+    return lastWorldTime;
+}
+
+
+}

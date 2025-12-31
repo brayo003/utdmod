@@ -1,0 +1,24 @@
+package com.utdmod.network;
+
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.network.ServerPlayerEntity;
+
+public class ServerTensionSync {
+public static void initialize() {
+PayloadTypeRegistry.playS2C().register(TensionSyncPacket.ID, TensionSyncPacket.CODEC);
+}
+
+public static void syncTensionToPlayer(ServerPlayerEntity player, double tension) {
+    ServerPlayNetworking.send(player, new TensionSyncPacket(tension));
+}
+
+public static void syncTensionToAllPlayers(Iterable<ServerPlayerEntity> players, double tension) {
+    TensionSyncPacket packet = new TensionSyncPacket(tension);
+    for (ServerPlayerEntity player : players) {
+        ServerPlayNetworking.send(player, packet);
+    }
+}
+
+
+}

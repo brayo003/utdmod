@@ -1,0 +1,10 @@
+package com.utdmod.signals;
+
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+
+public class TensionWorldEffects {
+    public static void update(ServerWorld world) {
+        // Placeholder
+    }
+}

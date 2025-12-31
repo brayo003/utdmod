@@ -1,0 +1,55 @@
+package com.utdmod.net;
+
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
+import com.utdmod.signals.TensionManager;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class MultiplayerTensionBlend {
+
+    private static final Map<ResourceKey<Biome>, Double> BIOME_MULTIPLIERS = new HashMap<>();
+
+    static {
+        BIOME_MULTIPLIERS.put(Biome.PLAINS, 1.0);
+        BIOME_MULTIPLIERS.put(Biome.DESERT, 1.2);
+        BIOME_MULTIPLIERS.put(Biome.SWAMP, 1.4);
+        BIOME_MULTIPLIERS.put(Biome.JUNGLE, 1.5);
+        BIOME_MULTIPLIERS.put(Biome.DEEP_DARK, 2.0);
+        BIOME_MULTIPLIERS.put(Biome.SNOWY_PLAINS, 0.8);
+        BIOME_MULTIPLIERS.put(Biome.BEACH, 0.7);
+    }
+
+    private static final double BASE_MULTIPLIER = 1.0;
+
+    public static void blendTension(ServerLevel world) {
+        if (world.getServer().getTickCount() % 20 != 0) return;
+        double totalBlendedTension = 0.0;
+        for (ServerPlayer player : world.players()) {
+            double playerBaseTension = getPlayerBaseTension(player);
+            double biomeMultiplier = getBiomeTensionMultiplier(world, player.blockPosition());
+            double playerScaledTension = playerBaseTension * biomeMultiplier;
+            totalBlendedTension += playerScaledTension;
+        }
+        if (!world.players().isEmpty()) totalBlendedTension /= world.players().size();
+        TensionManager.setTension(totalBlendedTension);
+    }
+
+    private static double getPlayerBaseTension(ServerPlayer player) {
+        return Math.random() * 0.5 + 0.5;
+    }
+
+    private static double getBiomeTensionMultiplier(ServerLevel world, BlockPos pos) {
+        var biomeHolder = world.getBiome(pos);
+        if (biomeHolder.isBound() && biomeHolder.unwrapKey().isPresent()) {
+            ResourceKey<Biome> biomeKey = biomeHolder.unwrapKey().get();
+            return BIOME_MULTIPLIERS.getOrDefault(biomeKey, BASE_MULTIPLIER);
+        }
+        return BASE_MULTIPLIER;
+    }
+}

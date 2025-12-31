@@ -1,0 +1,17 @@
+package com.utdmod.client;
+
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import com.utdmod.signals.PlayerStateTension;
+import com.utdmod.signals.BiomeTensionEffects;
+import com.utdmod.rituals.RitualManager;
+
+@Environment(EnvType.CLIENT)
+public class ClientTickRouter {
+    public static void register() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            PlayerStateTension.onClientTick();
+            BiomeTensionEffects.onClientTick();
+            RitualManager.onClientTick();
+        });
+    }
+}

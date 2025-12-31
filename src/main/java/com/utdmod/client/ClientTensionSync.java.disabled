@@ -1,0 +1,22 @@
+package com.utdmod.client;
+
+import com.utdmod.network.TensionSyncPacket;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+
+@Environment(EnvType.CLIENT)
+public class ClientTensionSync {
+private static double syncedTension = 0.5;
+
+public static void initialize() {
+    ClientPlayNetworking.registerGlobalReceiver(TensionSyncPacket.ID, 
+        (packet, context) -> {
+            syncedTension = packet.tension();
+        });
+}
+
+public static double getSyncedTension() {
+    return syncedTension;
+}
+
+
+}

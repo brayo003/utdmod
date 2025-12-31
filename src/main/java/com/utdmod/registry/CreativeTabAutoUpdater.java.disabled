@@ -1,0 +1,50 @@
+package com.utdmod.registry;
+
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+
+Automatically discovers and adds new utdmod items/blocks to creative tab
+*/
+public class CreativeTabAutoUpdater {
+private static final Logger LOGGER = LoggerFactory.getLogger("UTD-CreativeTab");
+private static final Set<Identifier> alreadyAdded = new HashSet<>();
+
+public static void scanAndUpdateCreativeTab() {
+int addedCount = 0;
+for (RegistryKey<Item> key : Registries.ITEM.getKeys()) {
+Identifier id = key.getValue();
+if (id.getNamespace().equals("utdmod") && !alreadyAdded.contains(id)) {
+Item item = Registries.ITEM.get(id);
+ModItemGroups.addItem(new ItemStack(item));
+alreadyAdded.add(id);
+LOGGER.debug("Auto-added item to creative tab: {}", id);
+}
+}
+if (addedCount > 0) {
+LOGGER.info("CreativeTabUpdater: Added {} new items to UTD_GROUP", addedCount);
+}
+}
+
+public static void updateNow() {
+scanAndUpdateCreativeTab();
+}
+
+public static void clearCache() {
+alreadyAdded.clear();
+LOGGER.info("CreativeTabUpdater cache cleared");
+}
+
+public static int getDiscoveredCount() {
+return alreadyAdded.size();
+}
+}

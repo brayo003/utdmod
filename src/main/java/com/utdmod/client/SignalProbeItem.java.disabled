@@ -1,0 +1,206 @@
+package com.utdmod.items;
+
+import com.utdmod.signals.BiomeResponder;
+import com.utdmod.signals.BiomeCategories;
+import com.utdmod.signals.TensionManager;
+import com.utdmod.signals.PlayerStateTension;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.biome.Biome;
+
+@Environment(EnvType.CLIENT)
+public class SignalProbeItem extends Item {
+private static final int COOLDOWN = 20;
+private static double lastTension = 0.5;
+
+public SignalProbeItem(Settings settings) {
+    super(settings);
+}
+
+@Override
+public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    if (world.isClient) return TypedActionResult.success(user.getStackInHand(hand));
+    ServerWorld serverWorld = (ServerWorld) world;
+    BlockPos playerPos = user.getBlockPos();
+
+    double globalTension = TensionManager.getTension();
+    double biomeTension = BiomeResponder.getBiomeTension(world, playerPos);
+    double playerTension = PlayerStateTension.calculatePlayerTension(user);
+
+    String trend = calculateTrend(globalTension);
+    Formatting trendColor = getTrendColor(trend);
+
+    RegistryEntry<Biome> biomeEntry = world.getBiome(playerPos);
+    BiomeCategories biomeCategory = BiomeCategories.fromBiome(biomeEntry);
+    String biomeName = getBiomeName(biomeEntry);
+
+    user.sendMessage(Text.literal("╔════════════════════════════╗").formatted(Formatting.GOLD), false);
+    user.sendMessage(Text.literal("║   UTD SIGNAL PROBE v2.0   ║").formatted(Formatting.GOLD, Formatting.BOLD), false);
+    user.sendMessage(Text.literal("╚════════════════════════════╝").formatted(Formatting.GOLD), false);
+
+    Formatting tensionColor = getTensionColor(globalTension);
+    String tensionLevel = getTensionDescription(globalTension);
+    user.sendMessage(Text.literal(""), false);
+    user.sendMessage(Text.literal("⚡ Global Tension: ")
+        .formatted(Formatting.YELLOW)
+        .append(Text.literal(String.format("%.3f", globalTension)).formatted(tensionColor, Formatting.BOLD))
+        .append(Text.literal(" [" + tensionLevel + "]").formatted(Formatting.GRAY)), false);
+
+    user.sendMessage(Text.literal("   Trend: ").formatted(Formatting.GRAY)
+        .append(Text.literal(trend).formatted(trendColor)), false);
+
+    user.sendMessage(Text.literal(""), false);
+    user.sendMessage(Text.literal("🌍 Biome Analysis:").formatted(Formatting.AQUA), false);
+    user.sendMessage(Text.literal("   Name: ").formatted(Formatting.GRAY)
+        .append(Text.literal(biomeName).formatted(Formatting.WHITE)), false);
+    user.sendMessage(Text.literal("   Category: ").formatted(Formatting.GRAY)
+        .append(Text.literal(biomeCategory.name()).formatted(Formatting.YELLOW)), false);
+    user.sendMessage(Text.literal("   Base Tension: ").formatted(Formatting.GRAY)
+        .append(Text.literal(String.format("%.2f", biomeTension)).formatted(getBiomeTensionColor(biomeTension))), false);
+
+    user.sendMessage(Text.literal(""), false);
+    user.sendMessage(Text.literal("👤 Player State:").formatted(Formatting.GREEN), false);
+    user.sendMessage(Text.literal("   Health: ").formatted(Formatting.GRAY)
+        .append(Text.literal(String.format("%.1f/%.1f", user.getHealth(), user.getMaxHealth())).formatted(getHealthColor(user))), false);
+    user.sendMessage(Text.literal("   Hunger: ").formatted(Formatting.GRAY)
+        .append(Text.literal(String.valueOf(user.getHungerManager().getFoodLevel()) + "/20").formatted(getHungerColor(user))), false);
+    user.sendMessage(Text.literal("   Contribution: ").formatted(Formatting.GRAY)
+        .append(Text.literal(String.format("%.3f", playerTension)).formatted(getTensionColor(playerTension))), false);
+
+    user.sendMessage(Text.literal(""), false);
+    user.sendMessage(Text.literal("📍 Position: ").formatted(Formatting.DARK_GRAY)
+        .append(Text.literal(String.format("X:%d Y:%d Z:%d", playerPos.getX(), playerPos.getY(), playerPos.getZ())).formatted(Formatting.GRAY)), false);
+
+    user.sendMessage(Text.literal(""), false);
+    displayWarnings(user, globalTension, biomeTension, biomeCategory);
+
+    spawnProbeParticles(serverWorld, user);
+    playProbeSound(world, playerPos, globalTension);
+
+    lastTension = globalTension;
+    user.getItemCooldownManager().set(this, COOLDOWN);
+
+    return TypedActionResult.success(user.getStackInHand(hand));
+}
+
+private String calculateTrend(double currentTension) {
+    double delta = currentTension - lastTension;
+    if (Math.abs(delta) < 0.01) return "◆ Stable";
+    if (delta > 0) return "▲ Rising";
+    return "▼ Falling";
+}
+
+private Formatting getTrendColor(String trend) {
+    if (trend.contains("Rising")) return Formatting.RED;
+    if (trend.contains("Falling")) return Formatting.GREEN;
+    return Formatting.YELLOW;
+}
+
+private void displayWarnings(PlayerEntity player, double globalTension, double biomeTension, BiomeCategories biome) {
+    boolean hasWarnings = false;
+    if (globalTension >= 0.9) {
+        player.sendMessage(Text.literal("⚠ CRITICAL: Extreme tension detected!").formatted(Formatting.DARK_RED, Formatting.BOLD), false);
+        hasWarnings = true;
+    } else if (globalTension >= 0.75) {
+        player.sendMessage(Text.literal("⚠ WARNING: High tension - storm imminent").formatted(Formatting.RED), false);
+        hasWarnings = true;
+    }
+    if (biomeTension >= 0.8) {
+        player.sendMessage(Text.literal("⚠ CAUTION: High-tension biome detected").formatted(Formatting.GOLD), false);
+        hasWarnings = true;
+    }
+    if (globalTension <= 0.25) {
+        player.sendMessage(Text.literal("✓ SAFE: Low tension - conditions stable").formatted(Formatting.DARK_GREEN), false);
+        hasWarnings = true;
+    }
+    switch (biome) {
+        case NETHER, THEEND -> player.sendMessage(Text.literal("⚠ Extreme environment - tension amplified").formatted(Formatting.DARK_RED), false);
+        case DESERT, JUNGLE -> player.sendMessage(Text.literal("⚠ Harsh biome - increased tension effects").formatted(Formatting.GOLD), false);
+    }
+    if (!hasWarnings) player.sendMessage(Text.literal("✓ No anomalies detected").formatted(Formatting.GREEN), false);
+}
+
+private void spawnProbeParticles(ServerWorld world, PlayerEntity player) {
+    double tension = TensionManager.getTension();
+    BlockPos pos = player.getBlockPos();
+    for (int i = 0; i < 12; i++) {
+        double angle = (Math.PI * 2 * i) / 12;
+        double radius = 1.0;
+        double x = pos.getX() + 0.5 + Math.cos(angle) * radius;
+        double z = pos.getZ() + 0.5 + Math.sin(angle) * radius;
+        double y = pos.getY() + 1.5;
+        if (tension > 0.7) world.spawnParticles(ParticleTypes.FLAME, x, y, z, 1, 0, 0, 0, 0);
+        else if (tension < 0.3) world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, x, y, z, 1, 0, 0, 0, 0);
+        else world.spawnParticles(ParticleTypes.ENCHANT, x, y, z, 1, 0, 0, 0, 0);
+    }
+}
+
+private void playProbeSound(World world, BlockPos pos, double tension) {
+    float pitch = (float)(1.0 + tension * 0.5);
+    if (tension > 0.8) world.playSound(null, pos, SoundEvents.BLOCK_BELL_USE, SoundCategory.PLAYERS, 0.5f, pitch);
+    else world.playSound(null, pos, SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 0.5f, pitch);
+}
+
+private String getBiomeName(RegistryEntry<Biome> biomeEntry) {
+    if (biomeEntry.getKey().isEmpty()) return "Unknown";
+    return biomeEntry.getKey().get().getValue().getPath().replace("_", " ").toUpperCase();
+}
+
+private String getTensionDescription(double tension) {
+    if (tension >= 0.9) return "CRITICAL";
+    if (tension >= 0.75) return "VERY HIGH";
+    if (tension >= 0.6) return "HIGH";
+    if (tension >= 0.4) return "MODERATE";
+    if (tension >= 0.25) return "LOW";
+    return "MINIMAL";
+}
+
+private Formatting getTensionColor(double tension) {
+    if (tension >= 0.9) return Formatting.DARK_RED;
+    if (tension >= 0.75) return Formatting.RED;
+    if (tension >= 0.6) return Formatting.GOLD;
+    if (tension >= 0.4) return Formatting.YELLOW;
+    if (tension >= 0.25) return Formatting.GREEN;
+    return Formatting.DARK_GREEN;
+}
+
+private Formatting getBiomeTensionColor(double tension) {
+    if (tension >= 0.8) return Formatting.RED;
+    if (tension >= 0.6) return Formatting.GOLD;
+    if (tension >= 0.4) return Formatting.YELLOW;
+    return Formatting.GREEN;
+}
+
+private Formatting getHealthColor(PlayerEntity player) {
+    float healthPercent = player.getHealth() / player.getMaxHealth();
+    if (healthPercent < 0.3f) return Formatting.RED;
+    if (healthPercent < 0.6f) return Formatting.YELLOW;
+    return Formatting.GREEN;
+}
+
+private Formatting getHungerColor(PlayerEntity player) {
+    int hunger = player.getHungerManager().getFoodLevel();
+    if (hunger < 6) return Formatting.RED;
+    if (hunger < 12) return Formatting.YELLOW;
+    return Formatting.GREEN;
+}
+
+@Override
+public boolean hasGlint(ItemStack stack) {
+    return TensionManager.getTension() >= 0.9;
+}
+
+
+}

@@ -1,0 +1,10 @@
+package com.utdmod.tension;
+
+import net.minecraft.server.level.ServerLevel;
+
+public class UTDDiagnostics {
+public static void tick(ServerWorld world) {
+// Placeholder: diagnostics logic
+System.out.println("UTD tick in world " + world.toString());
+}
+}

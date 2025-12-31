@@ -1,0 +1,17 @@
+package com.utdmod.probe;
+
+import com.utdmod.TensionManager;
+import com.utdmod.UTDMod;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+
+public class ProbeHandler {
+    public static long lastProbeTime = -1;
+    public static void onProbeUse(PlayerEntity player, ItemStack stack) {
+        lastProbeTime = player.getWorld().getTime();
+        double tension = TensionManager.getGlobalTension();
+        UTDMod.LOGGER.info("[PROBE] Player {} checked tension: {}", player.getName().getString(), tension);
+        player.sendMessage(Text.literal("Tension: " + String.format("%.2f", tension)), false);
+    }
+}

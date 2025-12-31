@@ -1,0 +1,436 @@
+
+> Configure project :
+Fabric Loom: 1.6.12
+Not publishing sources jar as it was not found. Use java.withSourcesJar() to fix.
+
+> Task :compileJava FAILED
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol
+import net.minecraft.client.MinecraftClient;
+                           ^
+  symbol:   class MinecraftClient
+  location: package net.minecraft.client
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist
+import net.minecraft.client.util.math.MatrixStack;
+                                     ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol
+import net.minecraft.client.gui.DrawContext;
+                               ^
+  symbol:   class DrawContext
+  location: package net.minecraft.client.gui
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol
+    public void onHudRender(DrawContext context, float tickDelta) {
+                            ^
+  symbol:   class DrawContext
+  location: class TensionHud
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/storm/StormManager.java:5: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/storm/StormManager.java:9: error: cannot find symbol
+    public static void tick(ServerWorld world) {
+                            ^
+  symbol:   class ServerWorld
+  location: class StormManager
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:3: error: package net.minecraft.block does not exist
+import net.minecraft.block.Block;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:4: error: package net.minecraft.block does not exist
+import net.minecraft.block.BlockState;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:5: error: package net.minecraft.entity.player does not exist
+import net.minecraft.entity.player.PlayerEntity;
+                                  ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:6: error: cannot find symbol
+import net.minecraft.util.ActionResult;
+                         ^
+  symbol:   class ActionResult
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:7: error: cannot find symbol
+import net.minecraft.util.Hand;
+                         ^
+  symbol:   class Hand
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:8: error: package net.minecraft.util.hit does not exist
+import net.minecraft.util.hit.BlockHitResult;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:9: error: package net.minecraft.util.math does not exist
+import net.minecraft.util.math.BlockPos;
+                              ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:10: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:13: error: cannot find symbol
+public class RitualBlock extends Block {
+                                 ^
+  symbol: class Block
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:14: error: cannot find symbol
+    public RitualBlock(Settings settings) {
+                       ^
+  symbol:   class Settings
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:19: error: cannot find symbol
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, 
+                              ^
+  symbol:   class BlockState
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:19: error: cannot find symbol
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, 
+                                                ^
+  symbol:   class World
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:19: error: cannot find symbol
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, 
+                                                             ^
+  symbol:   class BlockPos
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:20: error: cannot find symbol
+                             PlayerEntity player, Hand hand, BlockHitResult hit) {
+                             ^
+  symbol:   class PlayerEntity
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:20: error: cannot find symbol
+                             PlayerEntity player, Hand hand, BlockHitResult hit) {
+                                                  ^
+  symbol:   class Hand
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:20: error: cannot find symbol
+                             PlayerEntity player, Hand hand, BlockHitResult hit) {
+                                                             ^
+  symbol:   class BlockHitResult
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:19: error: cannot find symbol
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, 
+           ^
+  symbol:   class ActionResult
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:3: error: package net.minecraft.entity.player does not exist
+import net.minecraft.entity.player.PlayerEntity;
+                                  ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:4: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:5: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemStack;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:6: error: cannot find symbol
+import net.minecraft.util.Hand;
+                         ^
+  symbol:   class Hand
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:7: error: cannot find symbol
+import net.minecraft.util.TypedActionResult;
+                         ^
+  symbol:   class TypedActionResult
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:8: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:11: error: cannot find symbol
+public class SignalProbeItem extends Item {
+                                     ^
+  symbol: class Item
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:12: error: cannot find symbol
+    public SignalProbeItem(Settings settings) {
+                           ^
+  symbol:   class Settings
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:17: error: cannot find symbol
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+                                            ^
+  symbol:   class World
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:17: error: cannot find symbol
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+                                                         ^
+  symbol:   class PlayerEntity
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:17: error: cannot find symbol
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+                                                                            ^
+  symbol:   class Hand
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:17: error: cannot find symbol
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+           ^
+  symbol:   class TypedActionResult
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:17: error: cannot find symbol
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+                             ^
+  symbol:   class ItemStack
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/debug/UTDDiagnostics.java:3: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/debug/UTDDiagnostics.java:7: error: cannot find symbol
+    public static void tick(ServerWorld world) {
+                            ^
+  symbol:   class ServerWorld
+  location: class UTDDiagnostics
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:5: error: package net.minecraft.entity.player does not exist
+import net.minecraft.entity.player.PlayerEntity;
+                                  ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:6: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:7: error: package net.minecraft.text does not exist
+import net.minecraft.text.Text;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:15: error: cannot find symbol
+    public static void performRitual(ServerWorld world, PlayerEntity player) {
+                                     ^
+  symbol:   class ServerWorld
+  location: class RitualHandler
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:15: error: cannot find symbol
+    public static void performRitual(ServerWorld world, PlayerEntity player) {
+                                                        ^
+  symbol:   class PlayerEntity
+  location: class RitualHandler
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/biome/BiomeTensionEffects.java:3: error: cannot find symbol
+import net.minecraft.client.MinecraftClient;
+                           ^
+  symbol:   class MinecraftClient
+  location: package net.minecraft.client
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/PlayerStateTension.java:4: error: package net.minecraft.entity.player does not exist
+import net.minecraft.entity.player.PlayerEntity;
+                                  ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/PlayerStateTension.java:5: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/PlayerStateTension.java:6: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/PlayerStateTension.java:14: error: cannot find symbol
+    public static void updatePlayer(PlayerEntity player) {
+                                    ^
+  symbol:   class PlayerEntity
+  location: class PlayerStateTension
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/TensionManager.java:4: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/TensionWorldEffects.java:4: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/TensionWorldEffects.java:5: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/TensionWorldEffects.java:9: error: cannot find symbol
+    public static void update(World world, double tension) {
+                              ^
+  symbol:   class World
+  location: class TensionWorldEffects
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:3: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.RegistryKey;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:4: error: package net.minecraft.world.biome does not exist
+import net.minecraft.world.biome.Biome;
+                                ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:5: error: package net.minecraft.world.biome does not exist
+import net.minecraft.world.biome.BiomeKeys;
+                                ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:6: error: cannot find symbol
+import net.minecraft.util.Identifier;
+                         ^
+  symbol:   class Identifier
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:7: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:11: error: cannot find symbol
+    public static void respond(World world, BlockPos pos) {
+                               ^
+  symbol:   class World
+  location: class BiomeResponder
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:11: error: cannot find symbol
+    public static void respond(World world, BlockPos pos) {
+                                            ^
+  symbol:   class BlockPos
+  location: class BiomeResponder
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:5: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemGroup;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:6: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemStack;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:7: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registries;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:8: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registry;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:9: error: package net.minecraft.text does not exist
+import net.minecraft.text.Text;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:10: error: cannot find symbol
+import net.minecraft.util.Identifier;
+                         ^
+  symbol:   class Identifier
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:13: error: cannot find symbol
+    public static final ItemGroup UTD_GROUP = Registry.register(Registries.ITEM_GROUP,
+                        ^
+  symbol:   class ItemGroup
+  location: class ModItemGroup
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/WardingCrystal.java:3: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/WardingCrystal.java:10: error: cannot find symbol
+public class WardingCrystal extends Item {
+                                    ^
+  symbol: class Item
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/WardingCrystal.java:13: error: cannot find symbol
+    public WardingCrystal(Settings settings) {
+                          ^
+  symbol:   class Settings
+  location: class WardingCrystal
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:6: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:7: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registries;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:8: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registry;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:9: error: cannot find symbol
+import net.minecraft.util.Identifier;
+                         ^
+  symbol:   class Identifier
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:19: error: cannot find symbol
+    public static final Item SIGNAL_PROBE = registerItem("signal_probe",
+                        ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:23: error: cannot find symbol
+    public static final Item WARDING_CRYSTAL = registerItem("warding_crystal",
+                        ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:28: error: cannot find symbol
+    private static Item registerItem(String name, Item item) {
+                                                  ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:28: error: cannot find symbol
+    private static Item registerItem(String name, Item item) {
+                   ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:6: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:7: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registry;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:8: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registries;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:9: error: cannot find symbol
+import net.minecraft.util.Identifier;
+                         ^
+  symbol:   class Identifier
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:13: error: cannot find symbol
+    public static final Item SIGNAL_PROBE = new SignalProbeItem(new Item.Settings().maxCount(1));
+                        ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:14: error: cannot find symbol
+    public static final Item WARDING_CRYSTAL = new WardingCrystal(new Item.Settings());
+                        ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:5: error: package net.minecraft.block does not exist
+import net.minecraft.block.Block;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:6: error: package net.minecraft.item does not exist
+import net.minecraft.item.BlockItem;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:7: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:8: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registry;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:9: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registries;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:10: error: cannot find symbol
+import net.minecraft.util.Identifier;
+                         ^
+  symbol:   class Identifier
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:14: error: cannot find symbol
+    public static final Block RITUAL_BLOCK = new RitualBlock(Block.Settings.create().strength(1.0f));
+                        ^
+  symbol:   class Block
+  location: class ModBlocks
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/tension/UTDDiagnostics.java:3: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/tension/UTDDiagnostics.java:7: error: cannot find symbol
+    public static void tick(ServerWorld world) {
+                            ^
+  symbol:   class ServerWorld
+  location: class UTDDiagnostics
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/tension/TensionWorldEffects.java:3: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/tension/TensionWorldEffects.java:7: error: cannot find symbol
+    public static void update(ServerWorld world) {
+                              ^
+  symbol:   class ServerWorld
+  location: class TensionWorldEffects
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/net/MultiplayerTensionBlend.java:3: error: cannot find symbol
+import net.minecraft.server.network.ServerPlayerEntity;
+                                   ^
+  symbol:   class ServerPlayerEntity
+  location: package net.minecraft.server.network
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/net/MultiplayerTensionBlend.java:4: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/net/MultiplayerTensionBlend.java:9: error: cannot find symbol
+public static double compute(ServerWorld world, double baseTension) {
+                             ^
+  symbol:   class ServerWorld
+  location: class MultiplayerTensionBlend
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/probe/ProbeHandler.java:5: error: package net.minecraft.entity.player does not exist
+import net.minecraft.entity.player.PlayerEntity;
+                                  ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/probe/ProbeHandler.java:6: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemStack;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/probe/ProbeHandler.java:7: error: package net.minecraft.text does not exist
+import net.minecraft.text.Text;
+                         ^
+100 errors
+only showing the first 100 errors, of 102 total; use -Xmaxerrs if you would like to see more
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.6/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 6s
+1 actionable task: 1 executed

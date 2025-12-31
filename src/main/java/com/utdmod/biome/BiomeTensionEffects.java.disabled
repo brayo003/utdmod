@@ -1,0 +1,12 @@
+package com.utdmod.biome;
+
+import net.minecraft.client.MinecraftClient;
+
+public class BiomeTensionEffects {
+
+    public static boolean isInsideTenseBiome() {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null) return false;
+        return mc.player.getBlockPos().getY() < 50;
+    }
+}

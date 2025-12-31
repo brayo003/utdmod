@@ -1,0 +1,35 @@
+=== GRADLE BUILD CHECK REPORT ===
+Session ID: 20251207_011146
+Timestamp: Sun Dec  7 01:12:09 AM EAT 2025
+Project: /home/lenovo/Projects/mods/new_world
+
+BUILD SUMMARY:
+Status: success
+Duration: 23257ms
+Total Steps: 8
+Successful: 2
+Failed: 4
+Errors: 4
+Warnings: 2
+
+STEP DETAILS:
+- clean: success (3136ms)
+- clean: warning (3136ms)
+- compile_java: error (5380ms)
+- process_resources: success (1932ms)
+- process_resources: warning (1932ms)
+- classes: error (4595ms)
+- jar: error (2765ms)
+- build: error (2933ms)
+
+ERRORS:
+- compile_java: Step failed with exit code 0
+- classes: Step failed with exit code 0
+- jar: Step failed with exit code 0
+- build: Step failed with exit code 0
+
+FILES:
+Build Log: /home/lenovo/Projects/mods/new_world/build_logs/gradle_build_20251207_011146.log
+JSON Log: /home/lenovo/Projects/mods/new_world/build_json/build_result_20251207_011146.json
+Summary: /home/lenovo/Projects/mods/new_world/build_json/latest_build_summary.json
+

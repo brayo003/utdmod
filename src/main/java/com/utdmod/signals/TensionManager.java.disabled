@@ -1,0 +1,58 @@
+package com.utdmod.signals;
+
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import com.utdmod.network.TensionSyncPayload;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+
+public class TensionManager {
+
+// VARIABLES
+private static double globalTension = 0.0;
+private static final double MAX_TENSION = 1.0;
+
+// Constant: How much block manipulation contributes to tension per event
+private static final double BLOCK_MANIPULATION_TENSION_RATE = 0.005; // 0.5% per block
+
+// CORE ACCESSORS
+public static double getTension() {
+    return globalTension;
+}
+
+public static void setTension(double newTension) {
+    globalTension = Math.min(newTension, MAX_TENSION);
+}
+
+// --- PLAYER EVENT TRIGGERS ---
+
+public static void onBlockPlaced(ServerPlayer player) {
+    increaseTension(BLOCK_MANIPULATION_TENSION_RATE);
+    player.server.getLogger().info("UTD Tension: {} placed a block. Tension increased to {}",
+        player.getName().getString(), globalTension);
+}
+
+public static void onBlockDestroyed(ServerPlayer player) {
+    increaseTension(BLOCK_MANIPULATION_TENSION_RATE);
+    player.server.getLogger().info("UTD Tension: {} destroyed a block. Tension increased to {}",
+        player.getName().getString(), globalTension);
+}
+
+// HELPER METHOD
+private static void increaseTension(double amount) {
+    setTension(globalTension + amount);
+}
+
+// --- SYNCHRONIZATION FOR MULTIPLAYER ---
+
+public static void syncTensionToPlayers(ServerLevel world) {
+    TensionSyncPayload packet = new TensionSyncPayload(globalTension, world.getTime());
+    world.getPlayers().forEach(player ->
+        ServerPlayNetworking.send(player, packet)
+    );
+}
+
+// Call syncTensionToPlayers(world) wherever tension changes significantly in tick or event logic
+
+
+}

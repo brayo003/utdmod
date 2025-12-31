@@ -1,0 +1,818 @@
+=== DIRECTORY TREE ===
+.
+├── BiomeCategories.java
+├── BiomeResponder.java
+├── build
+│   ├── classes
+│   │   └── java
+│   │       └── main
+│   ├── generated
+│   │   └── sources
+│   │       ├── annotationProcessor
+│   │       └── headers
+│   ├── loom-cache
+│   └── tmp
+│       └── compileJava
+├── build_and_run_mod.sh
+├── build.gradle
+├── build_log_20251206_170037.log
+├── build_log_20251206_170130.log
+├── check_mod.sh
+├── create_valid_textures.py
+├── DebugLagTest.java
+├── deps_check_20251206_174854.log
+├── deps_check.sh
+├── deps.txt
+├── download_all_deps.sh
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradle.properties
+├── gradlew
+├── lag_debug.log
+├── LICENSE
+├── mc_run.log
+├── minecraft_log.txt
+├── mod_run_20251206_160516.log
+├── nether_overhaul_config.py
+├── nether_overhaul_main.py
+├── nether_overhaul_runtime.py
+├── net.minecraft.text.Text
+├── ProbeHandler.java
+├── PROJECT_DUMP.txt
+├── PROJECT_STATUS.txt
+├── RitualHandler.java
+├── run
+│   ├── command_history.txt
+│   ├── config
+│   │   └── fabric
+│   │       └── indigo-renderer.properties
+│   ├── crash-reports
+│   │   └── crash-2025-12-04_17.43.48-client.txt
+│   ├── data
+│   │   └── fabricDefaultResourcePacks.dat
+│   ├── downloads
+│   │   └── log.json
+│   ├── hs_err_pid308434.log
+│   ├── logs
+│   │   ├── 2025-12-03-1.log.gz
+│   │   ├── 2025-12-03-2.log.gz
+│   │   ├── 2025-12-03-3.log.gz
+│   │   ├── 2025-12-03-4.log.gz
+│   │   ├── 2025-12-03-5.log.gz
+│   │   ├── 2025-12-03-6.log.gz
+│   │   ├── 2025-12-04-1.log.gz
+│   │   ├── 2025-12-04-2.log.gz
+│   │   ├── 2025-12-04-3.log.gz
+│   │   ├── 2025-12-04-4.log.gz
+│   │   ├── 2025-12-04-5.log.gz
+│   │   ├── 2025-12-04-6.log.gz
+│   │   ├── 2025-12-05-1.log.gz
+│   │   ├── 2025-12-05-2.log.gz
+│   │   ├── 2025-12-05-3.log.gz
+│   │   ├── 2025-12-05-4.log.gz
+│   │   ├── 2025-12-05-5.log.gz
+│   │   ├── 2025-12-05-6.log.gz
+│   │   ├── 2025-12-06-1.log.gz
+│   │   ├── 2025-12-06-2.log.gz
+│   │   ├── 2025-12-06-3.log.gz
+│   │   ├── 2025-12-06-4.log.gz
+│   │   ├── 2025-12-06-5.log.gz
+│   │   ├── debug-1.log.gz
+│   │   ├── debug-2.log.gz
+│   │   ├── debug-3.log.gz
+│   │   ├── debug-4.log.gz
+│   │   ├── debug-5.log.gz
+│   │   ├── debug.log
+│   │   ├── latest.log
+│   │   └── telemetry
+│   ├── mods
+│   ├── options.txt
+│   ├── resourcepacks
+│   ├── resources
+│   ├── saves
+│   │   └── check mod
+│   │       ├── advancements
+│   │       ├── data
+│   │       ├── datapacks
+│   │       ├── DIM-1
+│   │       ├── DIM1
+│   │       ├── entities
+│   │       ├── icon.png
+│   │       ├── level.dat
+│   │       ├── level.dat_old
+│   │       ├── playerdata
+│   │       ├── poi
+│   │       ├── region
+│   │       ├── session.lock
+│   │       └── stats
+│   └── usercache.json
+├── run_mod.sh
+├── settings.gradle
+├── setup_resources.sh
+├── src
+│   └── main
+│       ├── java
+│       │   └── com
+│       └── resources
+│           ├── assets
+│           ├── data
+│           └── fabric.mod.json
+├── StormManager.java
+├── TensionManager.java
+├── update_build_and_rebuild.sh
+├── utd_debug.log
+├── utd_diag.log
+├── utd_final.log
+├── utd_fixed.log
+├── utd_full_debug.log
+├── utd_full_diag.log
+├── utd_integrated.log
+├── utd_items.log
+├── UTDModInitializer.java
+├── utd_new.log
+└── verify_imports.sh
+
+43 directories, 90 files
+=== GIT STATUS ===
+=== GRADLE ERRORS (if any) ===
+
+> Configure project :
+Fabric Loom: 1.6.12
+Not publishing sources jar as it was not found. Use java.withSourcesJar() to fix.
+
+> Task :compileJava FAILED
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol
+import net.minecraft.client.MinecraftClient;
+                           ^
+  symbol:   class MinecraftClient
+  location: package net.minecraft.client
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist
+import net.minecraft.client.util.math.MatrixStack;
+                                     ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol
+import net.minecraft.client.gui.DrawContext;
+                               ^
+  symbol:   class DrawContext
+  location: package net.minecraft.client.gui
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol
+    public void onHudRender(DrawContext context, float tickDelta) {
+                            ^
+  symbol:   class DrawContext
+  location: class TensionHud
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/storm/StormManager.java:3: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/storm/StormManager.java:6: error: cannot find symbol
+public static void tick(ServerWorld world) {
+                        ^
+  symbol:   class ServerWorld
+  location: class StormManager
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/CustomBlocks.java:3: error: package net.minecraft.block does not exist
+import net.minecraft.block.Block;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/CustomBlocks.java:4: error: package net.minecraft.block does not exist
+import net.minecraft.block.Blocks;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/CustomBlocks.java:5: error: package net.minecraft.block does not exist
+import net.minecraft.block.Material;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/CustomBlocks.java:8: error: cannot find symbol
+public static final Block MYSTIC_STONE = new Block(Block.Settings.of(Material.STONE));
+                    ^
+  symbol:   class Block
+  location: class CustomBlocks
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:3: error: package net.minecraft.block does not exist
+import net.minecraft.block.Block;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:4: error: package net.minecraft.block does not exist
+import net.minecraft.block.BlockState;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:5: error: cannot find symbol
+import net.minecraft.util.ActionResult;
+                         ^
+  symbol:   class ActionResult
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:6: error: cannot find symbol
+import net.minecraft.util.Hand;
+                         ^
+  symbol:   class Hand
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:7: error: package net.minecraft.util.hit does not exist
+import net.minecraft.util.hit.BlockHitResult;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:8: error: package net.minecraft.util.math does not exist
+import net.minecraft.util.math.BlockPos;
+                              ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:9: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:10: error: package net.minecraft.entity.player does not exist
+import net.minecraft.entity.player.PlayerEntity;
+                                  ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:12: error: cannot find symbol
+public class RitualBlock extends Block {
+                                 ^
+  symbol: class Block
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:13: error: cannot find symbol
+public RitualBlock(Settings settings) {
+                   ^
+  symbol:   class Settings
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:18: error: cannot find symbol
+public ActionResult onUse(BlockState state, World world, BlockPos pos,
+                          ^
+  symbol:   class BlockState
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:18: error: cannot find symbol
+public ActionResult onUse(BlockState state, World world, BlockPos pos,
+                                            ^
+  symbol:   class World
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:18: error: cannot find symbol
+public ActionResult onUse(BlockState state, World world, BlockPos pos,
+                                                         ^
+  symbol:   class BlockPos
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:19: error: cannot find symbol
+                          PlayerEntity player, Hand hand, BlockHitResult hit) {
+                          ^
+  symbol:   class PlayerEntity
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:19: error: cannot find symbol
+                          PlayerEntity player, Hand hand, BlockHitResult hit) {
+                                               ^
+  symbol:   class Hand
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:19: error: cannot find symbol
+                          PlayerEntity player, Hand hand, BlockHitResult hit) {
+                                                          ^
+  symbol:   class BlockHitResult
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/blocks/RitualBlock.java:18: error: cannot find symbol
+public ActionResult onUse(BlockState state, World world, BlockPos pos,
+       ^
+  symbol:   class ActionResult
+  location: class RitualBlock
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/WardingCrystal.java:3: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/WardingCrystal.java:5: error: cannot find symbol
+public class WardingCrystal extends Item {
+                                    ^
+  symbol: class Item
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/WardingCrystal.java:6: error: cannot find symbol
+public WardingCrystal(Settings settings) {
+                      ^
+  symbol:   class Settings
+  location: class WardingCrystal
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/CustomItems.java:3: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/CustomItems.java:4: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemGroup;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/CustomItems.java:7: error: cannot find symbol
+public static final Item MYSTIC_GEM = new Item(new Item.Settings().group(ItemGroup.MISC));
+                    ^
+  symbol:   class Item
+  location: class CustomItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:3: error: package net.minecraft.entity.player does not exist
+import net.minecraft.entity.player.PlayerEntity;
+                                  ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:4: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:5: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemStack;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:6: error: cannot find symbol
+import net.minecraft.util.Hand;
+                         ^
+  symbol:   class Hand
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:7: error: cannot find symbol
+import net.minecraft.util.TypedActionResult;
+                         ^
+  symbol:   class TypedActionResult
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:8: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:10: error: cannot find symbol
+public class SignalProbeItem extends Item {
+                                     ^
+  symbol: class Item
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:11: error: cannot find symbol
+public SignalProbeItem(Settings settings) {
+                       ^
+  symbol:   class Settings
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:16: error: cannot find symbol
+public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+                                        ^
+  symbol:   class World
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:16: error: cannot find symbol
+public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+                                                     ^
+  symbol:   class PlayerEntity
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:16: error: cannot find symbol
+public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+                                                                        ^
+  symbol:   class Hand
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:16: error: cannot find symbol
+public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+       ^
+  symbol:   class TypedActionResult
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/items/SignalProbeItem.java:16: error: cannot find symbol
+public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+                         ^
+  symbol:   class ItemStack
+  location: class SignalProbeItem
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/debug/UTDDiagnostics.java:3: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/debug/UTDDiagnostics.java:10: error: cannot find symbol
+public static void tick(ServerWorld world) {
+                        ^
+  symbol:   class ServerWorld
+  location: class UTDDiagnostics
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:3: error: package net.minecraft.entity.player does not exist
+import net.minecraft.entity.player.PlayerEntity;
+                                  ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:4: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:5: error: package net.minecraft.text does not exist
+import net.minecraft.text.Text;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:8: error: cannot find symbol
+    public static void performRitual(ServerWorld world, PlayerEntity player) {
+                                     ^
+  symbol:   class ServerWorld
+  location: class RitualHandler
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/ritual/RitualHandler.java:8: error: cannot find symbol
+    public static void performRitual(ServerWorld world, PlayerEntity player) {
+                                                        ^
+  symbol:   class PlayerEntity
+  location: class RitualHandler
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/biome/BiomeTensionEffects.java:3: error: cannot find symbol
+import net.minecraft.client.MinecraftClient;
+                           ^
+  symbol:   class MinecraftClient
+  location: package net.minecraft.client
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/PlayerStateTension.java:3: error: package net.minecraft.entity.player does not exist
+import net.minecraft.entity.player.PlayerEntity;
+                                  ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/PlayerStateTension.java:4: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/PlayerStateTension.java:5: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/PlayerStateTension.java:8: error: cannot find symbol
+    public static void updatePlayer(PlayerEntity player) {
+                                    ^
+  symbol:   class PlayerEntity
+  location: class PlayerStateTension
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/TensionManager.java:4: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/TensionWorldEffects.java:3: error: package net.minecraft.server.world does not exist
+import net.minecraft.server.world.ServerWorld;
+                                 ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/TensionWorldEffects.java:4: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/TensionWorldEffects.java:7: error: cannot find symbol
+    public static void update(ServerWorld world) {
+                              ^
+  symbol:   class ServerWorld
+  location: class TensionWorldEffects
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:3: error: package net.minecraft.util.math does not exist
+import net.minecraft.util.math.BlockPos;
+                              ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:4: error: cannot find symbol
+import net.minecraft.world.World;
+                          ^
+  symbol:   class World
+  location: package net.minecraft.world
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:7: error: cannot find symbol
+    public static void respond(World world, BlockPos pos) {
+                               ^
+  symbol:   class World
+  location: class BiomeResponder
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/signals/BiomeResponder.java:7: error: cannot find symbol
+    public static void respond(World world, BlockPos pos) {
+                                            ^
+  symbol:   class BlockPos
+  location: class BiomeResponder
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:3: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemGroup;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:4: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemStack;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:5: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registries;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:6: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registry;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:7: error: cannot find symbol
+import net.minecraft.util.Identifier;
+                         ^
+  symbol:   class Identifier
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItemGroup.java:10: error: cannot find symbol
+public static final ItemGroup UTD_GROUP = Registry.register(Registries.ITEM_GROUP,
+                    ^
+  symbol:   class ItemGroup
+  location: class ModItemGroup
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/WardingCrystal.java:3: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/WardingCrystal.java:5: error: cannot find symbol
+public class WardingCrystal extends Item {
+                                    ^
+  symbol: class Item
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/WardingCrystal.java:6: error: cannot find symbol
+public WardingCrystal(Settings settings) {
+                      ^
+  symbol:   class Settings
+  location: class WardingCrystal
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:3: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:4: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registries;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:5: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registry;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:6: error: cannot find symbol
+import net.minecraft.util.Identifier;
+                         ^
+  symbol:   class Identifier
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:9: error: cannot find symbol
+public static final Item SIGNAL_PROBE = new Item(new Item.Settings());
+                    ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/item/ModItems.java:10: error: cannot find symbol
+public static final Item WARDING_CRYSTAL = new Item(new Item.Settings());
+                    ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItemGroups.java:3: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemGroup;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItemGroups.java:4: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemStack;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItemGroups.java:5: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registries;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItemGroups.java:6: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registry;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItemGroups.java:7: error: cannot find symbol
+import net.minecraft.util.Identifier;
+                         ^
+  symbol:   class Identifier
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItemGroups.java:11: error: cannot find symbol
+    public static ItemGroup UTD_GROUP;
+                  ^
+  symbol:   class ItemGroup
+  location: class ModItemGroups
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:3: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:4: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemGroup;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:5: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registries;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:6: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registry;
+                             ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:7: error: cannot find symbol
+import net.minecraft.util.Identifier;
+                         ^
+  symbol:   class Identifier
+  location: package net.minecraft.util
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:10: error: cannot find symbol
+public static final Item SIGNAL_PROBE = new Item(new Item.Settings().group(ItemGroup.MISC));
+                    ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModItems.java:11: error: cannot find symbol
+public static final Item WARDING_CRYSTAL = new Item(new Item.Settings().group(ItemGroup.MISC));
+                    ^
+  symbol:   class Item
+  location: class ModItems
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:3: error: package net.minecraft.block does not exist
+import net.minecraft.block.Block;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:4: error: package net.minecraft.block does not exist
+import net.minecraft.block.Material;
+                          ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:5: error: package net.minecraft.item does not exist
+import net.minecraft.item.BlockItem;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:6: error: package net.minecraft.item does not exist
+import net.minecraft.item.Item;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:7: error: package net.minecraft.item does not exist
+import net.minecraft.item.ItemGroup;
+                         ^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/registry/ModBlocks.java:8: error: package net.minecraft.registry does not exist
+import net.minecraft.registry.Registries;
+                             ^
+100 errors
+only showing the first 100 errors, of 115 total; use -Xmaxerrs if you would like to see more
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':compileJava'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:148)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:282)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:146)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:134)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:116)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: org.gradle.api.internal.tasks.compile.CompilationFailedException: Compilation failed; see the compiler error output for details.
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:61)
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:41)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.delegateAndHandleErrors(NormalizingJavaCompiler.java:98)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:38)
+	at org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:38)
+	at org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:46)
+	at org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:36)
+	at org.gradle.jvm.toolchain.internal.DefaultToolchainJavaCompiler.execute(DefaultToolchainJavaCompiler.java:57)
+	at org.gradle.api.tasks.compile.JavaCompile.lambda$createToolchainCompiler$3(JavaCompile.java:202)
+	at org.gradle.api.internal.tasks.compile.CleaningJavaCompiler.execute(CleaningJavaCompiler.java:53)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalCompilerFactory.lambda$createRebuildAllCompiler$0(IncrementalCompilerFactory.java:52)
+	at org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:70)
+	at org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:44)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:66)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:64)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:48)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler.execute(CompileJavaBuildOperationReportingCompiler.java:48)
+	at org.gradle.api.tasks.compile.JavaCompile.performCompilation(JavaCompile.java:220)
+	at org.gradle.api.tasks.compile.JavaCompile.performIncrementalCompilation(JavaCompile.java:161)
+	at org.gradle.api.tasks.compile.JavaCompile.compile(JavaCompile.java:146)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.doExecute(IncrementalTaskAction.java:45)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.execute(IncrementalTaskAction.java:26)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:247)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.run(DefaultBuildOperationExecutor.java:68)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:232)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:215)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:198)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:165)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:41)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:74)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:67)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:37)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:64)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:40)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:29)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:75)
+	at org.gradle.internal.Either$Right.fold(Either.java:175)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:59)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:44)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:33)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:76)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:54)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:54)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:36)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:65)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:36)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveCachingStateStep.execute(ResolveCachingStateStep.java:76)
+	at org.gradle.internal.execution.steps.ResolveCachingStateStep.execute(ResolveCachingStateStep.java:37)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:106)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:55)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:61)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:292)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:66)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:66)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:38)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:36)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:26)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:47)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:34)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:145)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:134)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:116)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.6/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 6s
+1 actionable task: 1 executed

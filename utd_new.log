@@ -1,0 +1,26 @@
+
+> Configure project :
+Fabric Loom: 1.6.12
+Failed to parse fabric.mod.json: /home/lenovo/Projects/mods/new_world/src/main/resources/fabric.mod.json
+
+> Task :compileJava FAILED
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/UTDModInitializer.java:25: error: class, interface, enum, or record expected
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+^
+/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/UTDModInitializer.java:28: error: class, interface, enum, or record expected
+ServerTickEvents.END_SERVER_TICK.register(com.utdmod.signals.OptimizedTickHandler::tick);
+^
+2 errors
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+BUILD FAILED in 1s
+1 actionable task: 1 executed

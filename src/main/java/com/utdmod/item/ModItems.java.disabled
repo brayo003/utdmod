@@ -1,0 +1,18 @@
+package com.utdmod.item;
+
+import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
+
+public class ModItems {
+public static final Item SIGNAL_PROBE = new Item(new Item.Settings());
+public static final Item WARDING_CRYSTAL = new Item(new Item.Settings());
+
+public static void registerItems() {
+    Registry.register(Registries.ITEM, new Identifier("utdmod", "signal_probe"), SIGNAL_PROBE);
+    Registry.register(Registries.ITEM, new Identifier("utdmod", "warding_crystal"), WARDING_CRYSTAL);
+}
+
+
+}

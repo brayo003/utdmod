@@ -1,0 +1,10 @@
+package com.utdmod.tension;
+
+import net.minecraft.server.level.ServerLevel;
+
+public class TensionWorldEffects {
+public static void update(ServerWorld world) {
+// Placeholder: world tension effect logic
+System.out.println("Updating world tension for " + world.toString());
+}
+}

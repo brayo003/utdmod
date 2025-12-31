@@ -1,0 +1,16 @@
+package com.utdmod.signals;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+
+public class BiomeResponder {
+    public static void respond(World world, BlockPos pos) {
+        // Placeholder: fetch biome at position
+        BiomeCategories biome = BiomeCategories.PLAINS;
+
+        switch (biome) {
+            case DESERT, NETHER, THEEND -> System.out.println("High tension biome detected");
+            case PLAINS, FOREST, SWAMP, TAIGA -> System.out.println("Low tension biome detected");
+        }
+    }
+}

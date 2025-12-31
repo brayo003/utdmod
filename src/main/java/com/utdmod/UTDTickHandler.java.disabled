@@ -1,0 +1,28 @@
+package com.utdmod;
+
+import com.utdmod.signal.SmallSignal;
+import com.utdmod.signals.PlayerStateTension;
+import com.utdmod.signals.BiomeTensionEffects;
+import com.utdmod.rituals.RitualManager;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+
+public class UTDTickHandler {
+    private static final int TICK_INTERVAL = 10;
+    private static int tickCounter = 0;
+
+    public static void register() {
+        ServerTickEvents.START_SERVER_TICK.register(server -> {
+            tickCounter++;
+            if (tickCounter >= TICK_INTERVAL) {
+                tickCounter = 0;
+
+                SmallSignal signal = new SmallSignal();
+                signal.update(server);
+
+                PlayerStateTension.onClientTick();
+                BiomeTensionEffects.onClientTick();
+                RitualManager.onClientTick();
+            }
+        });
+    }
+}

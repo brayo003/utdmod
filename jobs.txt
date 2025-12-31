@@ -1,0 +1,8 @@
+python3 utd_sweep.py --part 0 --parts 8 --rmin -1.5 --rmax 1.8 --steps 41 --trials 500
+python3 utd_sweep.py --part 1 --parts 8 --rmin -1.5 --rmax 1.8 --steps 41 --trials 500
+python3 utd_sweep.py --part 2 --parts 8 --rmin -1.5 --rmax 1.8 --steps 41 --trials 500
+python3 utd_sweep.py --part 3 --parts 8 --rmin -1.5 --rmax 1.8 --steps 41 --trials 500
+python3 utd_sweep.py --part 4 --parts 8 --rmin -1.5 --rmax 1.8 --steps 41 --trials 500
+python3 utd_sweep.py --part 5 --parts 8 --rmin -1.5 --rmax 1.8 --steps 41 --trials 500
+python3 utd_sweep.py --part 6 --parts 8 --rmin -1.5 --rmax 1.8 --steps 41 --trials 500
+python3 utd_sweep.py --part 7 --parts 8 --rmin -1.5 --rmax 1.8 --steps 41 --trials 500

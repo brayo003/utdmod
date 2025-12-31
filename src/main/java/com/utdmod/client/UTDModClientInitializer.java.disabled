@@ -1,0 +1,11 @@
+package com.utdmod.client;
+
+import net.fabricmc.api.ClientModInitializer;
+
+@Environment(EnvType.CLIENT)
+public class UTDModClientInitializer implements ClientModInitializer {
+    @Override
+    public void onInitializeClient() {
+        // Client-only setup goes here
+    }
+}
