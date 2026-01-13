@@ -47,6 +47,19 @@ What it means in Minecraft:
     T: System tension (0.0 = stable, 1.0+ = collapse)
 ```
 
+## In-Game Behavior Examples
+
+- **High ∇ρ**: Dense village = high base tension
+- **High E**: Raid event = adds excitation
+- **High F**: Player builds walls = increases damping
+- **T > 1.0**: System collapse = dimension instability events
+
+## Technical Targets
+1. **HUD**: Render tension value 0.0-2.0 with color coding (green→yellow→red)
+2. **AI**: Tension-serpents spawn when T > 0.7, path toward high-∇ρ areas
+3. **World Tick**: Calculate T per dimension every 20 ticks using chunk analysis
+
+
 ## Build
 ```bash
 ./gradlew build
