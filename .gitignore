@@ -3,3 +3,5 @@
 *.tar.gz
 results/
 build_logs/
+**/.gradle/
+**/build/
