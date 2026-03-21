@@ -1,0 +1,1 @@
+{"schemaVersion": 1, "id": "utdtest", "version": "1.0.0", "name": "UTD Test", "entrypoints": {"main": ["com.utdtest.TickEngine"]}}

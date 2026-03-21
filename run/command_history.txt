@@ -1,0 +1,12 @@
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/give @s utdmod:ritual_block
+/give @s u
+/give @s utdmod:ritual_block
+/give @s utdmod:ritual_block 64

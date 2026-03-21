@@ -1,0 +1,5 @@
+v1	named	intermediary
+FIELD	com/utdmod/mixin/PiglinBrainMixin	Lnet/minecraft/world/World;	world	field_6002
+FIELD	com/utdmod/mixin/VillagerEntityTradeMixin	Lnet/minecraft/world/World;	world	field_6002
+FIELD	com/utdmod/mixin/CatEntityPhantomMixin	Lnet/minecraft/world/World;	world	field_6002
+FIELD	com/utdmod/mixin/EndermanEntityMixin	Lnet/minecraft/world/World;	world	field_6002

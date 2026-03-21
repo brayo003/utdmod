@@ -1,0 +1,14 @@
+{
+  "mappings": {
+    "com/utdmod/mixin/LootTableMixin": {
+      "get": "Lnet/minecraft/class_47;method_296(Lnet/minecraft/class_169;)Ljava/lang/Object;"
+    }
+  },
+  "data": {
+    "named:intermediary": {
+      "com/utdmod/mixin/LootTableMixin": {
+        "get": "Lnet/minecraft/class_47;method_296(Lnet/minecraft/class_169;)Ljava/lang/Object;"
+      }
+    }
+  }
+}

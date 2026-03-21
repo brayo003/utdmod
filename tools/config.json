@@ -1,0 +1,9 @@
+{
+  "base_rate": 0.0010646125,
+  "ritual_reduction": 0.05,
+  "wraith_threshold": 0.6499999999999998,
+  "serpent_threshold": 0.98,
+  "grid_n": 200,
+  "steps": 20000,
+  "ritual_use_interval": 500
+}

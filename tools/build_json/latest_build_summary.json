@@ -1,0 +1,115 @@
+{
+  "build_session": {
+    "id": "20251207_011146",
+    "start_time": "2025-12-07T01:11:46+03:00",
+    "project_root": "/home/lenovo/Projects/mods/new_world",
+    "gradle_version": "",
+    "java_version": "17.0.17",
+    "git_branch": "unknown",
+    "git_commit": "unknown",
+    "trigger": "manual",
+    "end_time": "2025-12-07T01:12:09+03:00"
+  },
+  "steps": [
+    {
+      "name": "clean",
+      "status": "success",
+      "message": "Step completed successfully",
+      "details": "",
+      "duration_ms": 3136,
+      "timestamp": "2025-12-07T01:11:50+03:00"
+    },
+    {
+      "name": "clean",
+      "status": "warning",
+      "message": "Step completed with 2 warnings",
+      "details": "",
+      "duration_ms": 3136,
+      "timestamp": "2025-12-07T01:11:50+03:00"
+    },
+    {
+      "name": "compile_java",
+      "status": "error",
+      "message": "Step failed with exit code 0",
+      "details": "\n> Configure project :\nFabric Loom: 1.6.12\nNot publishing sources jar as it was not found. Use java.withSourcesJar() to fix.\n\n> Task :compileJava FAILED\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol\nimport net.minecraft.client.MinecraftClient;\n                           ^\n  symbol:   class MinecraftClient\n  location: package net.minecraft.client\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist\nimport net.minecraft.client.util.math.MatrixStack;\n                                     ^\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol\nimport net.minecraft.client.gui.DrawContext;\n                               ^\n  symbol:   class DrawContext\n  location: package net.minecraft.client.gui\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol",
+      "duration_ms": 5380,
+      "timestamp": "2025-12-07T01:11:56+03:00"
+    },
+    {
+      "name": "process_resources",
+      "status": "success",
+      "message": "Step completed successfully",
+      "details": "",
+      "duration_ms": 1932,
+      "timestamp": "2025-12-07T01:11:58+03:00"
+    },
+    {
+      "name": "process_resources",
+      "status": "warning",
+      "message": "Step completed with 2 warnings",
+      "details": "",
+      "duration_ms": 1932,
+      "timestamp": "2025-12-07T01:11:58+03:00"
+    },
+    {
+      "name": "classes",
+      "status": "error",
+      "message": "Step failed with exit code 0",
+      "details": "\n> Configure project :\nFabric Loom: 1.6.12\nNot publishing sources jar as it was not found. Use java.withSourcesJar() to fix.\n\n> Task :compileJava\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol\nimport net.minecraft.client.MinecraftClient;\n                           ^\n  symbol:   class MinecraftClient\n  location: package net.minecraft.client\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist\nimport net.minecraft.client.util.math.MatrixStack;\n                                     ^\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol\nimport net.minecraft.client.gui.DrawContext;\n                               ^\n  symbol:   class DrawContext\n  location: package net.minecraft.client.gui\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol",
+      "duration_ms": 4595,
+      "timestamp": "2025-12-07T01:12:03+03:00"
+    },
+    {
+      "name": "jar",
+      "status": "error",
+      "message": "Step failed with exit code 0",
+      "details": "\n> Configure project :\nFabric Loom: 1.6.12\nNot publishing sources jar as it was not found. Use java.withSourcesJar() to fix.\n\n> Task :compileJava FAILED\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol\nimport net.minecraft.client.MinecraftClient;\n                           ^\n  symbol:   class MinecraftClient\n  location: package net.minecraft.client\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist\nimport net.minecraft.client.util.math.MatrixStack;\n                                     ^\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol\nimport net.minecraft.client.gui.DrawContext;\n                               ^\n  symbol:   class DrawContext\n  location: package net.minecraft.client.gui\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol",
+      "duration_ms": 2765,
+      "timestamp": "2025-12-07T01:12:06+03:00"
+    },
+    {
+      "name": "build",
+      "status": "error",
+      "message": "Step failed with exit code 0",
+      "details": "\n> Configure project :\nFabric Loom: 1.6.12\nNot publishing sources jar as it was not found. Use java.withSourcesJar() to fix.\n\n> Task :compileJava FAILED\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol\nimport net.minecraft.client.MinecraftClient;\n                           ^\n  symbol:   class MinecraftClient\n  location: package net.minecraft.client\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist\nimport net.minecraft.client.util.math.MatrixStack;\n                                     ^\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol\nimport net.minecraft.client.gui.DrawContext;\n                               ^\n  symbol:   class DrawContext\n  location: package net.minecraft.client.gui\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol",
+      "duration_ms": 2933,
+      "timestamp": "2025-12-07T01:12:09+03:00"
+    }
+  ],
+  "errors": [
+    {
+      "component": "compile_java",
+      "message": "Step failed with exit code 0",
+      "details": "\n> Configure project :\nFabric Loom: 1.6.12\nNot publishing sources jar as it was not found. Use java.withSourcesJar() to fix.\n\n> Task :compileJava FAILED\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol\nimport net.minecraft.client.MinecraftClient;\n                           ^\n  symbol:   class MinecraftClient\n  location: package net.minecraft.client\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist\nimport net.minecraft.client.util.math.MatrixStack;\n                                     ^\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol\nimport net.minecraft.client.gui.DrawContext;\n                               ^\n  symbol:   class DrawContext\n  location: package net.minecraft.client.gui\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol",
+      "timestamp": "2025-12-07T01:11:56+03:00"
+    },
+    {
+      "component": "classes",
+      "message": "Step failed with exit code 0",
+      "details": "\n> Configure project :\nFabric Loom: 1.6.12\nNot publishing sources jar as it was not found. Use java.withSourcesJar() to fix.\n\n> Task :compileJava\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol\nimport net.minecraft.client.MinecraftClient;\n                           ^\n  symbol:   class MinecraftClient\n  location: package net.minecraft.client\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist\nimport net.minecraft.client.util.math.MatrixStack;\n                                     ^\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol\nimport net.minecraft.client.gui.DrawContext;\n                               ^\n  symbol:   class DrawContext\n  location: package net.minecraft.client.gui\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol",
+      "timestamp": "2025-12-07T01:12:03+03:00"
+    },
+    {
+      "component": "jar",
+      "message": "Step failed with exit code 0",
+      "details": "\n> Configure project :\nFabric Loom: 1.6.12\nNot publishing sources jar as it was not found. Use java.withSourcesJar() to fix.\n\n> Task :compileJava FAILED\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol\nimport net.minecraft.client.MinecraftClient;\n                           ^\n  symbol:   class MinecraftClient\n  location: package net.minecraft.client\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist\nimport net.minecraft.client.util.math.MatrixStack;\n                                     ^\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol\nimport net.minecraft.client.gui.DrawContext;\n                               ^\n  symbol:   class DrawContext\n  location: package net.minecraft.client.gui\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol",
+      "timestamp": "2025-12-07T01:12:06+03:00"
+    },
+    {
+      "component": "build",
+      "message": "Step failed with exit code 0",
+      "details": "\n> Configure project :\nFabric Loom: 1.6.12\nNot publishing sources jar as it was not found. Use java.withSourcesJar() to fix.\n\n> Task :compileJava FAILED\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:3: error: cannot find symbol\nimport net.minecraft.client.MinecraftClient;\n                           ^\n  symbol:   class MinecraftClient\n  location: package net.minecraft.client\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:4: error: package net.minecraft.client.util.math does not exist\nimport net.minecraft.client.util.math.MatrixStack;\n                                     ^\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:5: error: cannot find symbol\nimport net.minecraft.client.gui.DrawContext;\n                               ^\n  symbol:   class DrawContext\n  location: package net.minecraft.client.gui\n/home/lenovo/Projects/mods/new_world/src/main/java/com/utdmod/client/TensionHud.java:11: error: cannot find symbol",
+      "timestamp": "2025-12-07T01:12:09+03:00"
+    }
+  ],
+  "warnings": [],
+  "summary": {
+    "total_steps": 8,
+    "successful_steps": 2,
+    "failed_steps": 4,
+    "total_errors": 4,
+    "total_warnings": 2,
+    "build_duration_ms": 23257,
+    "final_status": "success"
+  }
+}
