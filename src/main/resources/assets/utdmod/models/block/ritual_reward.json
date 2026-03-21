@@ -1,5 +1,7 @@
 {
-  "textures": [
-    "particle/generic_particle"
-  ]
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "utdmod:block/ritual_reward"
+  }
 }
+

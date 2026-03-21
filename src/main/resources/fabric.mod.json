@@ -7,7 +7,8 @@
     "authors": ["brayo"],
     "environment": "*",
     "entrypoints": {
-        "main": ["com.utdmod.UTDMod"]
+        "main": ["com.utdmod.UTDMod"],
+        "client": ["com.utdmod.client.UTDModClient"]
     },
     "depends": {
         "minecraft": "1.20.4",
