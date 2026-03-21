@@ -1,31 +1,5 @@
-# Gradle
-.gradle/
-build/
-out/
-bin/
-
-# IDE
-.idea/
-*.iml
-*.ipr
-*.iws
-.classpath
-.project
-.settings/
-.vscode/
-
-# Minecraft/Run
-run/
-logs/
-crash-reports/
-debug/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Local config
-*.properties
-*.json
-!gradle.properties
-!src/main/resources/*.json
+*.log
+*.class
+*.tar.gz
+results/
+build_logs/
