@@ -10,3 +10,13 @@
 /give @s u
 /give @s utdmod:ritual_block
 /give @s utdmod:ritual_block 64
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode spectator
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative

@@ -1,5 +1,6 @@
 package com.utdmod.ritual;
 
+import com.utdmod.core.TensionActivityLedger;
 import com.utdmod.core.TensionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,7 +20,8 @@ public class RitualHandler {
             
             // Apply tension reduction
             TensionManager.reduceTension(tensionReduction);
-            
+            TensionActivityLedger.addRitual(tensionReduction);
+
             // Send feedback to player
             player.sendMessage(Text.literal("Ritual performed! Tension reduced by " + tensionReduction));
             
@@ -39,7 +41,8 @@ public class RitualHandler {
         try {
             double tensionReduction = 0.3;
             TensionManager.reduceTension(tensionReduction);
-            
+            TensionActivityLedger.addRitual(tensionReduction);
+
             player.sendMessage(Text.literal("Warding ritual completed! Tension reduced by " + tensionReduction));
             // Warding ritual performed
             
@@ -54,7 +57,8 @@ public class RitualHandler {
             // Stronger tension reduction for storm calming
             double tensionReduction = 0.8;
             TensionManager.reduceTension(tensionReduction);
-            
+            TensionActivityLedger.addRitual(tensionReduction);
+
             player.sendMessage(Text.literal("Storm calming ritual! Tension reduced by " + tensionReduction));
             // Storm calming ritual performed
             

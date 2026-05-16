@@ -1,69 +1,52 @@
 # UTD Mod - DCII Tension System (Minecraft 1.20.4 Fabric)
 
-**Technical Implementation of Substrate X Theory**
+**Technical implementation of Substrate X–style “world tension” dynamics**
 
-This Minecraft mod implements the **DCII (Domain-Calibrated Instability Index)** framework from the Substrate X Theory of Information Gravity.
+This Minecraft mod implements a **server-authoritative tension field** with optional **per-chunk** dynamics and client **mirrored state** for HUD/audio.
 
-## Theoretical Foundation
-Part of: **Substrate X: Theory of Information Gravity**
-- Full theory: https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
-- Implements: T = α|∇ρ| + βE - γF tension dynamics
-- float calculateTension(float baseStress, float threats, float defenses) {
-    return baseStress + (threatMultiplier * threats) - (defenseMultiplier * defenses);
-}
+## What the code actually implements
 
+### Global tension (`com.utdmod.core.TensionManager`)
 
-## Status: Technical Help Needed
-The foundation works (mod loads, basic systems) but needs implementation help.
+Each server tick the mod updates a scalar `T` with:
 
-## Working
-- Mod loads without crashes
-- Basic item registration
-- Clean build system
+- **Decay:** linear term proportional to `T`
+- **Nonlinear feedback:** a `T²` amplification term (capped by a hard max)
+- **Inflow:** movement-derived continuous inflow plus an **event buffer** (mining, combat hooks, etc.) that decays after application
 
-## Need Help With
-1. HUD overlay rendering (tension meter)
-2. Entity AI (tension serpents/wraiths)
-3. Dimension-specific world ticking
-4. Ritual mechanics
-5. Network synchronization
+Storm and corruption tiers are driven from this same state (thresholds + hysteresis where applicable).
 
-## For technical Modders
+### Chunk field (`ChunkTensionData` + `TensionServerTick`)
 
-This mod implements a mathematically rigorous tension system based on regularized transport equations. 
+On a slower cadence, the server walks chunks that carry tension and applies a **discrete reaction–diffusion–style** update: neighbor averaging (diffusion-like), local nonlinear growth, cubic damping, coupling from global `T`, optional local storm drain, and caps. Global `T` is then **weakly coupled** back toward the spatial average.
 
-**Quick for developers:**
-```java
-// The core tension equation
-float T = alpha * gradientMagnitude(rho) + beta * excitation - gamma * damping;
-What it means in Minecraft:
+This is **not** the gradient–excitation–damping formula from older docs; it is an explicit **dynamical update rule** tuned for gameplay.
 
-    ∇ρ: Spatial information density gradient (terrain, structures)
+### Client mirror (`com.utdmod.client.TensionSyncState`)
 
-    E: Excitation (mobs, player actions, events)
+The client **never** runs `core.TensionManager`. It only reads `CLIENT_TENSION` / `CLIENT_STORM`, updated from `TensionSyncPacket` sent by the server.
 
-    F: Damping (defenses, stabilizers, player interventions)
+## Architecture (post-refactor)
 
-    T: System tension (0.0 = stable, 1.0+ = collapse)
-```
+| Layer | Responsibility |
+|--------|------------------|
+| `core.TensionManager` | Single server source of truth for global tension + storm flag |
+| `TensionServerTick` | One `END_SERVER_TICK` pipeline: inflow → global tick → chunk field → weather/secondary hooks → broadcast sync |
+| `TensionSyncState` | Client snapshot for overlays, audio, and any client-only consumers |
+| `TensionSyncPacket` | Server → client snapshot |
 
-## In-Game Behavior Examples
+## Status
 
-- **High ∇ρ**: Dense village = high base tension
-- **High E**: Raid event = adds excitation
-- **High F**: Player builds walls = increases damping
-- **T > 1.0**: System collapse = dimension instability events
-
-## Technical Targets
-1. **HUD**: Render tension value 0.0-2.0 with color coding (green→yellow→red)
-2. **AI**: Tension-serpents spawn when T > 0.7, path toward high-∇ρ areas
-3. **World Tick**: Calculate T per dimension every 20 ticks using chunk analysis
-
+- Mod loads; **single global tension + chunk map + sync** share one server pipeline.
+- Content: blocks, items, entities, block entities register from `UTDMod` init.
+- Further work: spawn rules, entity render registration, HUD polish, and balancing.
 
 ## Build
+
 ```bash
 ./gradlew build
-Collaboration
 ```
 
-Looking for Fabric/Java developers to help implement the DCII framework in Minecraft.
+## Collaboration
+
+Looking for Fabric/Java developers to extend the DCII-style framework in Minecraft.

@@ -7,7 +7,7 @@ import net.minecraft.entity.mob.SkeletonEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.server.world.ServerWorld;
-import com.utdmod.signals.TensionManager;
+import com.utdmod.core.TensionManager;
 
 import java.util.EnumSet;
 

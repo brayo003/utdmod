@@ -2,7 +2,9 @@
   "required": true,
   "package": "com.utdmod.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [],
+  "mixins": [
+    "SpawnHelperMixin"
+  ],
   "client": ["client.WorldRendererMixin"],
   "injectors": { "defaultRequire": 1 }
 }

@@ -4,7 +4,7 @@ import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import com.utdmod.signals.TensionManager;
+import com.utdmod.core.TensionManager;
 
 import java.util.EnumSet;
 import java.util.Random;

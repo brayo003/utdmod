@@ -1,11 +1,15 @@
 package com.utdmod.entity;
 
+import com.utdmod.core.TensionManager;
+import com.utdmod.tension.ChunkTensionManager;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -51,7 +55,18 @@ public class TensionWraithEntity extends HostileEntity {
         if (this.avoidanceCooldownTicks > 0) {
             this.avoidanceCooldownTicks--;
         }
-        
-        // Spawn tracking removed to prevent lag
+
+        if (!getWorld().isClient && getWorld() instanceof ServerWorld sw && this.age % 30 == 0) {
+            double tGlobal = TensionManager.getTension();
+            double tLocal = ChunkTensionManager.getLocalTension(sw, new ChunkPos(getBlockPos()));
+            double t = Math.max(tGlobal, tLocal * 0.92);
+            if (t > 1.1 && getTarget() == null) {
+                PlayerEntity nearest = sw.getClosestPlayer(this, 40.0);
+                if (nearest != null && !nearest.isCreative() && !nearest.isSpectator()
+                    && sw.random.nextDouble() < Math.min(0.4, (t - 1.0) * 0.2)) {
+                    setTarget(nearest);
+                }
+            }
+        }
     }
 }

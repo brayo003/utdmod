@@ -18,7 +18,8 @@ public class ModItemGroups {
             .displayName(Text.translatable("itemGroup." + UTDMod.MOD_ID + ".utd_group"))
             .icon(() -> new ItemStack(ModItems.SIGNAL_PROBE))
             .entries((context, entries) -> {
-                entries.add(ModBlocks.RITUAL_BLOCK);
+                entries.add(ModItems.RITUAL_BLOCK);
+                entries.add(ModItems.TENSION_STABILIZER);
                 entries.add(ModItems.SIGNAL_PROBE);
                 entries.add(ModItems.WARDING_CRYSTAL);
             })

@@ -1,6 +1,6 @@
 package com.utdmod.mixin;
 
-import com.utdmod.signals.TensionManager;
+import com.utdmod.core.TensionManager;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.CatEntity;

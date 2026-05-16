@@ -1,6 +1,6 @@
 package com.utdmod.mixin;
 
-import com.utdmod.signals.TensionManager;
+import com.utdmod.core.TensionManager;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.item.ItemStack;

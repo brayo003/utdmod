@@ -1,67 +1,70 @@
 package com.utdmod.network;
 
-import net.minecraft.server.network.ServerPlayerEntity;
+import com.utdmod.core.TensionManager;
+import com.utdmod.core.TensionTraceClock;
+import com.utdmod.ritual.RitualHandler;
+import com.utdmod.tick.TensionLogger;
+import com.utdmod.tension.ChunkTensionManager;
+import com.utdmod.UTDMod;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-
-import com.utdmod.signals.TensionManager;
-import com.utdmod.ritual.RitualHandler;
-import com.utdmod.items.WardingCrystalItem;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ChunkPos;
 
 public class UseCrystalPacket {
-    
-    public static final Identifier USE_CRYSTAL_ID = 
-        new Identifier("utdmod", "use_crystal");
-    
+
+    public static final Identifier USE_CRYSTAL_ID = new Identifier(UTDMod.MOD_ID, "use_crystal");
+
     public static void sendToServer() {
-        PacketByteBuf buf = new PacketByteBuf(io.netty.buffer.Unpooled.buffer());
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         ClientPlayNetworking.send(USE_CRYSTAL_ID, buf);
     }
-    
+
     public static void registerReceiver() {
-        ServerPlayNetworking.registerGlobalReceiver(USE_CRYSTAL_ID, 
-            (server, player, handler, buf, responseSender) -> {
-                server.execute(() -> {
-                    handleCrystalUse(server, player);
-                });
-            });
+        ServerPlayNetworking.registerGlobalReceiver(USE_CRYSTAL_ID,
+            (server, player, handler, buf, responseSender) ->
+                server.execute(() -> handleCrystalUse(server, player)));
     }
-    
-    private static void handleCrystalUse(net.minecraft.server.MinecraftServer server, ServerPlayerEntity player) {
+
+    private static void handleCrystalUse(MinecraftServer server, ServerPlayerEntity player) {
         if (player == null) return;
-        
+
         ServerWorld world = player.getServerWorld();
-        
-        // Check if ritual can be performed
+
         if (RitualHandler.canPerformRitual(world, player)) {
-            // Apply warding effect
-            WardingCrystalItem.performWardingEffect(player);
-            
-            // Perform ritual
+            ChunkPos cp = new ChunkPos(player.getBlockPos());
+            double g0 = TensionManager.getTension();
+            double l0 = ChunkTensionManager.getLocalTension(world, cp);
             RitualHandler.performWardingRitual(world, player);
-            
-            // Sync tension to all clients
+            double g1 = TensionManager.getTension();
+            double l1 = ChunkTensionManager.getLocalTension(world, cp);
+
+            TensionLogger.traceWithGlobals(
+                TensionTraceClock.getServerTick(),
+                "RITUAL",
+                "crystal_use",
+                "warding_ritual",
+                cp,
+                player,
+                world,
+                l1 - l0,
+                l1,
+                g0,
+                g1
+            );
+
             double currentTension = TensionManager.getTension();
-            boolean stormActive = TensionManager.getTension() > 1.0;
-            
+            boolean stormActive = TensionManager.isStormActive();
+
             TensionSyncPacket.sendToAllPlayers(server, currentTension, stormActive);
-            
-            System.out.println("[CRYSTAL_USE] " + player.getName().getString() + " used Warding Crystal");
-            
         } else {
-            player.sendMessage(Text.literal("§cCannot use Warding Crystal now!"));
+            player.sendMessage(Text.literal("Cannot use Warding Crystal now!"));
         }
-    }
-    
-    public static PacketByteBuf write() {
-        return new PacketByteBuf(io.netty.buffer.Unpooled.buffer());
-    }
-    
-    public static void read(PacketByteBuf buf) {
-        // No data to read - simple trigger packet
     }
 }

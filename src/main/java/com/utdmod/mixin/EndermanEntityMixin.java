@@ -1,6 +1,6 @@
 package com.utdmod.mixin;
 
-import com.utdmod.signals.TensionManager;
+import com.utdmod.core.TensionManager;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;

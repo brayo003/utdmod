@@ -1,6 +1,6 @@
 package com.utdmod.mixin;
 
-import com.utdmod.signals.TensionManager;
+import com.utdmod.core.TensionManager;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
