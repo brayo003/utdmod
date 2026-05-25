@@ -1,0 +1,102 @@
+UTD TENSION / STORM — DATAFLOW (AS BUILT)
+=========================================
+
+[Player: mine / move / combat / ritual / sleep / portal]
+        |
+        v
++------------------+     +----------------------+
+| TensionEvents    |     | TensionServerTick    |
+| (Fabric hooks)   |     | (movement loop)      |
++--------+---------+     +----------+-----------+
+         |                          |
+         v                          v
++------------------+     +----------------------+
+| TensionLogger    |     | PlayerStateIntegrator|
+| -> TensionTrace  |     | (session fatigue)    |
+| -> DiagnosticLogs|     +----------+-----------+
++--------+---------+                |
+         |                          v
+         |                +----------------------+
+         +--------------->| ChunkTensionManager  |
+                          | (API facade)       |
+                          +----------+-----------+
+                                     |
+                                     v
+                          +----------------------+
+                          | ChunkTensionData     |
+                          | - local map        |
+                          | - state machine    |
+                          | - contamination    |
+                          | - NBT persist      |
+                          +----------+-----------+
+                                     |
+         every 5 server ticks        |
+                                     v
+                          +----------------------+
+                          | TensionServerTick    |
+                          | .tickChunkTension    |
+                          | D, LAMBDA, ALPHA,  |
+                          | BETA, GAMMA, storms  |
+                          +----------+-----------+
+                                     |
+         every server tick           |
+                                     v
+                          +----------------------+
+                          | GlobalFieldCoupling  |
+                          | .compute(server)   |
+                          | -> CouplingSplit   |
+                          +----------+-----------+
+                                     |
+                                     v
+                          +----------------------+
+                          | TensionManager       |
+                          | .tickGlobalDynamics|
+                          | pressure/catastrophe|
+                          | stormActive, corrupt|
+                          +----------+-----------+
+                                     |
+              +----------------------+----------------------+
+              |                      |                      |
+              v                      v                      v
+   +------------------+   +------------------+   +------------------+
+   | StormManager     |   | RegionDiagnostics|   | TensionActivity  |
+   | (regional amb.)  |   | Manager (8x8)    |   | Ledger           |
+   +--------+---------+   +--------+---------+   +--------+---------+
+            |                      |                      |
+            v                      v                      v
+   +------------------+   +------------------+   DiagnosticLogs
+   | DiagnosticLogs   |   | TensionSpawnEcology|  [GLOBAL_FLOW]
+   | [STORM]          |   | + SpawnHelperMixin |  [REGION]
+   +------------------+   +------------------+   SessionTelemetryExporter
+              |
+              v
+   +------------------+          every 20 ticks
+   | TensionMobHooks  |                  |
+   | (hostile buffs)  |                  v
+   +------------------+          +------------------+
+                                 | TensionSyncPacket|
+                                 +--------+---------+
+                                          |
+                                          v
+                                 +------------------+
+                                 | TensionSyncState |
+                                 | (client smooth)  |
+                                 +--------+---------+
+                                          |
+                    +---------------------+---------------------+
+                    v                     v                     v
+           +---------------+    +----------------+    +------------------+
+           | UTDAudioManager|    | TensionScreen  |    | TensionHud       |
+           |                |    | Overlay        |    |                  |
+           +---------------+    +----------------+    +------------------+
+
+PARALLEL / OPTIONAL (registered but secondary):
+  ExperimentTelemetry + /utdexp
+  RitualHandler, items, RitualBlock
+  LivingEntityDamageEvents
+
+NOT IN MAIN PIPELINE (dead / stub):
+  OptimizedTickHandler, CompositeTickHandler, WorldgenHooks
+  TensionHUD, SmallSignal, PlayerStateTension (signals/)
+  triggerWraithEvent / triggerSerpentEvent (empty)
+  Most mixins not in utdmod.mixins.json

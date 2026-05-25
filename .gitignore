@@ -5,3 +5,12 @@ results/
 build_logs/
 **/.gradle/
 **/build/
+
+# Minecraft & Gradle development overrides
+.gradle/
+build/
+bin/
+run/
+.idea/
+*.pdf
+Untitled Document *
