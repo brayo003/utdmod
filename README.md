@@ -1,7 +1,8 @@
 # UTD Mod - DCII Tension System (Minecraft 1.20.4 Fabric)
 
 **Technical implementation of Substrate X–style “world tension” dynamics**
-For more check this out https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
+
+For related work, check this out https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
 
 This Minecraft mod implements a **server-authoritative tension field** with optional **per-chunk** dynamics and client **mirrored state** for HUD/audio.
 
