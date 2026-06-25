@@ -41,6 +41,12 @@ The client **never** runs `core.TensionManager`. It only reads `CLIENT_TENSION` 
 | `TensionSyncState` | Client snapshot for overlays, audio, and any client-only consumers |
 | `TensionSyncPacket` | Server → client snapshot |
 
+## Why this exists
+
+Minecraft worlds eventually become static.
+This system attempts to give the world memory,
+regional state, and long-term evolution.
+
 ## Status
 
 - Mod loads; **single global tension + chunk map + sync** share one server pipeline.
