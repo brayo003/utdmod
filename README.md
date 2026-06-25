@@ -1,7 +1,6 @@
 # UTD Mod - DCII Tension System (Minecraft 1.20.4 Fabric)
 
 **Technical implementation of Substrate X–style “world tension” dynamics**
-
 For related work, check out https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
 
 
