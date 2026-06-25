@@ -2,6 +2,7 @@
 
 **Technical implementation of Substrate X–style “world tension” dynamics**
 
+
 For related work, check out https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
 
 
