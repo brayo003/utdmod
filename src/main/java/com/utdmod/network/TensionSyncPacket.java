@@ -28,7 +28,12 @@ public class TensionSyncPacket {
         boolean stormActive,
         double localTension,
         double regionAvg,
-        double regionMax
+        double regionMax,
+        int regionId,
+        int regionAge,
+        double regionMaturity,
+        int regionChunkCount,
+        int regionStateOrdinal
     ) {
         if (player == null) return;
 
@@ -38,6 +43,11 @@ public class TensionSyncPacket {
         buf.writeDouble(localTension);
         buf.writeDouble(regionAvg);
         buf.writeDouble(regionMax);
+        buf.writeInt(regionId);
+        buf.writeInt(regionAge);
+        buf.writeDouble(regionMaturity);
+        buf.writeInt(regionChunkCount);
+        buf.writeInt(regionStateOrdinal);
 
         ServerPlayNetworking.send(player, TENSION_SYNC_ID, buf);
     }
@@ -49,7 +59,20 @@ public class TensionSyncPacket {
             RegionDiagnosticsManager.RegionSnapshot snap = RegionDiagnosticsManager.get(cp.x, cp.z);
             double rAvg = snap != null ? snap.avg : local;
             double rMax = snap != null ? snap.max : local;
-            sendToPlayer(player, tension, stormActive, local, rAvg, rMax);
+            int regionId = 0;
+            int regionAge = 0;
+            double regionMaturity = 0.0;
+            int regionChunkCount = 0;
+            int regionState = 0;
+            com.utdmod.core.Region r = com.utdmod.core.RegionManager.getRegionForChunk(player.getServerWorld(), cp);
+            if (r != null) {
+                regionId = r.getId();
+                regionAge = r.getAge();
+                regionMaturity = r.getMaturity();
+                regionChunkCount = r.getChunkCount();
+                regionState = r.getState().ordinal();
+            }
+            sendToPlayer(player, tension, stormActive, local, rAvg, rMax, regionId, regionAge, regionMaturity, regionChunkCount, regionState);
         }
     }
 
@@ -65,7 +88,12 @@ public class TensionSyncPacket {
         double localTension = buf.readDouble();
         double regionAvg = buf.readableBytes() >= 8 ? buf.readDouble() : localTension;
         double regionMax = buf.readableBytes() >= 8 ? buf.readDouble() : localTension;
-        client.execute(() -> TensionSyncState.applySnapshot(tension, stormActive, localTension, regionAvg, regionMax));
+        int regionId = buf.readableBytes() >= 4 ? buf.readInt() : 0;
+        int regionAge = buf.readableBytes() >= 4 ? buf.readInt() : 0;
+        double regionMaturity = buf.readableBytes() >= 8 ? buf.readDouble() : 0.0;
+        int regionChunkCount = buf.readableBytes() >= 4 ? buf.readInt() : 0;
+        int regionStateOrdinal = buf.readableBytes() >= 4 ? buf.readInt() : 0;
+        client.execute(() -> TensionSyncState.applySnapshot(tension, stormActive, localTension, regionAvg, regionMax, regionId, regionAge, regionMaturity, regionChunkCount, regionStateOrdinal));
     }
 
     public static PacketByteBuf write(double tension, boolean stormActive, double localTension, double regionAvg, double regionMax) {

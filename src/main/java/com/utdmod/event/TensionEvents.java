@@ -3,6 +3,8 @@ package com.utdmod.event;
 import com.utdmod.core.TensionActivityLedger;
 import com.utdmod.core.TensionManager;
 import com.utdmod.core.TensionTraceClock;
+import com.utdmod.ecology.RegionHistory;
+import com.utdmod.ecology.RegionEcologyManager;
 import com.utdmod.tick.TensionLogger;
 import com.utdmod.tension.ChunkTensionManager;
 import com.utdmod.UTDMod;
@@ -88,6 +90,7 @@ public final class TensionEvents {
                 g0,
                 g1
             );
+            RegionEcologyManager.recordMiningHistory(sw, pos, state.isIn(BlockTags.LOGS));
         });
 
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {

@@ -3,7 +3,6 @@ package com.utdmod.core;
 import com.utdmod.diag.DiagnosticLogs;
 import com.utdmod.experiment.ExperimentTelemetry;
 import com.utdmod.network.TensionSyncPacket;
-import com.utdmod.core.TensionTraceLogger;
 import com.utdmod.registry.ModItems;
 import com.utdmod.signals.PlayerStateIntegrator;
 import com.utdmod.storm.StormManager;
@@ -24,6 +23,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,13 +33,13 @@ import java.util.UUID;
 public final class TensionServerTick {
 
     private static long tickCounter = 0;
-    /** Last storm fraction from {@link #computeChunkCouplingSplit} for diagnostics. */
-    private static double lastCouplingStormFrac = 0.0;
     private static int stormCooldown = 0;
     private static double secondaryLastTension = Double.NaN;
 
     private static final Map<UUID, double[]> lastPlayerPos = new HashMap<>();
     private static final Map<String, Double> cumulativeSources = new HashMap<>();
+    private static final Map<UUID, Integer> lastKnownRegionByPlayer = new LinkedHashMap<>();
+    private static int lastGlobalLevel = 0;
 
     public static long getTickCounter() {
         return tickCounter;
@@ -114,50 +114,50 @@ public final class TensionServerTick {
      * Drives global tension from chunk statistics (mean, spread, storms, high-corruption chunks).
      */
     private static CouplingSplit computeChunkCouplingSplit(MinecraftServer server) {
-        double sum = 0.0;
-        double sumSq = 0.0;
-        int n = 0;
-        int storms = 0;
-        int fractured = 0;
+        var regions = RegionManager.getRegions();
+        int regionCount = regions.size();
+        double totalContribution = 0.0;
+        int totalStormChunks = 0;
+        int totalFracturedChunks = 0;
+        int largestRegionSize = 0;
+        double largestContribution = 0.0;
 
-        for (ServerWorld sw : server.getWorlds()) {
-            ChunkTensionData chunkData = ChunkTensionData.getServerState(sw);
-            Map<ChunkPos, Double> map = chunkData.getTensionMap();
-            for (Map.Entry<ChunkPos, Double> e : map.entrySet()) {
-                ChunkPos pos = e.getKey();
-                if (!sw.isChunkLoaded(pos.x, pos.z)) {
-                    continue;
-                }
-                double t = e.getValue();
-                sum += t;
-                sumSq += t * t;
-                n++;
-                if (chunkData.isStormActive(pos)) {
-                    storms++;
-                }
-                ChunkTensionData.ChunkState st = chunkData.getChunkState(pos);
-                if (st == ChunkTensionData.ChunkState.FRACTURED || st == ChunkTensionData.ChunkState.DECOUPLED) {
-                    fractured++;
-                }
+        for (Region region : regions) {
+            double contribution = region.getContribution();
+            totalContribution += contribution;
+            totalStormChunks += region.getStormChunks();
+            totalFracturedChunks += region.getFracturedChunks();
+            if (region.getChunkCount() > largestRegionSize) {
+                largestRegionSize = region.getChunkCount();
+                largestContribution = contribution;
             }
         }
 
-        if (n == 0) {
-            lastCouplingStormFrac = 0.0;
-            return new CouplingSplit(0.0, 0.0, 0.0, 0.0, 0, 0);
+        double averageContribution = regionCount > 0 ? totalContribution / regionCount : 0.0;
+        double ambient = 0.0035 * totalContribution;
+        double regional = 0.052 * totalContribution;
+
+        if (tickCounter % 20 == 0) {
+            double averageRegionMaturity = regionCount > 0
+                ? regions.stream().mapToDouble(Region::getMaturity).average().orElse(0.0)
+                : 0.0;
+            DiagnosticLogs.fieldSummary(
+                tickCounter,
+                TensionManager.getTension(),
+                regionCount,
+                largestRegionSize,
+                totalStormChunks,
+                totalFracturedChunks,
+                averageRegionMaturity,
+                totalContribution
+            );
         }
 
-        double mean = sum / n;
-        double variance = Math.max(0.0, sumSq / n - mean * mean);
-        double stdev = Math.sqrt(variance);
-        double stormFrac = storms / (double) n;
-        double fracturedFrac = fractured / (double) n;
-        lastCouplingStormFrac = stormFrac;
+        if (tickCounter % 100 == 0) {
+            DiagnosticLogs.regionSummary(tickCounter, regions);
+        }
 
-        // Mean term: strong enough when n≈1 (single hot chunk, stdev≈0). Stdev term: multi-chunk gradients.
-        double ambient = 0.0035 * mean;
-        double local = 0.052 * stdev + 0.14 * stormFrac + 0.26 * fracturedFrac;
-        return new CouplingSplit(ambient, local, stormFrac, fracturedFrac, storms, fractured);
+        return new CouplingSplit(ambient, regional, 0.0, 0.0, totalStormChunks, totalFracturedChunks);
     }
 
     private static void onEndServerTick(MinecraftServer server) {
@@ -223,7 +223,19 @@ public final class TensionServerTick {
             tickChunkTension(server);
         }
 
+        if (tickCounter % 20 == 0) {
+            RegionManager.refresh(server, tickCounter);
+        }
+
         CouplingSplit split = computeChunkCouplingSplit(server);
+
+        if (tickCounter % 20 == 0 && DiagnosticLogs.isGlobalFlowDebugEnabled()) {
+            System.out.printf(
+                "[COUPLING] tick=%d storms=%d fractured=%d ambient=%.6f regional=%.6f total=%.6f%n",
+                tickCounter, split.stormChunks, split.fracturedChunks,
+                split.ambientInflow, split.localCoupling, split.total);
+        }
+
         // Log-only: nonzero when chunk storms, global/regional storm hysteresis, or fractured mass (not a constant floor).
         boolean stormDriveContext = split.stormChunks > 0
             || split.fracturedChunks > 0
@@ -234,6 +246,10 @@ public final class TensionServerTick {
 
         if (tickCounter % 200 == 0) {
             RegionDiagnosticsManager.refresh(server, tickCounter);
+        }
+
+        if (tickCounter % 20 == 0) {
+            updatePlayerRegionEvents(server);
         }
 
         if (TensionManager.isStormActive()) {
@@ -282,8 +298,11 @@ public final class TensionServerTick {
                     "Chunk Tension: %.2f (%s) | Global: %.2f (%s) | %s",
                     localTension, state, globalTension, corruptionLevel, status)), true);
             }
-            System.out.printf("[UTDMod] Global Tension: %.2f | Storm: %s%n",
-                TensionManager.getTension(), TensionManager.isStormActive());
+            int newGlobalLevel = (int) Math.min(3, Math.floor(TensionManager.getTension()));
+            if (newGlobalLevel != lastGlobalLevel) {
+                DiagnosticLogs.globalLevelChanged(lastGlobalLevel, newGlobalLevel);
+                lastGlobalLevel = newGlobalLevel;
+            }
         }
 
         if (tickCounter % 20 == 0) {
@@ -362,7 +381,7 @@ public final class TensionServerTick {
 
                 localTension = Math.max(0, Math.min(localTension, 5.0));
 
-                if (UTDMod.LOGGER.isDebugEnabled()) {
+                if (DiagnosticLogs.isPerChunkDebugEnabled()) {
                     System.out.printf(
                         "[UTD-CHUNK] chunk=%d,%d local=%.4f diff=%.6f nonlin=%.6f sat=%.6f decay=%.6f feedback=%.6f%n",
                         chunkPos.x,
@@ -412,6 +431,29 @@ public final class TensionServerTick {
 
             if (tickCounter % (20 * 60 * 5) == 0) {
                 chunkData.pruneInactive(45L * 60L * 1000L);
+            }
+        }
+    }
+
+    private static void updatePlayerRegionEvents(MinecraftServer server) {
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            Region region = RegionManager.getRegionForChunk(player.getServerWorld(), new ChunkPos(player.getBlockPos()));
+            if (region == null) {
+                continue;
+            }
+            Integer previousRegionId = lastKnownRegionByPlayer.get(player.getUuid());
+            if (previousRegionId == null) {
+                DiagnosticLogs.playerEnterRegion(player.getName().getString(), region.getId(), region.getState().name());
+            } else if (!previousRegionId.equals(region.getId())) {
+                DiagnosticLogs.playerExitRegion(player.getName().getString(), previousRegionId);
+                DiagnosticLogs.playerEnterRegion(player.getName().getString(), region.getId(), region.getState().name());
+            }
+            lastKnownRegionByPlayer.put(player.getUuid(), region.getId());
+        }
+
+        for (UUID playerId : lastKnownRegionByPlayer.keySet()) {
+            if (server.getPlayerManager().getPlayer(playerId) == null) {
+                lastKnownRegionByPlayer.remove(playerId);
             }
         }
     }

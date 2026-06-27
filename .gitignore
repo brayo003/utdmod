@@ -14,3 +14,6 @@ run/
 .idea/
 *.pdf
 Untitled Document *
+.gradle/
+build/
+run/

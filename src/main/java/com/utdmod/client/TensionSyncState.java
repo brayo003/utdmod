@@ -17,6 +17,12 @@ public final class TensionSyncState {
     public static volatile double CLIENT_REGION_AVG = 0.0;
     public static volatile double CLIENT_REGION_MAX = 0.0;
     public static volatile boolean CLIENT_STORM = false;
+    // Per-current-region metadata (0 means none)
+    public static volatile int CLIENT_REGION_ID = 0;
+    public static volatile int CLIENT_REGION_AGE = 0;
+    public static volatile double CLIENT_REGION_MATURITY = 0.0;
+    public static volatile int CLIENT_REGION_CHUNK_COUNT = 0;
+    public static volatile int CLIENT_REGION_STATE = 0; // ordinal of com.utdmod.core.RegionState
 
     /** Exponential smoothing targets for experiential feedback (audio / overlay). */
     private static double smoothedGlobal = 0.0;
@@ -57,6 +63,16 @@ public final class TensionSyncState {
         CLIENT_LOCAL_TENSION = localTension;
         CLIENT_REGION_AVG = regionAvg;
         CLIENT_REGION_MAX = regionMax;
+    }
+
+    public static void applySnapshot(double tension, boolean storm, double localTension, double regionAvg, double regionMax,
+                                     int regionId, int regionAge, double regionMaturity, int regionChunkCount, int regionStateOrdinal) {
+        applySnapshot(tension, storm, localTension, regionAvg, regionMax);
+        CLIENT_REGION_ID = regionId;
+        CLIENT_REGION_AGE = regionAge;
+        CLIENT_REGION_MATURITY = regionMaturity;
+        CLIENT_REGION_CHUNK_COUNT = regionChunkCount;
+        CLIENT_REGION_STATE = regionStateOrdinal;
     }
 
     public static void applySnapshot(double tension, boolean storm, double localTension) {

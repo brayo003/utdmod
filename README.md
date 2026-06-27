@@ -4,7 +4,13 @@
 
 For related work, check this out https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
 
-This Minecraft mod implements a **server-authoritative tension field** with optional **per-chunk** dynamics and client **mirrored state** for HUD/audio.
+This repository contains a Fabric mod that adds a server-authoritative tension field to Minecraft. The current implementation focuses on global tension state, chunk-level coupling, region-based diagnostics, and server-to-client sync for overlays and audio.
+
+<p align="center">
+  <img src="docs/world_tension_map.png" alt="Example world tension map" width="860" />
+</p>
+
+This README summarizes the systems that are present in the current codebase and avoids claiming features that are not yet implemented or verified.
 
 ## What the code actually implements
 
@@ -29,6 +35,12 @@ This is **not** the gradient–excitation–damping formula from older docs; it 
 The client **never** runs `core.TensionManager`. It only reads `CLIENT_TENSION` / `CLIENT_STORM`, updated from `TensionSyncPacket` sent by the server.
 
 ## Architecture (post-refactor)
+
+The current structure is centered on a single server-side tension pipeline with a lightweight client mirror for HUD and audio feedback.
+
+<div align="center" style="max-width: 100%; overflow: auto; border: 1px solid #d0d7de; border-radius: 8px; padding: 8px; background: #0f172a;">
+  <img src="docs/architecture.png" alt="Architecture diagram" style="max-width: none; width: 1200px; height: auto; display: block; margin: 0 auto;" />
+</div>
 
 | Layer | Responsibility |
 |--------|------------------|

@@ -1,6 +1,7 @@
 package com.utdmod.client.ui;
 
 import com.utdmod.client.TensionSyncState;
+import com.utdmod.client.visual.ClientRegionPresentation;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -11,7 +12,10 @@ import net.minecraft.client.gui.DrawContext;
 public class TensionHud {
 
     public static void register() {
-        HudRenderCallback.EVENT.register((context, tickDelta) -> renderHud(context));
+        HudRenderCallback.EVENT.register((context, tickDelta) -> {
+            ClientRegionPresentation.renderOverlay(context, tickDelta);
+            renderHud(context);
+        });
     }
 
     /** Kept for callers that push state without going through {@link TensionSyncState} only. */
@@ -34,6 +38,24 @@ public class TensionHud {
 
         if (storm) {
             context.drawText(mc.textRenderer, "STORM ACTIVE", 10, 25, 0xFF0000, true);
+        }
+
+        // Optional region HUD (disabled by default)
+        if (com.utdmod.client.RegionHudConfig.SHOW_REGION_HUD) {
+            int x = 10;
+            int y = 40;
+            String id = String.format("Region: %d", TensionSyncState.CLIENT_REGION_ID);
+            String state = String.format("State: %s", com.utdmod.core.RegionState.values()[Math.max(0, Math.min(TensionSyncState.CLIENT_REGION_STATE, com.utdmod.core.RegionState.values().length - 1))]);
+            String age = String.format("Age: %d", TensionSyncState.CLIENT_REGION_AGE);
+            String mat = String.format("Maturity: %.3f", TensionSyncState.CLIENT_REGION_MATURITY);
+            String avg = String.format("AvgTension: %.3f", TensionSyncState.CLIENT_REGION_AVG);
+            String chunks = String.format("Chunks: %d", TensionSyncState.CLIENT_REGION_CHUNK_COUNT);
+            context.drawText(mc.textRenderer, id, x, y, 0xFFFFFF, true);
+            context.drawText(mc.textRenderer, state, x, y + 12, 0xFFFFFF, true);
+            context.drawText(mc.textRenderer, age, x, y + 24, 0xFFFFFF, true);
+            context.drawText(mc.textRenderer, mat, x, y + 36, 0xFFFFFF, true);
+            context.drawText(mc.textRenderer, avg, x, y + 48, 0xFFFFFF, true);
+            context.drawText(mc.textRenderer, chunks, x, y + 60, 0xFFFFFF, true);
         }
     }
 }

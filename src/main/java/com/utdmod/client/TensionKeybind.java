@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class TensionKeybind {
     private static KeyBinding tensionKey;
+    private static KeyBinding toggleRegionHudKey;
 
     public static void register() {
         tensionKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -16,11 +17,20 @@ public class TensionKeybind {
             GLFW.GLFW_KEY_Y,
             "category.utdmod"
         ));
+        toggleRegionHudKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.utdmod.toggle_region_hud",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_H,
+            "category.utdmod"
+        ));
     }
 
     public static void tick() {
         while (tensionKey.wasPressed()) {
             DebugSpikeTensionPacket.sendToServer();
+        }
+        while (toggleRegionHudKey.wasPressed()) {
+            com.utdmod.client.RegionHudConfig.SHOW_REGION_HUD = !com.utdmod.client.RegionHudConfig.SHOW_REGION_HUD;
         }
     }
 }

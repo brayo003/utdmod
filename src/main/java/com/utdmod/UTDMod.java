@@ -2,6 +2,7 @@ package com.utdmod;
 
 import com.utdmod.command.ExperimentCommands;
 import com.utdmod.core.TensionServerTick;
+import com.utdmod.ecology.RegionEcologyManager;
 import com.utdmod.ecology.TensionSpawnEcology;
 import com.utdmod.event.TensionEvents;
 import com.utdmod.event.TensionMobHooks;
@@ -40,6 +41,7 @@ public class UTDMod implements ModInitializer {
         ExperimentCommands.register();
         ExperimentClientReportPacket.registerServer();
         TensionSpawnEcology.register();
+        RegionEcologyManager.register();
 
         UseCrystalPacket.registerReceiver();
         DebugSpikeTensionPacket.registerServerReceiver();

@@ -1,6 +1,11 @@
 package com.utdmod.diag;
 
+import java.util.List;
+
+import com.utdmod.core.Region;
+import com.utdmod.core.RegionState;
 import com.utdmod.tension.ChunkTensionData;
+
 import net.minecraft.util.math.ChunkPos;
 
 /**
@@ -11,6 +16,8 @@ public final class DiagnosticLogs {
     private static final double T1 = 0.95;
     private static final double T2 = 1.28;
     private static final double T3 = 3.0;
+    private static final boolean DEBUG_PER_CHUNK_LOGS = Boolean.getBoolean("utd.diag.perChunk");
+    private static final boolean DEBUG_GLOBAL_FLOW_LOGS = Boolean.getBoolean("utd.diag.globalFlow");
 
     private static String stateDisplayName(ChunkTensionData.ChunkState state) {
         if (state == ChunkTensionData.ChunkState.STABLE) {
@@ -25,6 +32,133 @@ public final class DiagnosticLogs {
     }
 
     private DiagnosticLogs() {}
+
+    private static void printSection(String name) {
+        System.out.println("============================" + name + "============================");
+    }
+
+    public static boolean isPerChunkDebugEnabled() {
+        return DEBUG_PER_CHUNK_LOGS;
+    }
+
+    public static boolean isGlobalFlowDebugEnabled() {
+        return DEBUG_GLOBAL_FLOW_LOGS;
+    }
+
+    static String formatFieldSummaryLine(
+        long tick,
+        double globalTension,
+        int regionCount,
+        int largestRegionSize,
+        int stormChunks,
+        int fracturedChunks,
+        double averageRegionMaturity,
+        double totalRegionContribution
+    ) {
+        return String.format(
+            "[FIELD]tick=%dGlobalT=%.4fRegions=%dLargestRegion=%dStormChunks=%dFracturedChunks=%dAverageRegionMaturity=%.4fTotalRegionContribution=%.4f",
+            tick,
+            globalTension,
+            regionCount,
+            largestRegionSize,
+            stormChunks,
+            fracturedChunks,
+            averageRegionMaturity,
+            totalRegionContribution
+        );
+    }
+
+    static String formatRegionSummaryLine(int index, Region region) {
+        return String.format(
+            "[REGIONS]Region %dstate=%ssize=%dage=%daverageTension=%.4f maturity=%.4f contribution=%.4f fractured=%d storms=%d centroid=(%.1f,%.1f)",
+            index,
+            region.getState().name(),
+            region.getChunkCount(),
+            region.getAge(),
+            region.getAverageTension(),
+            region.getMaturity(),
+            region.getContribution(),
+            region.getFracturedChunks(),
+            region.getStormChunks(),
+            region.getCentroidX(),
+            region.getCentroidZ()
+        );
+    }
+
+    public static void fieldSummary(
+        long tick,
+        double globalTension,
+        int regionCount,
+        int largestRegionSize,
+        int stormChunks,
+        int fracturedChunks,
+        double averageRegionMaturity,
+        double totalRegionContribution
+    ) {
+        printSection("FIELD");
+        System.out.println(formatFieldSummaryLine(
+            tick,
+            globalTension,
+            regionCount,
+            largestRegionSize,
+            stormChunks,
+            fracturedChunks,
+            averageRegionMaturity,
+            totalRegionContribution
+        ));
+        System.out.println();
+    }
+
+    public static void regionSummary(long tick, List<Region> regions) {
+        if (regions == null || regions.isEmpty()) {
+            return;
+        }
+        printSection("REGIONS");
+        for (int i = 0; i < regions.size(); i++) {
+            System.out.println(formatRegionSummaryLine(i + 1, regions.get(i)));
+        }
+        System.out.println();
+    }
+
+    public static void regionCreated(int id, int chunkCount, String state) {
+        printSection("EVENTS");
+        System.out.printf("[REGION_CREATED]id=%d chunks=%d state=%s%n", id, chunkCount, state);
+    }
+
+    public static void regionMerged(int oldId, int newId) {
+        printSection("EVENTS");
+        System.out.printf("[REGION_MERGED]old=%d new=%d%n", oldId, newId);
+    }
+
+    public static void regionDestroyed(int id, int chunkCount) {
+        printSection("EVENTS");
+        System.out.printf("[REGION_DESTROYED]id=%d chunks=%d%n", id, chunkCount);
+    }
+
+    public static void regionStateChanged(int id, String oldState, String newState) {
+        printSection("EVENTS");
+        System.out.printf("[REGION_STATE_CHANGE]Region %d %s -> %s%n", id, oldState, newState);
+    }
+
+    public static void globalLevelChanged(int oldLevel, int newLevel) {
+        printSection("EVENTS");
+        System.out.printf("[GLOBAL_LEVEL_CHANGE]%d -> %d%n", oldLevel, newLevel);
+    }
+
+    public static void playerEnterRegion(String playerName, int regionId, String state) {
+        printSection("EVENTS");
+        System.out.printf("[PLAYER_ENTER_REGION]player=%s region=%d state=%s%n", playerName, regionId, state);
+    }
+
+    public static void playerExitRegion(String playerName, int regionId) {
+        printSection("EVENTS");
+        System.out.printf("[PLAYER_EXIT_REGION]player=%s region=%d%n", playerName, regionId);
+    }
+
+    public static void ecologySummary(int regionId, RegionState state, int decorationsApplied, int recoveriesApplied) {
+        printSection("ECOLOGY");
+        System.out.printf("[ECOLOGY]Region=%d State=%s DecorationsApplied=%d RecoveriesApplied=%d%n", regionId, state.name(), decorationsApplied, recoveriesApplied);
+    }
 
     public static String approximateState(double tension) {
         if (tension > T3) return "DECOUPLED";
@@ -93,6 +227,9 @@ public final class DiagnosticLogs {
         double combatSum,
         double net
     ) {
+        if (!DEBUG_GLOBAL_FLOW_LOGS) {
+            return;
+        }
         System.out.printf(
             "[GLOBAL_FLOW] tick=%d global=%.4f local_coupling=%.4f ambient_inflow=%.4f ambient_decay=%.4f "
                 + "nonlinear_feedback=%.4f ritual_buffer=%.4f storm_drive=%.4f movement_sum=%.4f mining_sum=%.4f combat_sum=%.4f net=%.4f%n",

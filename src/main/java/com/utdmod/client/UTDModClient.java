@@ -21,6 +21,7 @@ public class UTDModClient implements ClientModInitializer {
             TensionKeybind.tick();
             TensionSyncState.tickSmoothing();
             ClientRegionalAtmosphere.tick(client);
+            com.utdmod.client.visual.ClientRegionPresentation.tick(client);
 
             if (client.world != null && client.player != null && client.world.getTime() % 38 == 0L) {
                 UTDAudioManager.updateAmbientSounds();
