@@ -2,7 +2,13 @@
 
 **Technical implementation of Substrate X–style “world tension” dynamics**
 
-For related work, check this out https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
+
+For related work, check out https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
+
+
+
+UTD Mod adds a persistent world-state field to Minecraft. Player activity alters regional tension, tension diffuses through chunks, accumulates history, and drives world events.
+
 
 This repository contains a Fabric mod that adds a server-authoritative tension field to Minecraft. The current implementation focuses on global tension state, chunk-level coupling, region-based diagnostics, and server-to-client sync for overlays and audio.
 
@@ -48,6 +54,12 @@ The current structure is centered on a single server-side tension pipeline with 
 | `TensionServerTick` | One `END_SERVER_TICK` pipeline: inflow → global tick → chunk field → weather/secondary hooks → broadcast sync |
 | `TensionSyncState` | Client snapshot for overlays, audio, and any client-only consumers |
 | `TensionSyncPacket` | Server → client snapshot |
+
+## Why this exists
+
+Minecraft worlds eventually become static.
+This system attempts to give the world memory,
+regional state, and long-term evolution.
 
 ## Status
 
