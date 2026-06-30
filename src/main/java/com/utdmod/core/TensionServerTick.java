@@ -252,28 +252,7 @@ public final class TensionServerTick {
             updatePlayerRegionEvents(server);
         }
 
-        if (TensionManager.isStormActive()) {
-            if (stormCooldown > 0) {
-                stormCooldown--;
-            }
-            if (stormCooldown <= 0) {
-                for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                    ServerWorld world = player.getServerWorld();
-                    Vec3d pos = player.getPos();
-                    LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(world);
-                    if (lightning != null) {
-                        lightning.refreshPositionAfterTeleport(pos);
-                        world.spawnEntity(lightning);
-                    }
-                }
-                stormCooldown = 200;
-            }
-            if (tickCounter % 40 == 0) {
-                for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                    player.getHungerManager().addExhaustion(0.5f);
-                }
-            }
-        } else {
+        if (!TensionManager.isStormActive()) {
             stormCooldown = 0;
         }
 

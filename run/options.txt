@@ -121,7 +121,8 @@ key_key.hotbar.7:key.keyboard.7
 key_key.hotbar.8:key.keyboard.8
 key_key.hotbar.9:key.keyboard.9
 key_key.utdmod.spike:key.keyboard.y
-soundCategory_master:1.0
+key_key.utdmod.toggle_region_hud:key.keyboard.h
+soundCategory_master:0.06291390728476821
 soundCategory_music:1.0
 soundCategory_record:1.0
 soundCategory_weather:1.0

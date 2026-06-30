@@ -155,9 +155,42 @@ public final class DiagnosticLogs {
         System.out.printf("[PLAYER_EXIT_REGION]player=%s region=%d%n", playerName, regionId);
     }
 
-    public static void ecologySummary(int regionId, RegionState state, int decorationsApplied, int recoveriesApplied) {
+    public static void ecologySummary(
+        int regionId,
+        RegionState state,
+        double averageTension,
+        double maturity,
+        String trend,
+        int stress,
+        int decorationsApplied,
+        int recoveriesApplied,
+        boolean stormActive
+    ) {
         printSection("ECOLOGY");
-        System.out.printf("[ECOLOGY]Region=%d State=%s DecorationsApplied=%d RecoveriesApplied=%d%n", regionId, state.name(), decorationsApplied, recoveriesApplied);
+        System.out.println("================ ECOLOGY ================");
+        System.out.printf("Region %d%n", regionId);
+        System.out.printf("State: %s%n", state.name());
+        System.out.printf("Average Tension: %.2f%n", averageTension);
+        System.out.printf("Maturity: %.2f%n", maturity);
+        System.out.printf("Trend: %s%n", trend);
+        System.out.printf("Stress: %d%n", stress);
+        System.out.printf("Decorations Applied: %d%n", decorationsApplied);
+        System.out.printf("Recoveries Applied: %d%n", recoveriesApplied);
+        System.out.printf("Storm Active: %s%n", stormActive ? "true" : "false");
+        System.out.printf("Estimated Recovery: %d minutes%n", Math.max(1, (stress + 1) / 2));
+        System.out.println();
+    }
+
+    public static void regionCooling(int regionId, RegionState state, double averageTension, double maturity, int stress) {
+        System.out.printf("[REGION_COOLING] region=%d state=%s avg=%.2f maturity=%.2f stress=%d%n", regionId, state.name(), averageTension, maturity, stress);
+    }
+
+    public static void regionRecovering(int regionId, RegionState state, double averageTension, double maturity, int stress) {
+        System.out.printf("[REGION_RECOVERING] region=%d state=%s avg=%.2f maturity=%.2f stress=%d%n", regionId, state.name(), averageTension, maturity, stress);
+    }
+
+    public static void regionRehealed(int regionId, RegionState state, double averageTension, double maturity, int stress) {
+        System.out.printf("[REGION_REHEALED] region=%d state=%s avg=%.2f maturity=%.2f stress=%d%n", regionId, state.name(), averageTension, maturity, stress);
     }
 
     public static String approximateState(double tension) {
@@ -294,6 +327,14 @@ public final class DiagnosticLogs {
         System.out.printf("storm_strength=%.4f%n", stormStrength);
         System.out.printf("moving_toward=%d,%d%n", towardRx, towardRz);
         System.out.println();
+    }
+
+    public static void stormStarted(long tick, int regionId, String state, double readiness) {
+        System.out.printf("[STORM_STARTED] tick=%d region=%d state=%s readiness=%.2f%n", tick, regionId, state, readiness);
+    }
+
+    public static void stormEnded(int durationTicks, double peak, int regionId, String reason) {
+        System.out.printf("[STORM_ENDED] duration=%d peak=%.2f region=%d reason=%s%n", durationTicks, peak, regionId, reason);
     }
 
     public static void stormEnd(int durationTicks, double peak, int regionX, int regionZ, long tick) {

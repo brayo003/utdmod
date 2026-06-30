@@ -20,3 +20,11 @@
 /gamemode creative
 /gamemode survival
 /gamemode creative
+/gamemode spectator
+/gamemode creative
+/utdtest list
+/gamemode creative
+/gamemode survival
+/gamemode creative
+/gamemode survival
+/gamemode creative

@@ -66,8 +66,33 @@ public final class ChunkTensionManager {
         }
     }
 
+    public static void addForestryTension(ServerWorld world, ChunkPos pos, boolean matureTree) {
+        double baseAmount = matureTree ? 0.0085 : 0.0055;
+        applyWeightedLocalTension(world, pos, baseAmount, 1.0);
+
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) {
+                    continue;
+                }
+                ChunkPos neighbor = new ChunkPos(pos.x + dx, pos.z + dz);
+                double weight = Math.abs(dx) + Math.abs(dz) == 1 ? 0.42 : 0.22;
+                applyWeightedLocalTension(world, neighbor, baseAmount, weight);
+            }
+        }
+    }
+
+    private static void applyWeightedLocalTension(ServerWorld world, ChunkPos pos, double baseAmount, double weight) {
+        if (world == null || pos == null) {
+            return;
+        }
+        ChunkTensionData data = ChunkTensionData.getServerState(world);
+        double amount = baseAmount * weight;
+        data.addLocalTension(pos, amount, world);
+    }
+
     public static void addDeforestationTension(ServerWorld world, ChunkPos pos) {
-        addLocalTension(world, pos, 0.02);
+        addForestryTension(world, pos, true);
     }
 
     /**

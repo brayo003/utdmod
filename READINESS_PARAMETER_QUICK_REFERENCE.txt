@@ -1,0 +1,131 @@
+READINESS PARAMETER QUICK REFERENCE
+====================================
+
+Use this table to quickly select appropriate readiness parameters for gameplay.
+
+┌────────────────────────┬──────────┬──────────┬──────────┬──────────┬─────────────────┐
+│ Readiness Law          │ R(m=0.1) │ R(m=1.0) │ R(m=5.0) │ Parameter │ Recommended Use │
+├────────────────────────┼──────────┼──────────┼──────────┼──────────┼─────────────────┤
+│ Exponential            │          │          │          │          │                 │
+│  scale = 1.0           │   0.90   │   0.37   │  0.007   │ 1.0      │ Strong fatigue  │
+│  scale = 1.5           │   0.22   │   0.22   │   0.22   │ 1.5      │ Moderate        │
+│  scale = 2.0           │   0.95   │   0.61   │   0.082  │ 2.0      │ ★ RECOMMENDED   │
+│  scale = 3.0           │   0.72   │   0.72   │   0.72   │ 3.0      │ Gentler decay   │
+│  scale = 5.0           │   0.98   │   0.82   │   0.368  │ 5.0      │ Weak fatigue    │
+├────────────────────────┼──────────┼──────────┼──────────┼──────────┼─────────────────┤
+│ Rational               │          │          │          │          │                 │
+│  scale = 1.0           │   0.99   │   0.50   │   0.038  │ 1.0      │ Medium gating   │
+│  scale = 2.0           │   1.00   │   0.80   │   0.138  │ 2.0      │ Gentle decay    │
+│  scale = 3.0           │   1.00   │   0.90   │   0.278  │ 3.0      │ ★ ALTERNATIVE  │
+│  scale = 5.0           │   1.00   │   0.96   │   0.500  │ 5.0      │ Very permissive │
+├────────────────────────┼──────────┼──────────┼──────────┼──────────┼─────────────────┤
+│ Logistic               │          │          │          │          │                 │
+│  (m=1.0, w=1.0)        │   0.71   │   0.50   │   0.018  │ scale=1.0│ Threshold @1.0  │
+│  (m=1.5, w=1.0)        │   0.82   │   0.73   │   0.181  │ scale=1.5│ ★ THRESHOLD ALT │
+│  (m=2.0, w=1.0)        │   0.87   │   0.73   │   0.047  │ scale=2.0│ Threshold @2.0  │
+│  (m=2.0, w=0.8)        │   0.82   │   0.50   │   0.002  │ scale=2.0│ Sharp threshold │
+├────────────────────────┼──────────┼──────────┼──────────┼──────────┼─────────────────┤
+│ Field-Depth            │          │          │          │          │                 │
+│  scale = 1.0           │   0.37   │   0.37   │   0.37   │ 1.0      │ Depth gating    │
+│  scale = 2.0           │   0.61   │   0.61   │   0.61   │ 2.0      │ Weak gating     │
+│  scale = 5.0           │   0.82   │   0.82   │   0.82   │ 5.0      │ Very weak       │
+├────────────────────────┼──────────┼──────────┼──────────┼──────────┼─────────────────┤
+│ Combined (m=1.0, f=1.0)│   0.33   │   0.135  │   0.002  │ m=1.0    │ Dual gating     │
+│ Combined (m=1.5, f=1.5)│   0.10   │   0.021  │   0.000  │ m=1.5    │ Restrictive     │
+│ Combined (m=2.0, f=2.0)│   0.58   │   0.368  │   0.050  │ m=2.0    │ Moderate dual   │
+└────────────────────────┴──────────┴──────────┴──────────┴──────────┴─────────────────┘
+
+KEY:
+  R(m=0.1)  = Readiness at low memory (fresh sources)
+  R(m=1.0)  = Readiness at medium memory (typical active region)
+  R(m=5.0)  = Readiness at high memory (old dormant regions)
+  ★         = Recommended configuration
+
+INTERPRETATION:
+  R > 0.8   → Transport flows strongly; minimal suppression
+  R > 0.5   → Transport flows moderately; noticeable suppression
+  R > 0.2   → Transport flows weakly; strong suppression
+  R < 0.1   → Transport nearly blocked; severe suppression
+
+SELECTION GUIDE:
+────────────────
+
+Want gradual "fatigue" mechanics?
+  → Use Exponential (scale = 2.0 to 3.0)
+
+Want smooth, permissive propagation?
+  → Use Rational (scale = 3.0 to 5.0)
+
+Want discrete threshold switching?
+  → Use Logistic (scale = 1.5 to 2.0, width = 0.8 to 1.0)
+
+Want structural constraints?
+  → Use Field-Depth (scale = 2.0 to 5.0)
+  → WARNING: Pure field-depth is restrictive; consider combining with memory
+
+Want multi-factor gating?
+  → Use Combined (m_scale ≈ f_scale = 1.5 to 2.0)
+  → WARNING: Dual gating very suppressive; test carefully
+
+PARAMETER TUNING:
+─────────────────
+
+If transport too weak:
+  1. Increase scale parameter by ~25%
+  2. Example: scale 2.0 → 2.5
+  3. Result: R values increase at all memory levels
+
+If transport too strong:
+  1. Decrease scale parameter by ~25%
+  2. Example: scale 2.0 → 1.5
+  3. Result: R values decrease; higher suppression
+
+If wrong type of behavior:
+  1. Switch to different readiness variant
+  2. Exponential → Rational: softer decay
+  3. Exponential → Logistic: threshold behavior
+  4. Exponential → Combined: add structural constraint
+
+TESTING PROCEDURE:
+──────────────────
+
+1. Set readiness parameters in ParameterSet.java
+   Example:
+   ```java
+   readinessMemoryScale = 2.0;
+   transportBalanceMode = "exponential";
+   ```
+
+2. Run GameplayValidationExperiments
+   ```bash
+   ./gradlew -p simulation_lab test --tests 'GameplayValidationExperiments'
+   ```
+
+3. Check output in run/gameplay_validation/balance_summary.txt
+   Look for:
+   - Peak activation: 0.1 - 1.0 (reasonable range)
+   - Hotspot lifetime: 50-500 ticks (meaningful duration)
+   - Radius: 2.0 - 20.0 (spatial extent)
+   - Transport values: > 0.01 (nonzero transport)
+
+4. Adjust parameters if needed:
+   - Too much suppression? Increase scale
+   - Too little suppression? Decrease scale
+   - Wrong dynamics shape? Switch variants
+
+5. Repeat until satisfied with behavior
+
+CONVERGENCE NOTES:
+──────────────────
+
+After testing, if you need to lock in a configuration:
+
+Recommended final parameters:
+  readinessMemoryScale = 2.0
+  transportBalanceMode = "exponential"
+  readinessFieldScale = 1.0  (keep default)
+  readinessTransitionWidth = 1.0  (keep default)
+
+These should provide balanced, believable spatial dynamics.
+
+EOF

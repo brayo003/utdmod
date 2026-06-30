@@ -160,15 +160,15 @@ public final class Region {
             return RegionState.ANCIENT;
         }
 
-        if (averageTension >= 1.0 && chunkCount >= 8 && fracturedChunks >= Math.max(1, chunkCount / 8)) {
+        if (averageTension >= 1.05 && chunkCount >= 6 && fracturedChunks >= Math.max(1, chunkCount / 8)) {
             return RegionState.FRACTURED;
         }
 
-        if (maturity > 1.3 || averageTension > 0.75 || getFracturedDensity() > 0.15 || getStormDensity() > 0.15) {
+        if (averageTension >= 0.78 || maturity > 1.15 || getFracturedDensity() > 0.16 || getStormDensity() > 0.12) {
             return RegionState.STRAINED;
         }
 
-        if (maturity > 0.6 || averageTension > 0.45 || age > 1200) {
+        if (averageTension >= 0.35 || maturity > 0.5 || age > 900) {
             return RegionState.GROWING;
         }
 

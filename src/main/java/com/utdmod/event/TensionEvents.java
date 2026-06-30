@@ -73,10 +73,14 @@ public final class TensionEvents {
             ChunkPos cp = new ChunkPos(pos);
             double g0 = TensionManager.getTension();
             double before = ChunkTensionManager.getLocalTension(sw, cp);
-            ChunkTensionManager.addMiningTension(sw, cp, blockId);
+            String action = state.isIn(BlockTags.LOGS) ? "LOG_BREAK" : "BLOCK_BREAK";
+            if (state.isIn(BlockTags.LOGS)) {
+                ChunkTensionManager.addForestryTension(sw, cp, true);
+            } else {
+                ChunkTensionManager.addMiningTension(sw, cp, blockId);
+            }
             double after = ChunkTensionManager.getLocalTension(sw, cp);
             double g1 = TensionManager.getTension();
-            String action = state.isIn(BlockTags.LOGS) ? "LOG_BREAK" : "BLOCK_BREAK";
             TensionLogger.traceWithGlobals(
                 TensionTraceClock.getServerTick(),
                 "MINING",

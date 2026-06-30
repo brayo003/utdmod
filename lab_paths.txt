@@ -1,0 +1,87 @@
+===== GameplayValidationExperiments =====
+./simulation_lab/src/test/GameplayValidationExperiments.java
+
+===== ParameterSet =====
+./simulation_lab/src/ParameterSet.java
+
+===== DiagnosticsManager =====
+
+===== Instrumentation =====
+./simulation_lab/src/test/GameplayValidationInstrumentationTest.java
+
+===== Decay search =====
+simulation_lab/src/test/GameplayValidationExperiments.java:        File expDir = new File(outDir, "post_injection_decay");
+simulation_lab/src/test/GameplayValidationExperiments.java:            diag.writeRuntimeParameters("post_injection_decay", p, W, H, buildTicks, 5000, 0);
+simulation_lab/src/test/GameplayValidationExperiments.java:                summary.println("Experiment Name=post_injection_decay");
+simulation_lab/src/test/GameplayValidationExperiments.java:            diag.writeExperimentSummary("post_injection_decay", p, W, H, buildTicks, 5000, 0, A, M, C, "completed", "completed", null, true, true, false, true, p.v3FieldDepthGain != 0.0 || p.v3FieldDepthDecay != 0.0 || p.v3FieldDepthRadius != 0.0);
+simulation_lab/src/test/GameplayValidationInstrumentationTest.java:        File expDir = new File(dir, "post_injection_decay");
+
+simulation_lab/src/GridSimulationV2.java:                    // activation update: current retained minus decay plus transport and external
+simulation_lab/src/GridSimulationV2.java:                    // memory reduces decay; field depth no longer affects decay
+simulation_lab/src/GridSimulationV2.java:                    double decayFactor = parameters.v2ActivationDecay * memTerm;
+simulation_lab/src/GridSimulationV2.java:                    double nextActivation = Math.max(0.0, A * Math.max(0.0, 1.0 - decayFactor) + transport + external);
+simulation_lab/src/GridSimulationV2.java:                    // memory update: slowly accumulates from activation, decays slowly
+simulation_lab/src/test/OldVsYoungRegionComparisonTest.java:        System.out.println(String.format("decayHalfLife(ticks),%.2f,%.2f", young.halfLife, oldRegion.halfLife));
+simulation_lab/src/test/OldVsYoungRegionComparisonTest.java:                double decayFactor = parameters.v2ActivationDecay * memTerm;
+simulation_lab/src/test/OldVsYoungRegionComparisonTest.java:                double nextActivation = Math.max(0.0, A * Math.max(0.0, 1.0 - decayFactor) + transport + external);
+simulation_lab/src/test/FieldDepthSweepTest.java:                double decayFactor = parameters.v2ActivationDecay * memTerm;
+simulation_lab/src/test/FieldDepthSweepTest.java:                double nextActivation = Math.max(0.0, A * Math.max(0.0, 1.0 - decayFactor) + transport + external);
+simulation_lab/src/test/FieldDepthSweepTest.java:        double[] decays = new double[]{1e-6, 1e-5, 1e-4, 1e-3};
+simulation_lab/src/test/FieldDepthSweepTest.java:        // Sweep decay
+simulation_lab/src/test/FieldDepthSweepTest.java:        for (double val : decays) {
+simulation_lab/src/test/FieldDepthSweepTest.java:        // Sweep distance decay
+simulation_lab/src/test/LongFieldDepthExperimentTest.java:                    double decayFactor = p.v2ActivationDecay * memTerm;
+simulation_lab/src/test/LongFieldDepthExperimentTest.java:                    double nextActivation = Math.max(0.0, Axy * Math.max(0.0, 1.0 - decayFactor) + transport + external);
+simulation_lab/src/test/GameplayExperimentAuditTest.java:        w.println("Probe design: no further injection, only decay." );
+simulation_lab/src/test/GameplayExperimentAuditTest.java:            w.println("Intended measurement: whether a tiny disturbance can reactivate a decayed hotspot.");
+simulation_lab/src/test/GameplayExperimentAuditTest.java:        // decay 500 ticks before perturbation
+simulation_lab/src/test/GameplayExperimentAuditTest.java:        writeStateSummary(w, state, p, cx, cy, buildTicks, "post-decay");
+simulation_lab/src/test/GameplayExperimentAuditTest.java:        w.println("Max activation before perturbation after decay: " + max + ", threshold=" + threshold + ".");
+simulation_lab/src/test/GameplayExperimentAuditTest.java:                double decayFactor = parameters.v2ActivationDecay * memTerm;
+simulation_lab/src/test/GameplayExperimentAuditTest.java:                double nextActivation = Math.max(0.0, A * Math.max(0.0, 1.0 - decayFactor) + transport + external);
+simulation_lab/src/test/GameplayValidationExperiments.java:        // Experiment 8: Post-injection decay inspection
+simulation_lab/src/test/GameplayValidationExperiments.java:        private boolean decayExecuted = false;
+simulation_lab/src/test/GameplayValidationExperiments.java:            energy.println("tick,activation_created_by_transport,activation_created_externally,activation_removed_by_decay,activation_removed_by_clamp,net_activation_change");
+simulation_lab/src/test/GameplayValidationExperiments.java:                if (metrics.activationRemovedByDecay > 0.0 || metrics.activationRemovedByClamp > 0.0) decayExecuted = true;
+simulation_lab/src/test/GameplayValidationExperiments.java:            if (!decayExecuted) warnings.add("WARNING:Decay inactive.Results involving this subsystem should not be interpreted.");
+simulation_lab/src/test/GameplayValidationExperiments.java:                s.println("Decay executed=" + decayExecuted);
+simulation_lab/src/test/GameplayValidationExperiments.java:        File expDir = new File(outDir, "post_injection_decay");
+simulation_lab/src/test/GameplayValidationExperiments.java:            diag.writeRuntimeParameters("post_injection_decay", p, W, H, buildTicks, 5000, 0);
+simulation_lab/src/test/GameplayValidationExperiments.java:            List<Double> decayRemoved = new ArrayList<>();
+simulation_lab/src/test/GameplayValidationExperiments.java:                energy.println("tick,totalTransportEnergy,totalActivationDecay,transportAdded,decayRemoved,netEnergyChange");
+simulation_lab/src/test/GameplayValidationExperiments.java:                        decayRemoved.add(metrics.activationRemovedByDecay);
+simulation_lab/src/test/GameplayValidationExperiments.java:                summary.println("Experiment Name=post_injection_decay");
+simulation_lab/src/test/GameplayValidationExperiments.java:                summary.println("Did activation decay to zero?=" + (activationDecayedToZero ? "YES" : "NO"));
+simulation_lab/src/test/GameplayValidationExperiments.java:            try (PrintWriter analysis = new PrintWriter(new File(expDir, "decay_analysis.txt"))) {
+simulation_lab/src/test/GameplayValidationExperiments.java:            diag.writeExperimentSummary("post_injection_decay", p, W, H, buildTicks, 5000, 0, A, M, C, "completed", "completed", null, true, true, false, true, p.v3FieldDepthGain != 0.0 || p.v3FieldDepthDecay != 0.0 || p.v3FieldDepthRadius != 0.0);
+simulation_lab/src/test/GameplayValidationExperiments.java:            return fallbackToObserved ? "No decay observed within 5000 ticks" : "No equilibrium observed.";
+simulation_lab/src/test/GameplayValidationExperiments.java:                double decayFactor = parameters.v2ActivationDecay * memTerm;
+simulation_lab/src/test/GameplayValidationExperiments.java:                double candidateActivation = A * Math.max(0.0, 1.0 - decayFactor) + transport + external;
+simulation_lab/src/test/GameplayValidationExperiments.java:                metrics.activationRemovedByDecay += Math.max(0.0, A * (1.0 - Math.max(0.0, 1.0 - decayFactor)) - (A * Math.max(0.0, 1.0 - decayFactor)));
+simulation_lab/src/test/FieldModelV2Test.java:        // after activation decays, memory should remain > 0
+simulation_lab/src/test/FieldModelV2Test.java:        assertTrue(anyDecrease, "Activation trace did not contain any decrease (no decay observed)");
+simulation_lab/src/test/FieldDepthDiagnosticAuditTest.java:                    double decayFactor = p.v2ActivationDecay * memTerm;
+simulation_lab/src/test/FieldDepthDiagnosticAuditTest.java:                    double nextActivation = Math.max(0.0, Axy * Math.max(0.0, 1.0 - decayFactor) + transport + external);
+simulation_lab/src/test/GameplayValidationInstrumentationTest.java:        File dir = Files.createTempDirectory("post-injection-decay").toFile();
+simulation_lab/src/test/GameplayValidationInstrumentationTest.java:        File expDir = new File(dir, "post_injection_decay");
+simulation_lab/src/test/GameplayValidationInstrumentationTest.java:        assertTrue(new File(expDir, "decay_analysis.txt").exists());
+simulation_lab/src/test/V2ImplementationAuditTest.java:                double decayFactor = p.v2ActivationDecay * (1.0 - (m / (m + p.v2MemoryEffectK)));
+simulation_lab/src/test/V2ImplementationAuditTest.java:                double nextActivation = Math.max(0.0, a * Math.max(0.0, 1.0 - decayFactor) + transport);
+simulation_lab/src/GridSimulation.java:    public double[][] decayTerms;
+simulation_lab/src/GridSimulation.java:        this.decayTerms = new double[height][width];
+simulation_lab/src/GridSimulation.java:                    decayTerms[y][x] = parameters.decayEnabled ? parameters.lambda * cell.tension : 0.0;
+simulation_lab/src/GridSimulation.java:        } else if ("decay_disabled".equals(config.scenario)) {
+simulation_lab/src/GridSimulation.java:            parameters.decayEnabled = false;
+simulation_lab/src/FieldEquation.java:        double decay = p.decayEnabled ? p.lambda * current : 0.0;
+simulation_lab/src/FieldEquation.java:        double next = current + diffusion + nonlinear - saturation + globalFeedback + externalInput - decay - stormDrain;
+simulation_lab/src/ParameterSet.java:    public boolean decayEnabled;
+simulation_lab/src/ParameterSet.java:    public double v2ActivationDecay; // per-tick fractional decay of activation
+simulation_lab/src/ParameterSet.java:    public double v2MemoryDecay; // per-tick fractional decay of memory
+simulation_lab/src/ParameterSet.java:    public double v3FieldDepthDecay; // per-tick capacity decay (very small)
+simulation_lab/src/ParameterSet.java:                       boolean diffusionEnabled, boolean decayEnabled, boolean globalCouplingEnabled,
+simulation_lab/src/ParameterSet.java:        this.decayEnabled = decayEnabled;
+simulation_lab/src/ParameterSet.java:        this.v2ActivationDecay = 0.45; // fast decay per tick
+simulation_lab/src/ParameterSet.java:        this.v2MemoryDecay = 0.001; // very slow decay
+simulation_lab/src/ParameterSet.java:        this.v3FieldDepthDecay = 0.0001; // very slow decay
+simulation_lab/src/ParameterSet.java:                diffusionEnabled, decayEnabled, globalCouplingEnabled, nonlinearEnabled,
+simulation_lab/src/ExperimentLibrary.java:        scenarios.add("decay_disabled");

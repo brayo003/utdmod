@@ -26,10 +26,11 @@ public final class RegionEcologyManager {
     private static final int REGION_STEP = 4;
     private static final int CHUNKS_PER_REGION = 2;
     private static final int BLOCKS_PER_CHUNK = 2;
-    private static final int MAX_STRESS = 16;
+    private static final int MAX_STRESS = 20;
 
     private static final Map<Integer, Integer> stressByRegion = new HashMap<>();
     private static final Map<Integer, RegionHistory> historyByRegion = new HashMap<>();
+    private static final Map<Integer, RegionState> previousStateByRegion = new HashMap<>();
 
     private RegionEcologyManager() {}
 
@@ -74,6 +75,12 @@ public final class RegionEcologyManager {
 
         int decorationsApplied = 0;
         int recoveriesApplied = 0;
+        RegionState previousState = previousStateByRegion.get(region.getId());
+        int currentStress = stressByRegion.getOrDefault(region.getId(), 0);
+        boolean coolingTransition = false;
+        boolean recoveringTransition = false;
+        boolean healedTransition = false;
+
         List<ChunkPos> selectedChunks = selectChunks(region, CHUNKS_PER_REGION, world.random.nextLong());
         for (ChunkPos chunkPos : selectedChunks) {
             if (!world.isChunkLoaded(chunkPos.x, chunkPos.z)) {
@@ -84,7 +91,6 @@ public final class RegionEcologyManager {
                 if (surfacePos == null) {
                     continue;
                 }
-                int currentStress = stressByRegion.getOrDefault(region.getId(), 0);
                 RegionState state = region.getState();
                 RegionHistory history = historyByRegion.computeIfAbsent(region.getId(), ignored -> new RegionHistory());
                 if (history.getAge() < region.getAge()) {
@@ -92,10 +98,11 @@ public final class RegionEcologyManager {
                 }
                 history.advanceAge();
 
-                EcologyPolicy policy = selectPolicy(state, history);
+                EcologyPolicy policy = selectPolicy(state, history, region.getAverageTension(), currentStress);
                 if (policy == EcologyPolicy.RECOVERY && currentStress > 0) {
                     recoveriesApplied += applyRecovery(world, surfacePos);
                     currentStress = Math.max(0, currentStress - 1);
+                    recoveringTransition = true;
                 } else {
                     decorationsApplied += applyPolicyAction(world, surfacePos, policy, history);
                 }
@@ -106,15 +113,43 @@ public final class RegionEcologyManager {
                     currentStress = Math.min(MAX_STRESS, currentStress + 2);
                 } else if (state == RegionState.ANCIENT) {
                     currentStress = Math.min(MAX_STRESS, currentStress + 1);
+                } else if (state == RegionState.GROWING || state == RegionState.DORMANT) {
+                    currentStress = Math.max(0, currentStress - 1);
                 }
-                stressByRegion.put(region.getId(), currentStress);
             }
         }
 
-        if (decorationsApplied > 0 || recoveriesApplied > 0) {
-            if (tick % 200 == 0) {
-                DiagnosticLogs.ecologySummary(region.getId(), region.getState(), decorationsApplied, recoveriesApplied);
+        RegionState state = region.getState();
+        if (previousState != null && !previousState.equals(state)) {
+            if (previousState == RegionState.STRAINED && state == RegionState.GROWING) {
+                coolingTransition = true;
+            } else if (previousState != RegionState.DORMANT && state == RegionState.DORMANT && currentStress <= 0) {
+                healedTransition = true;
             }
+        }
+        if (coolingTransition) {
+            DiagnosticLogs.regionCooling(region.getId(), state, region.getAverageTension(), region.getMaturity(), currentStress);
+        } else if (recoveringTransition && recoveriesApplied > 0) {
+            DiagnosticLogs.regionRecovering(region.getId(), state, region.getAverageTension(), region.getMaturity(), currentStress);
+        } else if (healedTransition) {
+            DiagnosticLogs.regionRehealed(region.getId(), state, region.getAverageTension(), region.getMaturity(), currentStress);
+        }
+
+        stressByRegion.put(region.getId(), Math.max(0, currentStress));
+        previousStateByRegion.put(region.getId(), state);
+
+        if (tick % 200 == 0) {
+            DiagnosticLogs.ecologySummary(
+                region.getId(),
+                state,
+                region.getAverageTension(),
+                region.getMaturity(),
+                coolingTransition ? "Cooling" : (recoveriesApplied > 0 ? "Recovering" : "Steady"),
+                currentStress,
+                decorationsApplied,
+                recoveriesApplied,
+                region.getStormChunks() > 0
+            );
         }
     }
 
@@ -156,7 +191,7 @@ public final class RegionEcologyManager {
         return new BlockPos(x, world.getTopY(), z);
     }
 
-    private static EcologyPolicy selectPolicy(RegionState state, RegionHistory history) {
+    static EcologyPolicy selectPolicy(RegionState state, RegionHistory history, double averageTension, int currentStress) {
         if (state == RegionState.ANCIENT) {
             return EcologyPolicy.ANCIENT;
         }
@@ -164,10 +199,25 @@ public final class RegionEcologyManager {
             return EcologyPolicy.FRACTURED;
         }
         if (state == RegionState.STRAINED) {
-            return EcologyPolicy.STRAINED;
-        }
-        if (history.getTreesCut() > 80 || history.getBlocksMined() > 180) {
+            if (currentStress >= 8 || history.getTreesCut() >= 28 || history.getBlocksMined() >= 90) {
+                return EcologyPolicy.STRAINED;
+            }
             return EcologyPolicy.RECOVERY;
+        }
+        if (state == RegionState.GROWING) {
+            if (history.getTreesCut() >= 30 && averageTension >= 0.78) {
+                return EcologyPolicy.STRAINED;
+            }
+            if (currentStress > 2 || history.getTreesCut() >= 55 || history.getBlocksMined() >= 140) {
+                return EcologyPolicy.RECOVERY;
+            }
+            return EcologyPolicy.GROWING;
+        }
+        if (state == RegionState.DORMANT) {
+            if (currentStress > 2 || history.getTreesCut() >= 16 || history.getBlocksMined() >= 80) {
+                return EcologyPolicy.RECOVERY;
+            }
+            return EcologyPolicy.GROWING;
         }
         return EcologyPolicy.GROWING;
     }
@@ -197,12 +247,12 @@ public final class RegionEcologyManager {
         BlockState surface = world.getBlockState(surfacePos);
         BlockState above = world.getBlockState(surfacePos.up());
         if (surface.isOf(Blocks.GRASS_BLOCK) && above.isAir()) {
-            if (history.getTreesCut() > 40 && world.random.nextInt(100) < 15) {
+            if (history.getTreesCut() >= 25 && world.random.nextInt(100) < 10) {
                 world.setBlockState(surfacePos.up(), Blocks.OAK_SAPLING.getDefaultState());
-            } else if (world.random.nextBoolean()) {
+            } else if (world.random.nextInt(100) < 18) {
                 world.setBlockState(surfacePos.up(), Blocks.TALL_GRASS.getDefaultState());
-            } else {
-                world.setBlockState(surfacePos.up(), Blocks.DANDELION.getDefaultState());
+            } else if (world.random.nextInt(100) < 10) {
+                world.setBlockState(surfacePos.up(), Blocks.POPPY.getDefaultState());
             }
             return 1;
         }
@@ -241,7 +291,7 @@ public final class RegionEcologyManager {
             world.setBlockState(surfacePos.up(), Blocks.DEAD_BUSH.getDefaultState());
             applied++;
         }
-        if (world.random.nextInt(4) == 0) {
+        if (world.random.nextInt(6) == 0) {
             world.setBlockState(surfacePos.east(), Blocks.COBBLESTONE.getDefaultState());
             applied++;
         }
@@ -250,15 +300,15 @@ public final class RegionEcologyManager {
 
     private static int applyAncient(ServerWorld world, BlockPos surfacePos) {
         int applied = 0;
-        if (world.random.nextInt(6) == 0 && world.getBlockState(surfacePos.up()).isAir()) {
+        if (world.random.nextInt(8) == 0 && world.getBlockState(surfacePos.up()).isAir()) {
             world.setBlockState(surfacePos.up(), Blocks.AMETHYST_CLUSTER.getDefaultState());
             applied++;
         }
-        if (world.random.nextInt(8) == 0 && world.getBlockState(surfacePos).isOf(Blocks.COARSE_DIRT)) {
+        if (world.random.nextInt(10) == 0 && world.getBlockState(surfacePos).isOf(Blocks.COARSE_DIRT)) {
             world.setBlockState(surfacePos, Blocks.MOSSY_COBBLESTONE.getDefaultState());
             applied++;
         }
-        if (world.random.nextInt(10) == 0 && world.getBlockState(surfacePos.up()).isAir()) {
+        if (world.random.nextInt(12) == 0 && world.getBlockState(surfacePos.up()).isAir()) {
             world.setBlockState(surfacePos.up(), Blocks.VINE.getDefaultState());
             applied++;
         }
@@ -275,8 +325,14 @@ public final class RegionEcologyManager {
             world.setBlockState(surfacePos.up(), Blocks.AIR.getDefaultState());
             applied++;
         }
-        if (world.random.nextInt(4) == 0 && world.getBlockState(surfacePos.up()).isAir()) {
+        if (world.random.nextInt(6) == 0 && world.getBlockState(surfacePos.up()).isAir()) {
             world.setBlockState(surfacePos.up(), Blocks.TALL_GRASS.getDefaultState());
+            applied++;
+        } else if (world.random.nextInt(10) == 0 && world.getBlockState(surfacePos.up()).isAir()) {
+            world.setBlockState(surfacePos.up(), Blocks.POPPY.getDefaultState());
+            applied++;
+        } else if (world.random.nextInt(18) == 0 && world.getBlockState(surfacePos.up()).isAir()) {
+            world.setBlockState(surfacePos.up(), Blocks.OAK_SAPLING.getDefaultState());
             applied++;
         }
         return applied;
