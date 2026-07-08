@@ -22,6 +22,11 @@ public final class ChunkTensionManager {
         return data.getChunkState(pos);
     }
 
+    public static SubstrateState getOrCreateSubstrateState(ServerWorld world, ChunkPos pos) {
+        ChunkTensionData data = ChunkTensionData.getServerState(world);
+        return data.getOrCreateSubstrateState(pos);
+    }
+
     public static void setLocalTension(ServerWorld world, ChunkPos pos, double tension) {
         ChunkTensionData data = ChunkTensionData.getServerState(world);
         data.setLocalTension(pos, tension, world);

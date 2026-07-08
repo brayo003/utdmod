@@ -18,15 +18,18 @@ public final class ClientRegionalAtmosphere {
         double p = TensionSyncState.perceivedTension();
         double blend = Math.max(reg * 0.85, p);
         if (blend < 0.72) return;
-        if (client.world.random.nextInt(blend > 1.25 ? 14 : 38) != 0) return;
+        long tick = client.world.getTime();
+        int index = (int) (tick % 4);
         var ppos = client.player.getPos();
-        double ox = (client.world.random.nextDouble() - 0.5) * 10.0;
-        double oz = (client.world.random.nextDouble() - 0.5) * 10.0;
+        double offset = 1.5 + (blend - 0.72) * 3.5;
+        double ox = ((index * 2) - 3) * offset;
+        double oz = ((index % 2) * 2 - 1) * offset;
+
         if (blend > 1.25) {
             client.world.addParticle(
                 ParticleTypes.END_ROD,
                 ppos.x + ox,
-                client.player.getY() + client.world.random.nextDouble() * 2.0,
+                client.player.getY() + 1.0 + (index * 0.25),
                 ppos.z + oz,
                 0.0, 0.02, 0.0
             );

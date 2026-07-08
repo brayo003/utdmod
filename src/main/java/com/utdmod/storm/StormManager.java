@@ -29,12 +29,6 @@ public final class StormManager {
     private static final boolean DEBUG_LOGGING = false;
 
     private static int stormTickCounter = 0;
-    private static boolean stormActive = false;
-    private static int stormDuration = 0;
-    private static int stormRegionId = 0;
-    private static int stormRegionRx = 0;
-    private static int stormRegionRz = 0;
-    private static double stormPeakTension = 0.0;
 
     private StormManager() {}
 
@@ -92,113 +86,44 @@ public final class StormManager {
     }
 
     public static void tick(ServerWorld world) {
+        // StormManager no longer generates weather or storms.
+        // It only maintains diagnostics and state history for region-based field monitoring.
         stormTickCounter++;
         Region region = selectStormRegion(world);
         double readiness = computeReadiness(region);
-
-        if (stormActive) {
-            stormPeakTension = Math.max(stormPeakTension, readiness);
-            stormDuration++;
-            if (readiness < 0.18 && world.random.nextInt(900) == 0) {
-                endStorm(world, readiness, "COOLING");
-                return;
-            }
-            if (world.random.nextFloat() < lightningChance(region)) {
-                strikeLightning(world, region);
-            }
-            if (world.getRegistryKey() == World.OVERWORLD && world.random.nextInt(2400) == 0) {
-                world.setWeather(1000 + world.random.nextInt(800), 0, true, false);
-            }
-            return;
-        }
-
-        if (readiness > 0.72 && world.random.nextFloat() < 0.00022f + readiness * 0.00012f) {
-            triggerStorm(world, region, readiness);
+        if (DEBUG_LOGGING) {
+            System.out.printf("[STORM] tick=%d world=%s region=%s readiness=%.3f%n",
+                stormTickCounter,
+                world.getRegistryKey().getValue(),
+                region != null ? region.getId() : -1,
+                readiness
+            );
         }
     }
 
-    private static void triggerStorm(ServerWorld world, Region region, double readiness) {
-        if (stormActive) {
-            if (DEBUG_LOGGING) {
-                System.out.printf("[STORM] Storm already active in %s%n", world.getRegistryKey().getValue());
-            }
-            return;
-        }
-        stormActive = true;
-        stormDuration = 0;
-        stormPeakTension = readiness;
-        stormRegionId = region != null ? region.getId() : 0;
-        stormRegionRx = region != null ? (int) Math.round(region.getCentroidX()) : 0;
-        stormRegionRz = region != null ? (int) Math.round(region.getCentroidZ()) : 0;
+    private static void logStormStart(ServerWorld world, Region region, double readiness) {
+        int stormRegionId = region != null ? region.getId() : -1;
         DiagnosticLogs.stormStarted(world.getTime(), stormRegionId, region != null ? region.getState().name() : "UNKNOWN", readiness);
         if (DEBUG_LOGGING) {
-            System.out.printf("[STORM] Storm started in %s (readiness: %.2f)%n", world.getRegistryKey().getValue(), readiness);
-        }
-    }
-
-    private static void endStorm(ServerWorld world, double readiness, String reason) {
-        if (!stormActive) {
-            return;
-        }
-        stormActive = false;
-        DiagnosticLogs.stormEnded(stormDuration, stormPeakTension, stormRegionId, reason);
-        if (DEBUG_LOGGING) {
-            System.out.printf("[STORM] Storm ended in %s after %d ticks (readiness: %.2f, reason: %s)%n",
-                world.getRegistryKey().getValue(), stormDuration, readiness, reason);
+            System.out.printf("[STORM] Storm start logged in %s region=%d readiness=%.2f%n",
+                world.getRegistryKey().getValue(), stormRegionId, readiness);
         }
     }
 
     private static void strikeLightning(ServerWorld world, Region region) {
-        if (world == null || region == null) {
-            return;
-        }
-        ChunkTensionData chunkData = ChunkTensionData.getServerState(world);
-        List<ChunkPos> candidates = new ArrayList<>();
-        for (ChunkPos chunkPos : region.getChunks()) {
-            if (world.isChunkLoaded(chunkPos.x, chunkPos.z) && chunkData.getChunkState(chunkPos) == ChunkTensionData.ChunkState.FRACTURED) {
-                candidates.add(chunkPos);
-            }
-        }
-        if (candidates.isEmpty()) {
-            candidates.addAll(region.getChunks());
-        }
-        ChunkPos chosen = candidates.get(world.random.nextInt(candidates.size()));
-        int x = (chosen.x << 4) + world.random.nextInt(16);
-        int z = (chosen.z << 4) + world.random.nextInt(16);
-        int y = world.getTopY();
-        BlockPos pos = new BlockPos(x, y, z);
-        while (y > world.getBottomY() && world.getBlockState(pos).isAir()) {
-            y--;
-            pos = pos.down();
-        }
-        LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(world);
-        if (lightning != null) {
-            lightning.refreshPositionAfterTeleport(new Vec3d(x, y + 1, z));
-            world.spawnEntity(lightning);
-        }
-    }
-
-    public static boolean isStormActive() {
-        return stormActive;
-    }
-
-    public static int getStormDuration() {
-        return stormDuration;
+        // StormManager no longer chooses lightning positions deterministically.
     }
 
     public static void triggerRitualStorm(ServerWorld world, PlayerEntity player) {
         if (RitualHandler.canPerformRitual(world, player)) {
-            triggerStorm(world, selectStormRegion(world), 1.0);
+            Region region = selectStormRegion(world);
+            double readiness = computeReadiness(region);
+            logStormStart(world, region, readiness);
             player.sendMessage(Text.literal("Storm ritual activated!"));
         }
     }
 
     public static void calmStorm(ServerWorld world, double calmAmount) {
-        if (stormActive) {
-            TensionManager.reduceTension(calmAmount);
-            if (TensionManager.getTension() < 0.5) {
-                endStorm(world, TensionManager.getTension(), "RITUAL_CALMING");
-            }
-        }
+        TensionManager.reduceTension(calmAmount);
     }
 }

@@ -23,4 +23,8 @@ public class ExperimentConfig {
         this.externalInput = externalInput;
         this.seed = seed;
     }
+
+    public ExperimentConfig(String scenario, int impulseX, int impulseY) {
+        this("default", scenario, 4, 4, 200, new ParameterSet(), impulseX, impulseY, 1.0, 12345L);
+    }
 }

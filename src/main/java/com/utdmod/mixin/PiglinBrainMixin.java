@@ -6,6 +6,7 @@ import net.minecraft.entity.mob.PiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,15 +26,19 @@ public abstract class PiglinBrainMixin {
             if (!world.isClient()) {
                 PlayerEntity nearestPlayer = world.getClosestPlayer(piglin, 32.0);
                 
-                if (nearestPlayer instanceof ServerPlayerEntity serverPlayer) {
+                if (nearestPlayer instanceof ServerPlayerEntity) {
                     double tension = TensionManager.getTension();
-                    
-                    if (tension > 0.0 && world.random.nextFloat() < (tension * 0.1)) {
-                        System.out.println("[AI LOG] Piglin: Tension-induced hostility triggered (Trade Volatility). Tension: " + tension);
-                        piglin.setTarget(serverPlayer); 
+                    long tick = world.getTime();
+                    if (deterministicFloat(piglin.getBlockPos(), tick, 0) < (tension * 0.1)) {
+                        piglin.setTarget(nearestPlayer); 
                     }
                 }
             }
         }
+    }
+
+    private static float deterministicFloat(BlockPos pos, long tick, int salt) {
+        double value = Math.sin((pos.getX() * 31L + pos.getY() * 17L + pos.getZ() * 13L + tick * 7L + salt * 97L) * 0.6180339887498948) * 43758.5453123;
+        return (float) (value - Math.floor(value));
     }
 }

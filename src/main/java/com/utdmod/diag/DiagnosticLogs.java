@@ -5,6 +5,7 @@ import java.util.List;
 import com.utdmod.core.Region;
 import com.utdmod.core.RegionState;
 import com.utdmod.tension.ChunkTensionData;
+import com.utdmod.tension.SubstrateState;
 
 import net.minecraft.util.math.ChunkPos;
 
@@ -43,6 +44,27 @@ public final class DiagnosticLogs {
 
     public static boolean isGlobalFlowDebugEnabled() {
         return DEBUG_GLOBAL_FLOW_LOGS;
+    }
+
+    public static void substrateSnapshot(long tick, ChunkPos chunk, SubstrateState state) {
+        if (state == null) {
+            return;
+        }
+        System.out.printf(
+            "[SUBSTRATE]tick=%d chunk=%d,%d activation=%.6f memory=%.6f fieldDepth=%.6f transport=%.6f readiness=%.6f radius=%.3f capacity=%.6f peakActivation=%.6f convergence=%.6f%n",
+            tick,
+            chunk.x,
+            chunk.z,
+            state.getActivation(),
+            state.getMemory(),
+            state.getFieldDepth(),
+            state.getTransport(),
+            state.getReadiness(),
+            state.getRadius(),
+            state.getCapacity(),
+            state.getPeakActivation(),
+            state.getConvergence()
+        );
     }
 
     static String formatFieldSummaryLine(

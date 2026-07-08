@@ -14,3 +14,5 @@ rootProject.name = "utdmod"
 
 // Include external projects if necessary
 // include "other-project"
+
+includeBuild("../baritone")

@@ -36,17 +36,56 @@ public class ParameterSet {
     // V2 model parameters
     public double v2TransportGain; // transport strength from neighbors to activation
     public double v2ActivationDecay; // per-tick fractional decay of activation
-    public double v2MemoryGain; // how much memory grows per unit activation
-    public double v2MemoryDecay; // per-tick fractional decay of memory
+    /** @deprecated Use memoryFormationGain / memoryDecayRate instead. */
+    @Deprecated
+    public double v2MemoryGain;
+    /** @deprecated Use memoryFormationGain / memoryDecayRate instead. */
+    @Deprecated
+    public double v2MemoryDecay;
     public double v2MemoryInfluence; // how memory amplifies incoming activation
     public double v2MemoryEffectK; // small constant for memory scaling
+    // Memory law parameters (physical interpretation)
+    public double memoryFormationGain; // strength of historical experience formation
+    public double memoryMaximum; // saturation ceiling for accumulated memory
+    public double memoryFormationThreshold; // activation/baseline/depth threshold for formation
+    public double memoryDiffusionGain; // diffusion coefficient for spatial memory synchronization
+    public double memoryDepthRetentionGain; // how strongly depth slows forgetting
+    public double memoryDecayRate; // baseline forgetting rate for shallow regions
     public double v2ClampMax; // optional clamp for activation
     // Field Depth (structural memory / capacity) V3 parameters
-    public double v3FieldDepthGain; // per-tick capacity growth coefficient (small)
+    public double v3FieldDepthGain; // legacy depth relaxation gain retained for compatibility
+    public double depthGrowthGain; // growth term for organization-driven structural maturity
+    public double depthErosionGain; // erosion term for disorder-driven structural decay
     public double v3FieldDepthDecay; // per-tick capacity decay (very small)
     public double v3FieldDepthRadius; // maximum additional transport rings
     public double v3DistanceDecay; // distance attenuation for transport beyond base radius
     public double v3FieldDepthEffectK; // small constant for depth radius scaling
+    public double v3FieldDepthDiffusionGain; // extremely weak diffusion for field depth
+    public double v3DepthSensitivity; // depth amplifies activation sensitivity
+    public double v3DepthRecoveryGain; // depth changes activation recovery rate
+    public double v3DepthMemoryRetentionGain; // depth strengthens memory retention
+    public double v3DepthTransportGain; // depth increases transport mobility
+    public double v3DepthGradientGain; // local depth gradients alter coupling strength
+    public double v3ActivationBistabilityGain; // strength of cubic local bistability in activation
+    public double v3MemorySynchronizationGain; // selective memory synchronization with neighbors
+    public double v3TransportStateGain; // state-dependent modulation of transport coupling
+    // Adaptive relaxation (V2 hybrid law)
+    public boolean v2AdaptiveRelaxationEnabled;
+    public double v2RelaxationLambdaMin;
+    public double v2RelaxationLambdaGain;
+    public double v2RelaxationK;
+    public double v2RelaxationTc;
+    public double v2RelaxationMemoryBeta;
+    public double v2RelaxationDepthGamma;
+    public double v2ActivationFastGain;
+    public double v2BaselineGain;
+    public double v2BaselineRelaxation;
+    public double v2BaselineResting;
+    public double v2ActivationRelaxationGain;
+    public double v2BaselineAdaptationRate;
+    public double v2BaselineHealingRate;
+    public double v2DepthGain;
+    public double v2DepthRelaxation;
     public String transportBalanceMode;
     public double readinessMemoryScale;
     public double readinessFieldScale;
@@ -54,6 +93,8 @@ public class ParameterSet {
     public long seed;
     // Validation configuration
     public double validationMaxHotspotRadius;
+    // Unified coupled dynamics: explicit coupling matrix and state-vector transport
+    public CouplingMatrix couplingMatrix;
 
     public ParameterSet() {
         this(DEFAULT_D, DEFAULT_LAMBDA, DEFAULT_ALPHA, DEFAULT_BETA, DEFAULT_GAMMA,
@@ -88,24 +129,99 @@ public class ParameterSet {
         this.seed = seed;
         // V2 defaults
         this.v2TransportGain = 0.08;
-        this.v2ActivationDecay = 0.45; // fast decay per tick
-        this.v2MemoryGain = 0.02; // slow accumulation
-        this.v2MemoryDecay = 0.001; // very slow decay
+        this.v2ActivationDecay = 0.45; // restored to baseline
+        this.v2MemoryGain = 0.02;
+        this.v2MemoryDecay = 0.001;
         this.v2MemoryInfluence = 2.0; // amplifies incoming activation
         this.v2MemoryEffectK = 0.1;
-        this.v2ClampMax = 5.0;
+        this.memoryFormationGain = 0.02;
+        this.memoryMaximum = 2.0;
+        this.memoryFormationThreshold = 0.05;
+        this.memoryDiffusionGain = 0.002;
+        this.memoryDepthRetentionGain = 0.8;
+        this.memoryDecayRate = 0.001;
+        this.v2ClampMax = 1.5;
         // FieldDepth defaults: disabled by default, radius effect inactive
-        this.v3FieldDepthGain = 0.0; // set >0 to enable slow growth
-        this.v3FieldDepthDecay = 0.0001; // very slow decay
+        this.v3FieldDepthGain = 0.005; // legacy compatibility gain
+        this.depthGrowthGain = 0.04;
+        this.depthErosionGain = 0.03;
+        this.v3FieldDepthDecay = 0.0005; // moderate decay
         this.v3FieldDepthRadius = 0.0; // no extra radius by default
         this.v3DistanceDecay = 1.0; // moderate distance attenuation
         this.v3FieldDepthEffectK = 0.1;
+        this.v3FieldDepthDiffusionGain = 0.0002;
+        this.v3DepthSensitivity = 0.35;
+        this.v3DepthRecoveryGain = 0.25;
+        this.v3DepthMemoryRetentionGain = 0.20;
+        this.v3DepthTransportGain = 0.20;
+        this.v3DepthGradientGain = 0.12;
+        this.v3ActivationBistabilityGain = 0.65;
+        this.v3MemorySynchronizationGain = 0.012;
+        this.v3TransportStateGain = 0.20;
+        this.v2AdaptiveRelaxationEnabled = true;
+        this.v2RelaxationLambdaMin = 0.0006;
+        this.v2RelaxationLambdaGain = 0.0024;
+        this.v2RelaxationK = 15.0;
+        this.v2RelaxationTc = 1.0;
+        this.v2RelaxationMemoryBeta = 0.25;
+        this.v2RelaxationDepthGamma = 0.30;
+        this.v2ActivationFastGain = 0.18;
+        this.v2BaselineGain = 0.002;
+        this.v2BaselineRelaxation = 0.0005;
+        this.v2BaselineResting = 0.02;
+        this.v2ActivationRelaxationGain = 0.18;
+        this.v2BaselineAdaptationRate = 0.002;
+        this.v2BaselineHealingRate = 0.0005;
+        this.v2DepthGain = 0.00002;
+        this.v2DepthRelaxation = 0.00001;
         this.transportBalanceMode = "baseline";
         this.readinessMemoryScale = 1.0;
         this.readinessFieldScale = 1.0;
         this.readinessTransitionWidth = 1.0;
         // validation default
         this.validationMaxHotspotRadius = 10.0;
+        // Initialize coupling matrix with default weak symmetric coupling
+        this.couplingMatrix = new CouplingMatrix();
+        initializeDefaultCouplingMatrix();
+    }
+
+    /**
+     * Initialize coupling matrix with default weak symmetric interactions.
+     * These are tuning targets for achieving spatial stability without attractors.
+     */
+    private void initializeDefaultCouplingMatrix() {
+        // A affects: A (self-damping), M (activation drives memory), D, B
+        couplingMatrix.set(0, 0, -0.10);  // A self-decay
+        couplingMatrix.set(0, 1,  0.05);  // M → A (positive feedback)
+        couplingMatrix.set(0, 2,  0.04);  // D → A (depth excites)
+        couplingMatrix.set(0, 3,  0.04);  // B → A (baseline supplies activation)
+
+        // M affects: A, M (self-decay), D, B
+        couplingMatrix.set(1, 0,  0.06);  // A → M (activation grows memory)
+        couplingMatrix.set(1, 1, -0.05);  // M self-decay
+        couplingMatrix.set(1, 2,  0.03);  // D → M (depth supports memory)
+        couplingMatrix.set(1, 3,  0.02);  // B → M (baseline influences memory)
+
+        // D affects: A, M, D (self-decay), B
+        couplingMatrix.set(2, 0,  0.04);  // A → D (activity writes depth)
+        couplingMatrix.set(2, 1,  0.02);  // M → D (memory reinforces depth)
+        couplingMatrix.set(2, 2, -0.008); // D self-decay (very slow)
+        couplingMatrix.set(2, 3,  0.01);  // B → D
+
+        // B affects: A, M, D, B (self-decay)
+        couplingMatrix.set(3, 0,  0.05);  // A → B (activity depletes baseline)
+        couplingMatrix.set(3, 1,  0.02);  // M → B
+        couplingMatrix.set(3, 2,  0.01);  // D → B
+        couplingMatrix.set(3, 3, -0.03);  // B self-recovery
+    }
+
+    public void copyUnifiedDynamicsFrom(ParameterSet other) {
+        this.couplingMatrix = new CouplingMatrix();
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                this.couplingMatrix.set(i, j, other.couplingMatrix.get(i, j));
+            }
+        }
     }
 
     public ParameterSet copy() {
@@ -119,17 +235,51 @@ public class ParameterSet {
         copy.v2MemoryDecay = this.v2MemoryDecay;
         copy.v2MemoryInfluence = this.v2MemoryInfluence;
         copy.v2MemoryEffectK = this.v2MemoryEffectK;
+        copy.memoryFormationGain = this.memoryFormationGain;
+        copy.memoryMaximum = this.memoryMaximum;
+        copy.memoryFormationThreshold = this.memoryFormationThreshold;
+        copy.memoryDiffusionGain = this.memoryDiffusionGain;
+        copy.memoryDepthRetentionGain = this.memoryDepthRetentionGain;
+        copy.memoryDecayRate = this.memoryDecayRate;
         copy.v2ClampMax = this.v2ClampMax;
         copy.v3FieldDepthGain = this.v3FieldDepthGain;
+        copy.depthGrowthGain = this.depthGrowthGain;
+        copy.depthErosionGain = this.depthErosionGain;
         copy.v3FieldDepthDecay = this.v3FieldDepthDecay;
         copy.v3FieldDepthRadius = this.v3FieldDepthRadius;
         copy.v3DistanceDecay = this.v3DistanceDecay;
         copy.v3FieldDepthEffectK = this.v3FieldDepthEffectK;
+        copy.v3FieldDepthDiffusionGain = this.v3FieldDepthDiffusionGain;
+        copy.v3DepthSensitivity = this.v3DepthSensitivity;
+        copy.v3DepthRecoveryGain = this.v3DepthRecoveryGain;
+        copy.v3DepthMemoryRetentionGain = this.v3DepthMemoryRetentionGain;
+        copy.v3DepthTransportGain = this.v3DepthTransportGain;
+        copy.v3DepthGradientGain = this.v3DepthGradientGain;
+        copy.v3ActivationBistabilityGain = this.v3ActivationBistabilityGain;
+        copy.v3MemorySynchronizationGain = this.v3MemorySynchronizationGain;
+        copy.v3TransportStateGain = this.v3TransportStateGain;
+        copy.v2AdaptiveRelaxationEnabled = this.v2AdaptiveRelaxationEnabled;
+        copy.v2RelaxationLambdaMin = this.v2RelaxationLambdaMin;
+        copy.v2RelaxationLambdaGain = this.v2RelaxationLambdaGain;
+        copy.v2RelaxationK = this.v2RelaxationK;
+        copy.v2RelaxationTc = this.v2RelaxationTc;
+        copy.v2RelaxationMemoryBeta = this.v2RelaxationMemoryBeta;
+        copy.v2RelaxationDepthGamma = this.v2RelaxationDepthGamma;
+        copy.v2ActivationFastGain = this.v2ActivationFastGain;
+        copy.v2BaselineGain = this.v2BaselineGain;
+        copy.v2BaselineRelaxation = this.v2BaselineRelaxation;
+        copy.v2BaselineResting = this.v2BaselineResting;
+        copy.v2ActivationRelaxationGain = this.v2ActivationRelaxationGain;
+        copy.v2BaselineAdaptationRate = this.v2BaselineAdaptationRate;
+        copy.v2BaselineHealingRate = this.v2BaselineHealingRate;
+        copy.v2DepthGain = this.v2DepthGain;
+        copy.v2DepthRelaxation = this.v2DepthRelaxation;
         copy.transportBalanceMode = this.transportBalanceMode;
         copy.readinessMemoryScale = this.readinessMemoryScale;
         copy.readinessFieldScale = this.readinessFieldScale;
         copy.readinessTransitionWidth = this.readinessTransitionWidth;
         copy.validationMaxHotspotRadius = this.validationMaxHotspotRadius;
+        copy.copyUnifiedDynamicsFrom(this);
         return copy;
     }
 

@@ -2,8 +2,17 @@ package com.utdmod.core;
 
 import com.utdmod.diag.DiagnosticLogs;
 import com.utdmod.experiment.ExperimentTelemetry;
+import com.utdmod.field.FieldActuatorRegistry;
+import com.utdmod.interpretation.InterpretationService;
+import com.utdmod.interpretation.RegionalWeatherCoordinator;
+import com.utdmod.interpretation.WorldPresentationState;
 import com.utdmod.network.TensionSyncPacket;
 import com.utdmod.registry.ModItems;
+import com.utdmod.research.PerturbationType;
+import com.utdmod.research.ResearchBotManager;
+import com.utdmod.research.ResearchObserver;
+import com.utdmod.research.ResearchPerturbationBridge;
+import com.utdmod.research.player.ResearchPlayerRegistry;
 import com.utdmod.signals.PlayerStateIntegrator;
 import com.utdmod.storm.StormManager;
 import com.utdmod.tension.ChunkTensionData;
@@ -22,8 +31,10 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -76,32 +87,16 @@ public final class TensionServerTick {
     }
 
     public static void triggerLocalStorm(ChunkPos chunkPos, ServerWorld world) {
-        for (int i = 0; i < 2 + world.random.nextInt(2); i++) {
-            double x = (chunkPos.x << 4) + world.random.nextDouble() * 16;
-            double z = (chunkPos.z << 4) + world.random.nextDouble() * 16;
-
-            int y = world.getTopY();
-            BlockPos pos = new BlockPos((int) x, y, (int) z);
-            while (y > 0 && world.getBlockState(pos).isAir()) {
-                y--;
-                pos = pos.down();
-            }
-            y++;
-
-            LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(world);
-            if (lightning != null) {
-                lightning.refreshPositionAfterTeleport(new Vec3d(x, y, z));
-                world.spawnEntity(lightning);
-                if (UTDMod.LOGGER.isDebugEnabled()) {
-                    UTDMod.LOGGER.debug("Lightning spawned at {}, {}, {} in chunk {},{}", x, y, z, chunkPos.x, chunkPos.z);
-                }
-            }
+        // Local storm activation is now represented through substrate state only.
+        // Weather rendering and thunder are handled exclusively by WeatherActuator.
+        if (UTDMod.LOGGER.isDebugEnabled()) {
+            UTDMod.LOGGER.debug("Local storm triggered in chunk {},{} by substrate field state", chunkPos.x, chunkPos.z);
         }
         TensionTraceLogger.traceField(
             world.getTime(),
             "SYSTEM",
             "LOCAL_STORM_START",
-            "lightning_burst",
+            "local_storm_activated",
             chunkPos,
             ChunkTensionManager.getLocalTension(world, chunkPos),
             TensionManager.getTension(),
@@ -161,62 +156,21 @@ public final class TensionServerTick {
     }
 
     private static void onEndServerTick(MinecraftServer server) {
+        if (tickCounter == 0) {
+            com.utdmod.experiment.ExperimentLogger.ensureInitialized(server);
+        }
         tickCounter++;
         TensionTraceClock.setServerTick(tickCounter);
         TensionActivityLedger.reset();
 
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            PlayerStateIntegrator.onServerPlayerTick(player);
-
-            ServerWorld world = player.getServerWorld();
-            double[] last = lastPlayerPos.get(player.getUuid());
-            if (last == null) {
-                last = new double[3];
-                lastPlayerPos.put(player.getUuid(), last);
-            }
-            double cx = player.getX();
-            double cy = player.getY();
-            double cz = player.getZ();
-
-            if (player.isSpectator() || player.isCreative()) {
-                last[0] = cx;
-                last[1] = cy;
-                last[2] = cz;
+            trackPlayerMovement(player);
+        }
+        for (ServerPlayerEntity player : ResearchPlayerRegistry.getAll()) {
+            if (server.getPlayerManager().getPlayerList().contains(player)) {
                 continue;
             }
-
-            double dx = cx - last[0];
-            double dy = cy - last[1];
-            double dz = cz - last[2];
-            double distSq = dx * dx + dy * dy + dz * dz;
-            if (distSq > 0.01) {
-                ChunkPos chunkPos = new ChunkPos(player.getBlockPos());
-                String moveAction = "walk";
-                double amount = 0.0015;
-                if (player.isFallFlying()) {
-                    moveAction = "elytra";
-                    amount = 0.0035;
-                } else if (player.isSprinting()) {
-                    moveAction = "sprint";
-                    amount = 0.0022;
-                } else if (player.isTouchingWater() || player.isSubmergedInWater()) {
-                    moveAction = "swim";
-                    amount = 0.002;
-                }
-                if (world.getRegistryKey().equals(World.NETHER)) {
-                    moveAction = moveAction + "_nether";
-                    amount *= 1.25;
-                }
-                double before = ChunkTensionManager.getLocalTension(world, chunkPos);
-                ChunkTensionManager.addLocalTension(world, chunkPos, amount);
-                double after = ChunkTensionManager.getLocalTension(world, chunkPos);
-                addCumulativeSource("MOVEMENT", amount);
-                TensionActivityLedger.addMovement(amount);
-                TensionLogger.log(tickCounter, "MOVEMENT", moveAction, amount, before, after, chunkPos, player, world);
-            }
-            last[0] = cx;
-            last[1] = cy;
-            last[2] = cz;
+            trackPlayerMovement(player);
         }
 
         if (tickCounter % 5 == 0) {
@@ -239,7 +193,6 @@ public final class TensionServerTick {
         // Log-only: nonzero when chunk storms, global/regional storm hysteresis, or fractured mass (not a constant floor).
         boolean stormDriveContext = split.stormChunks > 0
             || split.fracturedChunks > 0
-            || StormManager.isStormActive()
             || TensionManager.isStormActive();
         double stormDiag = stormDriveContext ? 0.026 * split.stormChunkFrac + 0.042 * split.fracturedFrac : 0.0;
         TensionManager.tickGlobalDynamics(split.total, stormDiag, tickCounter, split.ambientInflow, split.localCoupling);
@@ -292,7 +245,10 @@ public final class TensionServerTick {
             StormManager.tick(sw);
         }
 
+        ResearchBotManager.tick(server, tickCounter);
+        ResearchObserver.tick(server, tickCounter);
         ExperimentTelemetry.tick(server, tickCounter);
+        com.utdmod.experiment.ExperimentLogger.maybeLogFieldSummary(server, tickCounter);
     }
 
     private static void tickChunkTension(MinecraftServer server) {
@@ -302,6 +258,18 @@ public final class TensionServerTick {
 
             var tensionChunks = new HashMap<>(chunkData.getTensionMap());
 
+            List<ChunkPos> loadedSubstrateChunks = new ArrayList<>();
+            for (var entry : tensionChunks.entrySet()) {
+                ChunkPos chunkPos = entry.getKey();
+                if (sw.isChunkLoaded(chunkPos.x, chunkPos.z)) {
+                    loadedSubstrateChunks.add(chunkPos);
+                }
+            }
+            chunkData.integrateAllSubstrateStates(sw, loadedSubstrateChunks);
+            var interpretations = InterpretationService.interpretWorld(sw, loadedSubstrateChunks);
+            RegionalWeatherCoordinator.applyWorldWeather(sw, interpretations);
+            WorldPresentationState.update(sw, interpretations);
+
             for (var entry : tensionChunks.entrySet()) {
                 ChunkPos chunkPos = entry.getKey();
                 if (!sw.isChunkLoaded(chunkPos.x, chunkPos.z)) {
@@ -310,11 +278,17 @@ public final class TensionServerTick {
 
                 double localTension = entry.getValue();
                 boolean stormHere = chunkData.isStormActive(chunkPos);
-                // Sparse updates: very calm chunks share work across ticks (only loaded entries are iterated).
-                if (localTension < 0.22 && !stormHere) {
+                boolean sparseGameplay = localTension < 0.22 && !stormHere;
+                if (sparseGameplay) {
                     int stride = 8;
                     int slot = Math.floorMod(chunkPos.x + chunkPos.z * 31, stride);
                     if (Math.floorMod(tickCounter / 5, stride) != slot) {
+                        if (chunkData.getSubstrateState(chunkPos) != null) {
+                            var interpretation = interpretations.get(chunkPos);
+                            if (interpretation != null) {
+                                FieldActuatorRegistry.actuateAll(sw, interpretation);
+                            }
+                        }
                         continue;
                     }
                 }
@@ -384,6 +358,13 @@ public final class TensionServerTick {
 
                 chunkData.setLocalTension(chunkPos, localTension, sw);
 
+                if (chunkData.getSubstrateState(chunkPos) != null) {
+                    var interpretation = interpretations.get(chunkPos);
+                    if (interpretation != null) {
+                        FieldActuatorRegistry.actuateAll(sw, interpretation);
+                    }
+                }
+
                 chunkData.tickContaminationMemory(chunkPos, localTension, sw.getTime());
                 if (chunkData.getContaminationLevel(chunkPos) > 0
                     && tickCounter % 600 == Math.floorMod(chunkPos.x + chunkPos.z * 17, 600)) {
@@ -437,6 +418,60 @@ public final class TensionServerTick {
         }
     }
 
+    private static void trackPlayerMovement(ServerPlayerEntity player) {
+        PlayerStateIntegrator.onServerPlayerTick(player);
+
+        ServerWorld world = player.getServerWorld();
+        double[] last = lastPlayerPos.computeIfAbsent(player.getUuid(), ignored -> new double[3]);
+        double cx = player.getX();
+        double cy = player.getY();
+        double cz = player.getZ();
+
+        if (player.isSpectator() || player.isCreative()) {
+            last[0] = cx;
+            last[1] = cy;
+            last[2] = cz;
+            return;
+        }
+
+        double dx = cx - last[0];
+        double dy = cy - last[1];
+        double dz = cz - last[2];
+        double distSq = dx * dx + dy * dy + dz * dz;
+        if (distSq > 0.01) {
+            ChunkPos chunkPos = new ChunkPos(player.getBlockPos());
+            String moveAction = "walk";
+            double amount = 0.0015;
+            if (player.isFallFlying()) {
+                moveAction = "elytra";
+                amount = 0.0035;
+            } else if (player.isSprinting()) {
+                moveAction = "sprint";
+                amount = 0.0022;
+            } else if (player.isTouchingWater() || player.isSubmergedInWater()) {
+                moveAction = "swim";
+                amount = 0.002;
+            }
+            if (world.getRegistryKey().equals(World.NETHER)) {
+                moveAction = moveAction + "_nether";
+                amount *= 1.25;
+            }
+            double before = ChunkTensionManager.getLocalTension(world, chunkPos);
+            boolean applied = ResearchPerturbationBridge.applyLocalPerturbation(
+                world, chunkPos, player.getBlockPos(), player, PerturbationType.MOVEMENT, moveAction, amount);
+            if (!applied) {
+                ChunkTensionManager.addLocalTension(world, chunkPos, amount);
+                TensionLogger.log(tickCounter, "MOVEMENT", moveAction, amount, before,
+                    ChunkTensionManager.getLocalTension(world, chunkPos), chunkPos, player, world);
+            }
+            addCumulativeSource("MOVEMENT", amount);
+            TensionActivityLedger.addMovement(amount);
+        }
+        last[0] = cx;
+        last[1] = cy;
+        last[2] = cz;
+    }
+
     private static void runWeatherAndRitualSecondary(MinecraftServer server) {
         double current = TensionManager.getTension();
         if (Double.isNaN(secondaryLastTension)) {
@@ -447,49 +482,7 @@ public final class TensionServerTick {
             return;
         }
 
-        if (current > 0.62 && secondaryLastTension <= 0.62) {
-            for (ServerWorld world : server.getWorlds()) {
-                if (world.isRaining()) continue;
-                float p = (float) Math.min(0.55, (current - 0.62) * 2.2);
-                if (world.random.nextFloat() < p) {
-                    int rain = 2400 + world.random.nextInt(3600);
-                    boolean thunder = current > 0.82 || world.random.nextFloat() < 0.35f;
-                    world.setWeather(rain, thunder ? 1200 + world.random.nextInt(1800) : 0, true, thunder);
-                }
-            }
-        }
-
-        if (current > 1.0 && secondaryLastTension <= 1.0) {
-            for (ServerWorld world : server.getWorlds()) {
-                if (world.isRaining()) continue;
-                world.setWeather(6000, 0, true, false);
-            }
-        } else if (current <= 1.0 && secondaryLastTension > 1.0) {
-            for (ServerWorld world : server.getWorlds()) {
-                if (!world.isRaining()) continue;
-                world.setWeather(0, 0, false, false);
-            }
-        }
-
-        if (current > 0.7) {
-            for (ServerWorld world : server.getWorlds()) {
-                for (ServerPlayerEntity player : world.getPlayers()) {
-                    if (world.random.nextFloat() < 0.1f) {
-                        player.addExperience(5);
-                    }
-                }
-            }
-        }
-
-        for (ServerWorld world : server.getWorlds()) {
-            for (ServerPlayerEntity player : world.getPlayers()) {
-                if (player.getMainHandStack().isOf(ModItems.WARDING_CRYSTAL) && TensionManager.getTension() > 0.5) {
-                    TensionManager.setTension(Math.max(0, TensionManager.getTension() - 0.2));
-                    break;
-                }
-            }
-        }
-
+        // Weather state is now managed solely by WeatherActuator.
         secondaryLastTension = current;
     }
 }

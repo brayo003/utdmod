@@ -32,9 +32,17 @@ public class TensionHud {
         float tFeel = (float) TensionSyncState.perceivedTension();
         boolean storm = TensionSyncState.CLIENT_STORM;
 
-        String tensionText = String.format("Tension: %.2f (local %.2f | feel %.2f)", tGlobal, tLocal, tFeel);
         int tensionColor = tFeel > 1.5f ? 0xFF5555 : tFeel > 1.0f ? 0xFFFF55 : 0x55FF55;
+        String tensionText = String.format("Tension: %.2f (local %.2f | feel %.2f)", tGlobal, tLocal, tFeel);
+        String researchMode = com.utdmod.client.TensionSyncState.CLIENT_RESEARCH_MODE;
+        String narrative = com.utdmod.client.TensionSyncState.CLIENT_RESEARCH_NARRATIVE;
         context.drawText(mc.textRenderer, tensionText, 10, 10, tensionColor, true);
+        context.drawText(mc.textRenderer, "Research: " + researchMode, 10, 25, 0x88CCFF, true);
+        context.drawText(mc.textRenderer, String.format("Regions:%d Largest:%d Scars:%d Waves:%d Osc:%d", TensionSyncState.CLIENT_RESEARCH_ACTIVE_REGIONS, TensionSyncState.CLIENT_RESEARCH_LARGEST_REGION_CHUNKS, TensionSyncState.CLIENT_RESEARCH_SCAR_COUNT, TensionSyncState.CLIENT_RESEARCH_WAVE_COUNT, TensionSyncState.CLIENT_RESEARCH_OSCILLATION_COUNT), 10, 40, 0xFFFFFF, true);
+        context.drawText(mc.textRenderer, String.format("Substrate depth:%.3f transport:(%.2f, %.2f)", TensionSyncState.CLIENT_RESEARCH_FIELD_DEPTH_MEAN, TensionSyncState.CLIENT_RESEARCH_TRANSPORT_X, TensionSyncState.CLIENT_RESEARCH_TRANSPORT_Z), 10, 54, 0xFFFFFF, true);
+        if (!narrative.isBlank()) {
+            context.drawText(mc.textRenderer, narrative, 10, 68, 0xFFFFFF, true);
+        }
 
         if (storm) {
             context.drawText(mc.textRenderer, "STORM ACTIVE", 10, 25, 0xFF0000, true);
@@ -43,7 +51,7 @@ public class TensionHud {
         // Optional region HUD (disabled by default)
         if (com.utdmod.client.RegionHudConfig.SHOW_REGION_HUD) {
             int x = 10;
-            int y = 40;
+            int y = 60;
             String id = String.format("Region: %d", TensionSyncState.CLIENT_REGION_ID);
             String state = String.format("State: %s", com.utdmod.core.RegionState.values()[Math.max(0, Math.min(TensionSyncState.CLIENT_REGION_STATE, com.utdmod.core.RegionState.values().length - 1))]);
             String age = String.format("Age: %d", TensionSyncState.CLIENT_REGION_AGE);

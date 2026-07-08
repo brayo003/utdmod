@@ -5,6 +5,8 @@ import com.utdmod.core.TensionManager;
 import com.utdmod.core.TensionTraceClock;
 import com.utdmod.ecology.RegionHistory;
 import com.utdmod.ecology.RegionEcologyManager;
+import com.utdmod.research.PerturbationType;
+import com.utdmod.research.ResearchPerturbationBridge;
 import com.utdmod.tick.TensionLogger;
 import com.utdmod.tension.ChunkTensionManager;
 import com.utdmod.UTDMod;
@@ -75,9 +77,9 @@ public final class TensionEvents {
             double before = ChunkTensionManager.getLocalTension(sw, cp);
             String action = state.isIn(BlockTags.LOGS) ? "LOG_BREAK" : "BLOCK_BREAK";
             if (state.isIn(BlockTags.LOGS)) {
-                ChunkTensionManager.addForestryTension(sw, cp, true);
+                ResearchPerturbationBridge.applyForestryPerturbation(sw, cp, pos, sp, true);
             } else {
-                ChunkTensionManager.addMiningTension(sw, cp, blockId);
+                ResearchPerturbationBridge.applyMiningPerturbation(sw, cp, pos, sp, blockId);
             }
             double after = ChunkTensionManager.getLocalTension(sw, cp);
             double g1 = TensionManager.getTension();
@@ -122,7 +124,7 @@ public final class TensionEvents {
             String typeId = Registries.ENTITY_TYPE.getId(entity.getType()).toString();
             double g0 = TensionManager.getTension();
             double before = ChunkTensionManager.getLocalTension(sw, cp);
-            ChunkTensionManager.addSlaughterTension(sw, cp, typeId);
+            ResearchPerturbationBridge.applyCombatPerturbation(sw, cp, entity.getBlockPos(), player, typeId);
             double after = ChunkTensionManager.getLocalTension(sw, cp);
             double g1 = TensionManager.getTension();
             String killKind = typeId.contains("villager") ? "villager_kill" : "mob_kill";
@@ -166,9 +168,10 @@ public final class TensionEvents {
                 ItemStack stack = player.getStackInHand(hand);
 
                 if (stack.isOf(net.minecraft.item.Items.FLINT_AND_STEEL) && state.isOf(Blocks.OBSIDIAN)) {
+                    ChunkPos cp = new ChunkPos(pos);
                     if (world.getBlockState(pos.up()).isOf(Blocks.OBSIDIAN)
                         || world.getBlockState(pos.down()).isOf(Blocks.OBSIDIAN)) {
-                        addLocal(sw, pos, NETHER_PORTAL_TENSION, sp, "MOVEMENT", "nether_portal_ignite");
+                        ResearchPerturbationBridge.applyLocalPerturbation(sw, cp, pos, sp, PerturbationType.PORTAL, "nether_portal_ignite", NETHER_PORTAL_TENSION);
                     }
                 }
             }
@@ -178,7 +181,7 @@ public final class TensionEvents {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 if (player.isSleeping() && player.getWorld() instanceof ServerWorld sw) {
-                    reduceLocal(sw, player.getBlockPos(), SLEEP_LOCAL_RELIEF, player, "MOVEMENT", "sleep_relief");
+                    ResearchPerturbationBridge.applyLocalPerturbation(sw, new ChunkPos(player.getBlockPos()), player.getBlockPos(), player, PerturbationType.SLEEP, "sleep_relief", -SLEEP_LOCAL_RELIEF);
                 }
             }
         });
@@ -194,9 +197,11 @@ public final class TensionEvents {
 
                 blocksPlacedRecently++;
                 lastPlacementTime = currentTime;
+                BlockPos pos = ((BlockHitResult) hitResult).getBlockPos();
+                ChunkPos cp = new ChunkPos(pos);
 
                 if (blocksPlacedRecently >= BULK_PLACEMENT_THRESHOLD) {
-                    addLocal(sw, ((BlockHitResult) hitResult).getBlockPos(), BULK_BUILD_TENSION, sp, "MINING", "bulk_build_placement");
+                    ResearchPerturbationBridge.applyLocalPerturbation(sw, cp, pos, sp, PerturbationType.BULK_BUILD, "bulk_build_placement", BULK_BUILD_TENSION);
                     blocksPlacedRecently = 0;
                 }
             }
@@ -207,8 +212,9 @@ public final class TensionEvents {
             if (!world.isClient() && world instanceof ServerWorld sw && player instanceof ServerPlayerEntity sp
                 && hitResult.getType() == net.minecraft.util.hit.HitResult.Type.BLOCK) {
                 BlockPos pos = hitResult.getBlockPos();
+                ChunkPos cp = new ChunkPos(pos);
                 if (world.getBlockState(pos).isOf(Blocks.ENCHANTING_TABLE)) {
-                    addLocal(sw, pos, ENCHANTING_TENSION, sp, "MINING", "enchanting_table_use");
+                    ResearchPerturbationBridge.applyLocalPerturbation(sw, cp, pos, sp, PerturbationType.ENCHANT, "enchanting_table_use", ENCHANTING_TENSION);
                 }
             }
             return ActionResult.PASS;
@@ -219,7 +225,7 @@ public final class TensionEvents {
             if (currentTime % 200 != 0) return;
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 if (player.getY() < 20 && player.getWorld() instanceof ServerWorld sw) {
-                    addLocal(sw, player.getBlockPos(), DEEP_MINING_TENSION, player, "MINING", "deep_layer_y<20");
+                    ResearchPerturbationBridge.applyLocalPerturbation(sw, new ChunkPos(player.getBlockPos()), player.getBlockPos(), player, PerturbationType.DEEP_MINING, "deep_layer_y<20", DEEP_MINING_TENSION);
                 }
             }
         });

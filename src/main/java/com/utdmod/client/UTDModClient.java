@@ -4,6 +4,7 @@ import com.utdmod.client.audio.UTDAudioManager;
 import com.utdmod.client.ui.TensionHud;
 import com.utdmod.client.visual.ClientRegionalAtmosphere;
 import com.utdmod.network.ExperimentClientReportPacket;
+import com.utdmod.network.ResearchSyncPacket;
 import com.utdmod.network.TensionSyncPacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -14,6 +15,8 @@ public class UTDModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         TensionSyncPacket.registerReceiver();
+        ResearchSyncPacket.registerReceiver();
+        com.utdmod.network.PresentationSyncPacket.registerReceiver();
         TensionHud.register();
 
         TensionKeybind.register();

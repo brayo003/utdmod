@@ -1,20 +1,4 @@
 /gamemode creative
-/gamemode survival
-/gamemode creative
-/gamemode survival
-/gamemode creative
-/gamemode survival
-/gamemode creative
-/gamemode survival
-/give @s utdmod:ritual_block
-/give @s u
-/give @s utdmod:ritual_block
-/give @s utdmod:ritual_block 64
-/gamemode creative
-/gamemode survival
-/gamemode creative
-/gamemode survival
-/gamemode creative
 /gamemode spectator
 /gamemode survival
 /gamemode creative
@@ -28,3 +12,39 @@
 /gamemode creative
 /gamemode survival
 /gamemode creative
+/utdbot seed 42
+/utdbot spawn
+/utdbot seed 42
+/utdbot spawn
+/list
+/utdbot seed 42
+/utdbot spawn
+/list
+/tp @s 2 64 63
+/effect give @s minecraft:night_vision 30 0 true
+/data get entity UTDResearchBot
+/tp @s UTDResearchBot
+/execute as @a run say @s
+/research config
+/utdbot reset 42
+/researchbot start
+/utdbot status
+/utdbot seed 42
+/utdbot reset
+/utdbot spawn
+/utdbot start
+/utdbot status
+/tp 8 63 62
+/utdbot status
+/research reset 42
+/utdbot remove
+/utdbot reset
+/utdbot remove
+/utdbot seed 567
+/utdbot reset
+/utdbot status
+/utdbot log on
+/gamemode spectator
+/utdbot status
+/tp @a -6 63 39
+/utdbot status

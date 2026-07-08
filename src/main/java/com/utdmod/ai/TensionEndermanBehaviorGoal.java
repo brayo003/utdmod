@@ -7,12 +7,10 @@ import net.minecraft.util.math.BlockPos;
 import com.utdmod.core.TensionManager;
 
 import java.util.EnumSet;
-import java.util.Random;
 
 public class TensionEndermanBehaviorGoal extends Goal {
     private final EndermanEntity enderman;
     private final ServerWorld world;
-    private final Random random = new Random();
 
     public TensionEndermanBehaviorGoal(EndermanEntity enderman, ServerWorld world) {
         this.enderman = enderman;
@@ -28,10 +26,20 @@ public class TensionEndermanBehaviorGoal extends Goal {
     @Override
     public void tick() {
         double tension = TensionManager.getTension();
+        long worldTime = world.getTime();
+        float chance = deterministicFloat(enderman.getBlockPos(), worldTime, 0);
 
-        if (random.nextFloat() < tension * 0.05) {
-            BlockPos targetPos = enderman.getBlockPos().add(random.nextInt(16) - 8, random.nextInt(8) - 4, random.nextInt(16) - 8);
+        if (chance < tension * 0.05) {
+            double dx = deterministicFloat(enderman.getBlockPos(), worldTime, 1) * 16.0 - 8.0;
+            double dy = deterministicFloat(enderman.getBlockPos(), worldTime, 2) * 8.0 - 4.0;
+            double dz = deterministicFloat(enderman.getBlockPos(), worldTime, 3) * 16.0 - 8.0;
+            BlockPos targetPos = enderman.getBlockPos().add((int) Math.round(dx), (int) Math.round(dy), (int) Math.round(dz));
             enderman.teleport(targetPos.getX() + 0.5, targetPos.getY(), targetPos.getZ() + 0.5);
         }
+    }
+
+    private static float deterministicFloat(BlockPos pos, long tick, int salt) {
+        double value = Math.sin((pos.getX() * 31L + pos.getY() * 17L + pos.getZ() * 13L + tick * 7L + salt * 97L) * 0.6180339887498948) * 43758.5453123;
+        return (float) (value - Math.floor(value));
     }
 }

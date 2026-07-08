@@ -9,6 +9,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -62,11 +63,19 @@ public class TensionWraithEntity extends HostileEntity {
             double t = Math.max(tGlobal, tLocal * 0.92);
             if (t > 1.1 && getTarget() == null) {
                 PlayerEntity nearest = sw.getClosestPlayer(this, 40.0);
-                if (nearest != null && !nearest.isCreative() && !nearest.isSpectator()
-                    && sw.random.nextDouble() < Math.min(0.4, (t - 1.0) * 0.2)) {
-                    setTarget(nearest);
+                if (nearest != null && !nearest.isCreative() && !nearest.isSpectator()) {
+                    long tick = sw.getTime();
+                    double probability = Math.min(0.4, (t - 1.0) * 0.2);
+                    if (deterministicDouble(getBlockPos(), tick, 0) < probability) {
+                        setTarget(nearest);
+                    }
                 }
             }
         }
+    }
+
+    private static double deterministicDouble(BlockPos pos, long tick, int salt) {
+        double value = Math.sin((pos.getX() * 31L + pos.getZ() * 17L + tick * 11L + salt * 97L) * 0.6180339887498948) * 43758.5453123;
+        return value - Math.floor(value);
     }
 }
