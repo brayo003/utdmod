@@ -1,20 +1,5 @@
-*.log
-*.class
-*.tar.gz
-results/
-build_logs/
-**/.gradle/
-**/build/
-
-# Minecraft & Gradle development overrides
 .gradle/
 build/
-bin/
-run/
-simulation_lab/
 .idea/
-*.pdf
-Untitled Document *
-.gradle/
-build/
+*.log
 run/
