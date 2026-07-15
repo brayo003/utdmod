@@ -50,10 +50,11 @@ public final class ResearchPerturbationBridge {
 
         double before = ChunkTensionManager.getLocalTension(world, chunkPos);
         if (amount >= 0.0) {
-            ChunkTensionManager.addLocalTension(world, chunkPos, amount);
-        } else {
-            ChunkTensionManager.reduceLocalTension(world, chunkPos, -amount);
+            // Inject as substrate impulse — no legacy ODE accumulation
+            com.utdmod.tension.ChunkTensionData.getServerState(world)
+                .addInstantaneousImpulse(chunkPos, amount);
         }
+        // reduceLocalTension has no substrate equivalent; negative perturbations are ignored
         double after = ChunkTensionManager.getLocalTension(world, chunkPos);
 
         TensionLogger.log(

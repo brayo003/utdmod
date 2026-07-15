@@ -17,16 +17,15 @@ public final class BuilderExperiment extends TimedExperiment {
     ctx.snapshot.transitionReason = "builder init";
     ctx.snapshot.shelterOrigin = ctx.snapshot.homePos.toImmutable();
     ctx.snapshot.shelterStep = 0;
-    ctx.building.setShelterOrigin(ctx.snapshot.homePos);
-    ctx.navigation.stop();
+    ctx.controller.stop();
+    ctx.controller.setShelterOrigin(ctx.snapshot.homePos);
     ctx.currentTarget = ctx.snapshot.homePos;
   }
 
   @Override
   public void tick(ResearchPlayerContext ctx, long tick) {
-    boolean done = ctx.building.tickBuildStep(ctx.navigation);
+    boolean done = ctx.controller.tickBuildStep();
     ctx.snapshot.transitionReason = done ? "builder complete" : "placing shelter";
-    // Best-effort: expose a stable navigation target for logging.
     if (ctx.currentTarget == null) {
       ctx.currentTarget = ctx.snapshot.homePos;
     }
@@ -34,14 +33,12 @@ public final class BuilderExperiment extends TimedExperiment {
 
   @Override
   public boolean isFinished(ResearchPlayerContext ctx, long tick) {
-    // End early if the shelter completes.
-    return super.isFinished(ctx, tick) || ctx.snapshot.shelterStep >= 999999;
+    return super.isFinished(ctx, tick) || ctx.controller.isBuildComplete();
   }
 
   @Override
   public void shutdown(ResearchPlayerContext ctx, long tick) {
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.snapshot.transitionReason = "builder shutdown";
   }
 }
-

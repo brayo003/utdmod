@@ -17,7 +17,7 @@ public final class PassiveWanderExperiment extends TimedExperiment {
   public void initialize(ResearchPlayerContext ctx, long tick) {
     ctx.snapshot.stateTicks = 0;
     ctx.snapshot.transitionReason = "experiment init";
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.currentTarget = null;
     ctx.snapshot.targetPos = ctx.snapshot.homePos;
   }
@@ -25,8 +25,7 @@ public final class PassiveWanderExperiment extends TimedExperiment {
   @Override
   public void tick(ResearchPlayerContext ctx, long tick) {
     int radiusChunks = Math.max(1, ctx.snapshot.allowedRadiusChunks);
-    if (ctx.currentTarget == null || ctx.navigation.isAtTarget(2.5) || (ctx.snapshot.stateTicks % 60) == 0) {
-      // Deterministic target generation using experiment-owned RNG (ctx.random).
+    if (ctx.currentTarget == null || ctx.controller.isAtTarget(2.5) || (ctx.snapshot.stateTicks % 60) == 0) {
       int maxBlocks = Math.max(16, radiusChunks * 8);
       int dx = ctx.random.nextInt(maxBlocks * 2 + 1) - maxBlocks;
       int dz = ctx.random.nextInt(maxBlocks * 2 + 1) - maxBlocks;
@@ -41,18 +40,17 @@ public final class PassiveWanderExperiment extends TimedExperiment {
       }
       ctx.currentTarget = target;
       ctx.snapshot.targetPos = target.toImmutable();
-      ctx.navigation.setTarget(target);
+      ctx.controller.goTo(target);
       ctx.snapshot.transitionReason = "wander target";
     }
 
-    ctx.navigation.tick();
+    ctx.controller.tick();
     ctx.snapshot.transitionReason = "wandering";
   }
 
   @Override
   public void shutdown(ResearchPlayerContext ctx, long tick) {
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.snapshot.transitionReason = "experiment done";
   }
 }
-

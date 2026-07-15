@@ -37,8 +37,8 @@ public final class FieldActuatorRegistry {
       long startNs = System.nanoTime();
       ActuatorOutcome outcome = ActuatorOutcome.UNKNOWN;
       try {
-        actuator.actuate(world, interpretation);
-        outcome = ActuatorOutcome.SUCCESS;
+        outcome = actuator.actuate(world, interpretation);
+        if (outcome == null) outcome = ActuatorOutcome.UNKNOWN;
       } catch (Throwable t) {
         outcome = ActuatorOutcome.FAILED;
         com.utdmod.UTDMod.LOGGER.error("[UTD] Actuator {} failed at chunk {},{}: {}",
@@ -50,7 +50,7 @@ public final class FieldActuatorRegistry {
             interpretation.chunkPos,
             actuator.getId(),
             interpretation.substrate,
-            "EXECUTED",
+            outcome.name(),
             interpretation.primaryIntent != null ? interpretation.primaryIntent.type.name() : "ambient",
             System.nanoTime() - startNs,
             outcome);

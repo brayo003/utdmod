@@ -1,25 +1,88 @@
 # Execution Pipeline
 
-## Verified runtime path
-This project executes as a server-authoritative tension simulation with a client presentation layer. The actual execution chain is:
+> **[UPDATED 2026-07-15]** The dominant state variable is the per-chunk **substrate state** (A, M, D, B),
+> not a stored tension scalar. Tension is a derived observation metric. The old chunk ODE
+> (`TensionServerTick.tickChunkTension`) does not exist in current code.
 
-1. Player action or lifecycle event fires in [src/main/java/com/utdmod/event/TensionEvents.java](../../src/main/java/com/utdmod/event/TensionEvents.java).
-2. The event injects local tension through [src/main/java/com/utdmod/tension/ChunkTensionManager.java](../../src/main/java/com/utdmod/tension/ChunkTensionManager.java).
-3. The local tension is stored in [src/main/java/com/utdmod/tension/ChunkTensionData.java](../../src/main/java/com/utdmod/tension/ChunkTensionData.java), which persists chunk state across saves.
-4. On the server tick, [src/main/java/com/utdmod/core/TensionServerTick.java](../../src/main/java/com/utdmod/core/TensionServerTick.java) applies the local field update loop every 5 ticks.
-5. The same server tick rebuilds connected regions every 20 ticks in [src/main/java/com/utdmod/core/RegionManager.java](../../src/main/java/com/utdmod/core/RegionManager.java).
-6. Global tension is updated every tick in [src/main/java/com/utdmod/core/TensionManager.java](../../src/main/java/com/utdmod/core/TensionManager.java).
-7. Storms are evaluated every tick in [src/main/java/com/utdmod/storm/StormManager.java](../../src/main/java/com/utdmod/storm/StormManager.java).
-8. Ecology is evaluated on a separate server-tick cadence in [src/main/java/com/utdmod/ecology/RegionEcologyManager.java](../../src/main/java/com/utdmod/ecology/RegionEcologyManager.java).
-9. Server snapshots are sent to clients via [src/main/java/com/utdmod/network/TensionSyncPacket.java](../../src/main/java/com/utdmod/network/TensionSyncPacket.java).
-10. Client presentation consumes those snapshots in [src/main/java/com/utdmod/client/TensionSyncState.java](../../src/main/java/com/utdmod/client/TensionSyncState.java), [src/main/java/com/utdmod/client/visual/ClientRegionalAtmosphere.java](../../src/main/java/com/utdmod/client/visual/ClientRegionalAtmosphere.java), and [src/main/java/com/utdmod/client/visual/ClientRegionPresentation.java](../../src/main/java/com/utdmod/client/visual/ClientRegionPresentation.java).
+---
+
+## Verified runtime path
+
+All server-side logic runs in a single `END_SERVER_TICK` handler registered in
+`TensionServerTick.register()`.
+
+### Step-by-step sequence (per server tick)
+
+1. **Player activity → substrate impulses**  
+   `TensionServerTick.trackPlayerMovement()` and `PlayerStateIntegrator.onServerPlayerTick()`
+   accumulate impulses in `ChunkTensionData.instantaneousImpulses`. Event hooks in
+   `TensionEvents` (mining, combat, portal use, etc.) also inject impulses via
+   `ChunkTensionManager.addMiningTension()` → `ChunkTensionData.addInstantaneousImpulse()`.
+
+2. **Substrate integration** (every 5 ticks)  
+   `TensionServerTick.tickSubstrate()` → `ChunkTensionData.integrateAllSubstrateStates()`.  
+   Applies `FieldDerivative.computeUnified()` (Euler step) for each loaded substrate chunk
+   using a double-buffer gather/apply pattern.  
+   After integration, runs `InterpretationService.interpretWorld()` and
+   `FieldActuatorRegistry.actuateAll()` per chunk.
+
+3. **Region refresh** (every 20 ticks)  
+   `RegionManager.refresh()` rebuilds connected-component regions from all chunks where
+   `T(x) > ACTIVE_TENSION_THRESHOLD (0.15)`.
+
+4. **Global metric recompute** (every tick)  
+   `TensionManager.recompute()` aggregates T(x) over all loaded substrate chunks into
+   globalMeanTension, globalMaxTension, globalVariance, globalActiveFraction, etc.
+   Sets stormActive and corruptionLevel from thresholds.
+
+5. **Region diagnostics** (every 200 ticks)  
+   `RegionDiagnosticsManager.refresh()` aggregates per-region snapshot data.
+
+6. **Player region events** (every 20 ticks)  
+   Tracks player chunk→region associations and emits enter/exit diagnostics.
+
+7. **HUD diagnostics** (every 40 ticks)  
+   Computes local T(x) at player position, sends actionbar message:
+   `Tension: T(x) (ChunkState) | Global: G (CorruptionLevel) | Storm/Calm`.
+
+8. **Field summary diagnostics** (every 20 ticks)  
+   `DiagnosticLogs.fieldSummary()` emits region count, storm/fractured counts, maturity stats.
+
+9. **Region summary diagnostics** (every 100 ticks)  
+   `DiagnosticLogs.regionSummary()`.
+
+10. **Client sync** (every 20 ticks)  
+    `TensionSyncPacket.sendToAllPlayers()` sends globalMeanTension and stormActive to all clients.
+
+11. **Storm tick** (every tick, per world)  
+    `StormManager.tick()` runs region-based storm selection and lightning logic.
+
+12. **Research / experiment infrastructure** (every tick)  
+    `ResearchBotManager.tick()`, `ResearchObserver.tick()`, `ExperimentTelemetry.tick()`,
+    `ExperimentLogger.maybeLogFieldSummary()`.
+
+---
 
 ## What the pipeline actually does
-- The dominant state variable is chunk-local tension.
-- The dominant update rule is the chunk field update in `TensionServerTick.tickChunkTension(...)`.
-- Region building is derived from chunk state, not the other way around.
-- Global tension is a summary and feedback term, not the primary driver of each chunk.
-- Storms and ecology are downstream consumers of region state and chunk state, not the core source of spatial dynamics.
 
-## Verdict on the architecture
-This is a genuine spatial field simulation in structure and execution, but the behavior is dominated by the server-side chunk field loop and the global coupling term. Ecology and presentation are real subsystems, but they do not dominate the simulation. They mostly observe state and mutate the world or the client UI.
+- **Primary state variable:** `SubstrateState` per chunk (activation, memory, fieldDepth, baseline).
+- **Primary update rule:** `FieldDerivative.computeUnified()` — a 4-variable coupled nonlinear system.
+- **Tension:** derived from substrate variables on demand, never stored.
+- **Regions:** derived from connected active chunks (T(x) > 0.15), rebuilt every 20 ticks.
+- **Global tension:** spatial mean of T(x) over loaded chunks, recomputed every tick.
+- **Storms:** downstream consumers of region state; do not inject tension directly.
+- **Ecology and presentation:** consume state, mutate the world or client UI; do not feed back into substrate.
+
+---
+
+## Source
+
+- `com.utdmod.core.TensionServerTick` — main tick orchestrator
+- `com.utdmod.tension.ChunkTensionData` — substrate storage and integration
+- `com.utdmod.tension.FieldDerivative` — update equations
+- `com.utdmod.core.TensionManager` — global metric aggregation
+- `com.utdmod.core.RegionManager` — region building
+- `com.utdmod.storm.StormManager` — storm logic
+- `com.utdmod.ecology.RegionEcologyManager` — block mutations
+- `com.utdmod.network.TensionSyncPacket` — client sync
+- `com.utdmod.client.TensionSyncState` — client mirror (never runs simulation)

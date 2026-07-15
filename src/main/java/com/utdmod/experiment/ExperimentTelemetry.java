@@ -86,7 +86,7 @@ public final class ExperimentTelemetry {
         Set<ChunkPos> affected = new HashSet<>();
         for (ServerWorld sw : server.getWorlds()) {
             ChunkTensionData data = ChunkTensionData.getServerState(sw);
-            for (ChunkPos cp : data.getTensionMap().keySet()) {
+            for (ChunkPos cp : data.getActiveChunkPositions()) {
                 if (!sw.isChunkLoaded(cp.x, cp.z)) continue;
                 double t = ChunkTensionManager.getLocalTension(sw, cp);
                 if (t < 0.22) continue;

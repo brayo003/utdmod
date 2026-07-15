@@ -1,0 +1,7 @@
+{
+  "_comment": "Item model for the Relaxation Agent (registry: utdmod:stability_tonic). Consumable that modifies local substrate dynamics — increasing damping, forgetting rate, or transport suppression — without deleting existing field state.",
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "utdmod:item/stability_tonic"
+  }
+}

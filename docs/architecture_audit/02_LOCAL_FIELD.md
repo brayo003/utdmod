@@ -1,56 +1,145 @@
 # Local Field
 
+> **[UPDATED 2026-07-15]** This file replaces the pre-refactor version that described a scalar
+> reaction-diffusion ODE (`T += D·T̄_nbr + α·T² − β·T³ + γ·G − λ·T`). That update rule
+> and `TensionServerTick.tickChunkTension()` no longer exist. See `docs/archive/` for the
+> old description.
+
+---
+
 ## Purpose
-The local field is the core dynamical substrate. It stores per-chunk tension, tracks chunk state, and evolves that state on the server tick.
+
+The local field is the core dynamical substrate. Each chunk carries a `SubstrateState` object
+with four evolving variables: **activation (A), memory (M), field depth (D), baseline (B)**.
+These are integrated every 5 server ticks by `ChunkTensionData.integrateAllSubstrateStates()`.
+
+Tension is **not stored per chunk**. It is computed on demand as a derived metric
+`T(x) = (wA·A/(1+A) + wM·M/(1+M) + wD·D/(1+D)) / (wA+wM+wD)`.
+
+---
 
 ## Inputs
-### Callers
-- Event injection in [src/main/java/com/utdmod/event/TensionEvents.java](../../src/main/java/com/utdmod/event/TensionEvents.java) calls `ChunkTensionManager` mutators.
-- Player movement in [src/main/java/com/utdmod/core/TensionServerTick.java](../../src/main/java/com/utdmod/core/TensionServerTick.java) adds local tension every tick for moving players.
-- Player-state fatigue in [src/main/java/com/utdmod/signals/PlayerStateIntegrator.java](../../src/main/java/com/utdmod/signals/PlayerStateIntegrator.java) adds slow session-based leakage.
-- The chunk update loop in `TensionServerTick.tickChunkTension(...)` updates all active chunks.
 
-### Methods
-- `ChunkTensionManager.getLocalTension(...)`
-- `ChunkTensionManager.addLocalTension(...)`
-- `ChunkTensionManager.addMiningTension(...)`
-- `ChunkTensionManager.addForestryTension(...)`
-- `ChunkTensionManager.addSlaughterTension(...)`
-- `ChunkTensionData.setLocalTension(...)`
-- `ChunkTensionData.addLocalTension(...)`
-- `ChunkTensionData.addMiningTension(...)`
+### Player actions (event injection)
+
+| Source | Entry point | Injection form |
+|---|---|---|
+| Player movement | `TensionServerTick.trackPlayerMovement()` | `ChunkTensionData.addInstantaneousImpulse(pos, amount)` |
+| Mining / block break | `TensionEvents` → `ChunkTensionManager.addMiningTension()` | impulse |
+| Combat / entity death | `TensionEvents` → `ChunkTensionManager` | impulse |
+| Portal / ritual use | `TensionEvents` | impulse |
+| ResearchPerturbationBridge | automated research players | impulse |
+
+All injections accumulate in `ChunkTensionData.instantaneousImpulses` (Map<ChunkPos, Double>).
+They are consumed as `externalInput` at the start of the next substrate integration tick.
+
+### Substrate integration inputs
+
+Per-chunk per-integration-cycle:
+- `externalInput` — consumed impulse for this chunk
+- `incomingTransport` — computed by `SubstrateTransport.computeIncoming()` from neighbor substrate snapshot
+- `stencil` — `SpatialStencil` (Laplacians and gradients of A, M, D from the tick-start snapshot)
+- `parameters` — `ParameterSet.runtime()` (singleton, validated defaults unless gameplay tuning enabled)
+
+---
 
 ## Outputs
-- Updates the in-memory chunk tension map.
-- Updates chunk state (`STABLE`, `STRAINED`, `FRACTURED`, `DECOUPLED`).
-- May set `stormActive` for a chunk.
-- Persists chunk tension to NBT via `writeNbt(...)` and restores via `fromNbt(...)`.
-- Emits diagnostics and experiment telemetry on state transitions.
+
+- Updated `SubstrateState` per chunk written back to `ChunkTensionData`.
+- Derived tension T(x) computed on demand for state classification, region aggregation, and HUD.
+- Chunk state (`STABLE / STRAINED / FRACTURED / DECOUPLED`) updated by `updateChunkClassification()`.
+- Storm flag per chunk updated by `updateChunkStateFromMetric()`.
+- All state changes emit diagnostics via `DiagnosticLogs.tensionState()`.
+- Experiment telemetry emitted via `ExperimentTelemetry.onChunkStateTransition()`.
+
+---
 
 ## Persistent state
-- The chunk field is stored in `ChunkTensionData`, which extends `PersistentState`.
-- It survives world saves through `PersistentStateManager` and is keyed as `chunk_tension_data`.
-- It also keeps contamination memory, mining-rate memory, storm flags, and access timestamps.
+
+`ChunkTensionData` extends `PersistentState`. It persists:
+- `SubstrateState` fields: activation, memory, transport, fieldDepth, baseline, externalInput, readiness, radius, capacity, peakActivation, convergence
+- `ChunkState` enum per chunk
+- recentMiningRate, stormActive, contaminationPeak, contaminationLevel
+- lastAccessMs per chunk (used for TTL pruning)
+
+NBT key: `substrateChunks` (legacy fallback: `localTensions` for forward/backward compat).
+PersistentState key: `chunk_tension_data`.
+
+---
 
 ## Algorithms
-The core chunk update in `TensionServerTick.tickChunkTension(...)` uses:
 
-- Diffusion: `diffusion = D * neighborAvg`
-- Decay: `decay = LAMBDA * localTension * decayMul`
-- Nonlinear reinforcement: `nonlinear = effectiveAlpha * localTension^2`
-- Saturation: `saturation = BETA * localTension^3`
-- Global feedback: `globalFeedback = GAMMA * globalTension`
-- Final update: `localTension += diffusion + nonlinear - saturation + globalFeedback - decay`
-- Storm drain: `localTension -= STORM_DRAIN_RATE` if the chunk is storm-active
+### Double-buffer integration (gather / apply)
 
-The update is clamped to $[0, 5]$.
+`ChunkTensionData.integrateAllSubstrateStates()`:
+
+1. Take a snapshot copy of all current substrate states (tick-start state).
+2. For each loaded chunk in the scheduled list:
+   a. Read `current` from snapshot.
+   b. Compute `SpatialStencil` (Laplacians, gradients) from the snapshot.
+   c. Compute `incomingTransport` from the snapshot.
+   d. Consume `externalInput` impulse.
+   e. Apply `FieldDerivative.computeUnified()` → Euler step on copy.
+3. Write all next-states back to `substrateStates` (apply phase).
+
+No chunk reads another chunk's mid-step state. All reads are from tick-start snapshot.
+
+### Chunk state classification
+
+`TensionServerTick.updateChunkStateFromMetric()` runs after each substrate tick:
+
+```
+T(x) > 0.95  → stormActive[chunk] = true
+T(x) < 0.25  → stormActive[chunk] = false
+chunkData.updateChunkClassification(pos, T(x), world)
+```
+
+`ChunkTensionData.calculateState(tension, currentState)` applies:
+
+```
+T(x) >= 3.0  (T3) → DECOUPLED
+T(x) >= 1.28 (T2) → FRACTURED
+T(x) >= 0.95 (T1) → STRAINED
+else             → STABLE
+```
+
+With `STATE_HYSTERESIS = 0.22`: downgrade is deferred until `T(x) < threshold - 0.22`.
+
+### Contamination memory
+
+When T(x) >= 1.35 → contamination level 2 ("heavy").
+When T(x) >= 1.15 → contamination level 1 ("medium").
+Level decrements when T(x) < 0.42, staggered over 200-tick slots.
+
+Contamination reduces the effective linear decay multiplier:
+- Level 1: multiplier 0.68 (32% slower recovery)
+- Level 2: multiplier 0.38 (62% slower recovery)
+
+### TTL pruning
+
+Every ~5 minutes (300 ticks × 20 s/min): `chunkData.pruneInactive(45 min)`.
+Chunks with T(x) >= 0.85 or contamination level >= 2 have extended TTLs (4–6 hours).
+
+---
 
 ## Tick rate
-- The field update runs every 5 server ticks.
-- Movement injection is per-player and per-tick if movement exceeds the threshold.
-- State transition effects are triggered when state changes occur.
 
-## Dependencies
-- Depends on `TensionManager` for feedback from the global field.
-- Depends on chunk neighbors and chunk state.
-- Provides the input data consumed by region and storm systems.
+| Operation | Cadence |
+|---|---|
+| Substrate integration | every 5 ticks |
+| Chunk state transitions | after every substrate tick |
+| Contamination decay | staggered, ~1 chunk per tick slot |
+| TTL pruning | every ~5 minutes |
+
+---
+
+## Source
+
+- `com.utdmod.tension.ChunkTensionData` — storage, integration, state classification
+- `com.utdmod.tension.SubstrateState` — per-chunk evolving state
+- `com.utdmod.tension.FieldDerivative` — canonical update equations
+- `com.utdmod.tension.SubstrateTransport` — inter-chunk transport kernel
+- `com.utdmod.tension.SpatialStencil` — Laplacian and gradient computation from neighbors
+- `com.utdmod.tension.SubstrateObservationModel` — T(x) and other derived metrics
+- `com.utdmod.tension.ParameterSet` — all numerical parameters
+- `com.utdmod.tension.ChunkTensionManager` — event injection entry points

@@ -1,174 +1,116 @@
 package com.utdmod.core;
 
-import com.utdmod.diag.DiagnosticLogs;
-import com.utdmod.tension.ChunkTensionManager;
+import com.utdmod.tension.ChunkTensionData;
+import com.utdmod.tension.SubstrateObservationModel;
+import com.utdmod.tension.SubstrateState;
 import net.minecraft.server.MinecraftServer;
+import java.util.Map;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
 /**
- * Global tension field. Dynamics use unified parameters; inflow is dominated by chunk aggregation
- * (see {@link TensionServerTick}) plus optional impulses (debug, rare global events).
+ * Global tension summary — a read-only aggregate of substrate metrics.
+ * There is no ODE here. Global tension is not an independently evolving state.
+ * It is recomputed each tick from the substrate field.
+ *
+ * T_global = weighted mean of T(x) over all active chunks.
  */
 public final class TensionManager {
-    private static double globalTension = 0.0;
+
+    // Snapshot updated each tick by recompute()
+    private static double globalMeanTension = 0.0;
+    private static double globalMaxTension = 0.0;
+    private static double globalVariance = 0.0;
+    private static double globalActiveFraction = 0.0;
+    private static double globalMeanDepth = 0.0;
+    private static double globalMaxDepth = 0.0;
+    private static double globalMeanMemory = 0.0;
+    private static double globalMeanActivation = 0.0;
     private static boolean stormActive = false;
-    private static final double T_MAX = 5.0;
-    /** Slightly faster decay so global returns to calm when coupling drops. */
-    private static final double LAMBDA = 0.0032;
-    /** Quadratic reinjection: keep small to avoid locking g≈T_MAX when coupling spikes. */
-    private static final double ALPHA = 0.002;
-    private static final double STORM_THRESHOLD = 1.0;
-    private static final double STORM_HYSTERESIS = 0.7;
-    private static double impulseBuffer = 0.0;
 
-    private static final double MIN_LAMBDA = 1e-6;
-    private static final double MAX_ALPHA = 1.0;
+    private static final double STORM_THRESHOLD = 0.55;
+    private static final double STORM_HYSTERESIS = 0.40;
 
-    private static final double[] CORRUPTION_THRESHOLDS = {0.8, 1.5, 2.5, 4.0};
+    private static final double[] CORRUPTION_THRESHOLDS = {0.20, 0.40, 0.60, 0.80};
     private static final String[] CORRUPTION_LEVELS = {"Subtle", "Moderate", "Severe", "Catastrophic"};
     private static int currentCorruptionLevel = 0;
 
     private TensionManager() {}
 
-    public static double getTension() {
-        return globalTension;
-    }
+    /**
+     * Recompute all global metrics from substrate state across all server worlds.
+     * Called once per tick from TensionServerTick after substrate integration.
+     */
+    public static void recompute(MinecraftServer server) {
+        double sumT = 0.0;
+        double sumTSq = 0.0;
+        double maxT = 0.0;
+        double sumDepth = 0.0;
+        double maxDepth = 0.0;
+        double sumMemory = 0.0;
+        double sumActivation = 0.0;
+        int activeCount = 0;
+        int totalCount = 0;
 
-    public static boolean isStormActive() {
-        return stormActive;
-    }
+        for (ServerWorld world : server.getWorlds()) {
+            ChunkTensionData data = ChunkTensionData.getServerState(world);
+            for (Map.Entry<ChunkPos, SubstrateState> entry : data.getSubstrateStatesView().entrySet()) {
+                ChunkPos pos = entry.getKey();
+                if (!world.isChunkLoaded(pos.x, pos.z)) continue;
+                SubstrateState ss = entry.getValue();
+                double t = SubstrateObservationModel.computeLocalTension(ss);
+                sumT += t;
+                sumTSq += t * t;
+                if (t > maxT) maxT = t;
+                double d = ss.getFieldDepth();
+                sumDepth += d;
+                if (d > maxDepth) maxDepth = d;
+                sumMemory += ss.getMemory();
+                sumActivation += ss.getActivation();
+                if (t > SubstrateState.ACTIVE_TENSION_THRESHOLD) activeCount++;
+                totalCount++;
+            }
+        }
 
-    public static void setTension(double tension) {
-        globalTension = Math.max(0.0, Math.min(T_MAX, tension));
+        if (totalCount > 0) {
+            globalMeanTension = sumT / totalCount;
+            globalVariance = (sumTSq / totalCount) - (globalMeanTension * globalMeanTension);
+            globalMeanDepth = sumDepth / totalCount;
+            globalMeanMemory = sumMemory / totalCount;
+            globalMeanActivation = sumActivation / totalCount;
+            globalActiveFraction = (double) activeCount / totalCount;
+        } else {
+            globalMeanTension = 0.0;
+            globalVariance = 0.0;
+            globalMeanDepth = 0.0;
+            globalMeanMemory = 0.0;
+            globalMeanActivation = 0.0;
+            globalActiveFraction = 0.0;
+        }
+        globalMaxTension = maxT;
+        globalMaxDepth = maxDepth;
+
+        // Storm flag driven by mean tension with hysteresis
+        if (globalMeanTension > STORM_THRESHOLD && !stormActive) stormActive = true;
+        if (globalMeanTension < STORM_HYSTERESIS) stormActive = false;
+
         updateCorruptionState();
     }
 
-    /**
-     * Buffered impulse used for debug spikes, rare scripted events, or legacy call sites.
-     * Player walking, mining, and combat should affect chunks via {@link ChunkTensionManager}, not this.
-     */
-    public static void addEvent(double amount) {
-        impulseBuffer += amount;
-    }
+    /** Mean derived tension T(x) over all loaded substrate chunks. */
+    public static double getTension() { return globalMeanTension; }
+    public static double getMaxTension() { return globalMaxTension; }
+    public static double getVariance() { return globalVariance; }
+    public static double getActiveFraction() { return globalActiveFraction; }
+    public static double getMeanDepth() { return globalMeanDepth; }
+    public static double getMaxDepth() { return globalMaxDepth; }
+    public static double getMeanMemory() { return globalMeanMemory; }
+    public static double getMeanActivation() { return globalMeanActivation; }
+    public static boolean isStormActive() { return stormActive; }
 
-    /**
-     * @deprecated Prefer {@link ChunkTensionManager#addMiningTension}.
-     */
-    @Deprecated
-    public static void addMiningTension(String blockId) {
-        // Intentionally not applied globally; retained for binary compatibility if referenced.
-    }
-
-    public static void addMiningTension(String blockId, ServerPlayerEntity player) {
-        if (player == null || player.getServer() == null) return;
-        ChunkTensionManager.addMiningTension(player.getServerWorld(), new ChunkPos(player.getBlockPos()), blockId);
-    }
-
-    public static void addDeforestationTension() {
-        // Local-only hook; implement via ChunkTensionManager when wired.
-    }
-
-    /**
-     * Advances global tension for one server tick.
-     *
-     * @param chunkCouplingInflow  drive from chunk statistics (unchanged total applied to dynamics)
-     * @param stormDiagnosticsNote storm-related diagnostic scalar for logs
-     * @param ambientInflowDiag    mean-term coupling (logging only; with localCouplingDiag should match chunk coupling)
-     * @param localCouplingDiag    hotspot coupling terms (logging only)
-     */
-    public static void tickGlobalDynamics(
-        double chunkCouplingInflow,
-        double stormDiagnosticsNote,
-        long serverTick,
-        double ambientInflowDiag,
-        double localCouplingDiag
-    ) {
-        int corruptionAtStart = currentCorruptionLevel;
-        boolean stormAtStart = stormActive;
-
-        double g0 = globalTension;
-        double ambientDecay = -LAMBDA * g0;
-        double nonlinear = ALPHA * g0 * g0;
-        double ritualSnap = impulseBuffer;
-        double inflow = chunkCouplingInflow + ritualSnap;
-
-        globalTension += ambientDecay + nonlinear + inflow;
-
-        globalTension = Math.max(0.0, Math.min(T_MAX, globalTension));
-
-        impulseBuffer *= 0.88;
-
-        if (globalTension > STORM_THRESHOLD && !stormActive) {
-            stormActive = true;
-        }
-        if (globalTension < STORM_HYSTERESIS) {
-            stormActive = false;
-        }
-
-        updateCorruptionState();
-        checkEquilibriumStability(inflow);
-
-        if (currentCorruptionLevel != corruptionAtStart) {
-            TensionTraceLogger.traceSystem(
-                TensionTraceClock.getServerTick(),
-                "CORRUPTION_TIER_CHANGE",
-                corruptionAtStart + "->" + currentCorruptionLevel + ":" + getCorruptionLevelName(),
-                globalTension,
-                "inflow=" + String.format("%.5f", inflow)
-            );
-        }
-        if (stormActive != stormAtStart) {
-            TensionTraceLogger.traceSystem(
-                TensionTraceClock.getServerTick(),
-                stormActive ? "GLOBAL_STORM_START" : "GLOBAL_STORM_END",
-                "hysteresis_threshold",
-                globalTension,
-                "stormActive=" + stormActive
-            );
-        }
-
-        if (serverTick % 20 == 0) {
-            double g1 = globalTension;
-            double net = g1 - g0;
-            DiagnosticLogs.globalFlowLine(
-                serverTick,
-                g1,
-                localCouplingDiag,
-                ambientInflowDiag,
-                ambientDecay,
-                nonlinear,
-                ritualSnap,
-                stormDiagnosticsNote,
-                TensionActivityLedger.getMovement(),
-                TensionActivityLedger.getMining(),
-                TensionActivityLedger.getCombat(),
-                net
-            );
-        }
-    }
-
-    private static void checkEquilibriumStability(double inflow) {
-        double lambda = Math.max(LAMBDA, MIN_LAMBDA);
-        double alpha = Math.min(ALPHA, MAX_ALPHA);
-        double i = Math.max(0.0, inflow);
-        double discriminant = lambda * lambda - 4.0 * alpha * i;
-        if (discriminant < 0) {
-            globalTension = Math.max(0.0, Math.min(T_MAX, globalTension * 0.9));
-            TensionTraceLogger.traceSystem(
-                TensionTraceClock.getServerTick(),
-                "EQUILIBRIUM_DAMP",
-                "discriminant<0 applied",
-                globalTension,
-                "inflow=" + String.format("%.5f", i)
-            );
-        }
-    }
-
-    public static int getCorruptionLevel() {
-        return currentCorruptionLevel;
-    }
+    public static int getCorruptionLevel() { return currentCorruptionLevel; }
 
     public static String getCorruptionLevelName() {
         return currentCorruptionLevel > 0
@@ -179,38 +121,52 @@ public final class TensionManager {
     private static void updateCorruptionState() {
         int newLevel = 0;
         for (int i = CORRUPTION_THRESHOLDS.length - 1; i >= 0; i--) {
-            if (globalTension >= CORRUPTION_THRESHOLDS[i]) {
+            if (globalMeanTension >= CORRUPTION_THRESHOLDS[i]) {
                 newLevel = i + 1;
                 break;
             }
         }
-        if (newLevel != currentCorruptionLevel) {
-            currentCorruptionLevel = newLevel;
-        }
+        currentCorruptionLevel = newLevel;
     }
 
-    public static void reduceTension(double amount) {
-        globalTension = Math.max(0.0, globalTension - amount);
-        updateCorruptionState();
+    // ---- Legacy compatibility stubs (kept for binary compatibility) ----
+
+    /** @deprecated Global tension is now a derived metric; this is a no-op. */
+    @Deprecated
+    public static void setTension(double tension) {}
+
+    /** @deprecated Global tension is now a derived metric; this is a no-op. */
+    @Deprecated
+    public static void addEvent(double amount) {}
+
+    /** @deprecated Use ChunkTensionManager directly. */
+    @Deprecated
+    public static void addMiningTension(String blockId) {}
+
+    /** @deprecated Use ChunkTensionManager directly. */
+    @Deprecated
+    public static void addMiningTension(String blockId, ServerPlayerEntity player) {
+        if (player == null || player.getServer() == null) return;
+        com.utdmod.tension.ChunkTensionManager.addMiningTension(
+            player.getServerWorld(), new ChunkPos(player.getBlockPos()), blockId);
     }
 
-    public static void triggerWraithEvent(World world) {
-        // Spawn integration point
-    }
+    /** @deprecated Global tension is now a derived metric; this is a no-op. */
+    @Deprecated
+    public static void reduceTension(double amount) {}
 
-    public static void triggerSerpentEvent(World world) {
-        // Spawn integration point
-    }
+    /** @deprecated Global tension is now a derived metric; this is a no-op. */
+    @Deprecated
+    public static void tickGlobalDynamics(double a, double b, long c, double d, double e) {}
+
+    public static void triggerWraithEvent(World world) {}
+    public static void triggerSerpentEvent(World world) {}
 
     public static TensionManager getServerState(MinecraftServer server) {
         return new TensionManager();
     }
 
     public float calculateBaseTension(ServerPlayerEntity player) {
-        float tBase = 0.005f;
-        if (player.getServer() != null) {
-            tBase *= 1.0f;
-        }
-        return tBase;
+        return 0.005f;
     }
 }

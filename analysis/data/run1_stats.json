@@ -1,0 +1,69 @@
+{
+  "activation_mean": {
+    "mean": 9.750460954393397e-06,
+    "std": 2.5708022526770974e-05,
+    "min": 0.0,
+    "max": 0.00015051533024356054,
+    "slope": -1.9277917093103875e-07,
+    "slope_r2": 0.32412075731288553,
+    "slope_p": 5.399963634111417e-24,
+    "slope_se": 1.7231416760498428e-08
+  },
+  "memory_mean": {
+    "mean": 0.0,
+    "std": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "slope": 0.0,
+    "slope_r2": 0.0,
+    "slope_p": 1.0,
+    "slope_se": 0.0
+  },
+  "field_depth_mean": {
+    "mean": 8.705266076729526e-05,
+    "std": 0.00011907255929914174,
+    "min": 0.0,
+    "max": 0.00037256522236954253,
+    "slope": -1.2835094399093967e-06,
+    "slope_r2": 0.6697284218797391,
+    "slope_p": 9.820547068476789e-65,
+    "slope_se": 5.5791116074638985e-08
+  },
+  "transport_mean": {
+    "mean": 0.0,
+    "std": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "slope": 0.0,
+    "slope_r2": 0.0,
+    "slope_p": 1.0,
+    "slope_se": 0.0
+  },
+  "convergence_mean": {
+    "mean": 0.9961105392298146,
+    "std": 0.06154002992062193,
+    "min": 0.0,
+    "max": 0.9999997641332882,
+    "slope": 8.770156403024999e-05,
+    "slope_r2": 0.011706396854872039,
+    "slope_p": 0.07987134220066174,
+    "slope_se": 4.9879082412889956e-05
+  },
+  "readiness_mean": {
+    "mean": 1.0,
+    "std": 0.0,
+    "min": 1.0,
+    "max": 1.0,
+    "slope": 0.0,
+    "slope_r2": 0.0,
+    "slope_p": 1.0,
+    "slope_se": 0.0
+  },
+  "activation_autocorr_lag1": 0.9328241382273212,
+  "activation_autocorr_lag10": 0.9324737036417484,
+  "activation_autocorr_lag50": 0.9305316525407797,
+  "activation_dominant_freq": 0.007633587786259542,
+  "activation_dominant_psd": 6.56108685094925e-09,
+  "memory_dominant_freq": 0.007633587786259542,
+  "transport_CV": null
+}

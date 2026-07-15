@@ -1,5 +1,6 @@
 package com.utdmod.research.experiment;
 
+import com.utdmod.research.player.ResearchPlayerSnapshot;
 import net.minecraft.util.math.BlockPos;
 
 /** Config parameters injected per agent experiment assignment. */
@@ -24,5 +25,20 @@ public final class ResearchExperimentConfig {
   public String couplingPresetId = "LAB";
 
   public ResearchExperimentConfig() {}
+
+  public static ResearchExperimentConfig fromSnapshot(ResearchPlayerSnapshot snapshot, BlockPos startingPos) {
+    ResearchExperimentConfig cfg = new ResearchExperimentConfig();
+    cfg.experimentId = snapshot.experimentId;
+    cfg.protocolId = snapshot.protocolId;
+    cfg.loggingLabel = snapshot.loggingLabel;
+    cfg.startingPos = startingPos;
+    cfg.durationTicks = snapshot.durationTicks;
+    cfg.allowedRadiusChunks = snapshot.allowedRadiusChunks;
+    cfg.botSeed = snapshot.botSeed;
+    cfg.experimentSeed = snapshot.experimentSeed;
+    cfg.miningOreId = snapshot.miningOreId;
+    cfg.miningGoalCount = snapshot.miningGoalCount;
+    return cfg;
+  }
 }
 

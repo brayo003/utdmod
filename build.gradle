@@ -24,7 +24,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:0.15.10"
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.92.1+1.20.4"
 
-    implementation "baritone:baritone-fabric:1.9.5-29-g054092e4"
+    // Baritone API (compile-time); runtime provided by baritone-fabric mod when present.
+    modCompileOnly files("${baritone_api_jar}")
 
     // JUnit 5 for tests
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'

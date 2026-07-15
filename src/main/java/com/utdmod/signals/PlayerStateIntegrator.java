@@ -33,20 +33,12 @@ public final class PlayerStateIntegrator {
             int hours = ticks / 72_000;
             double leak = 0.00015 * hours;
             ChunkPos pos = new ChunkPos(player.getBlockPos());
-            double before = ChunkTensionManager.getLocalTension(player.getServerWorld(), pos);
-            ChunkTensionManager.addLocalTension(player.getServerWorld(), pos, leak);
-            double after = ChunkTensionManager.getLocalTension(player.getServerWorld(), pos);
+            // Inject as substrate impulse
+            com.utdmod.tension.ChunkTensionData.getServerState(player.getServerWorld())
+                .addInstantaneousImpulse(pos, leak);
             TensionLogger.log(
-                TensionTraceClock.getServerTick(),
-                "MOVEMENT",
-                "session_fatigue_leak",
-                leak,
-                before,
-                after,
-                pos,
-                player,
-                player.getServerWorld()
-            );
+                TensionTraceClock.getServerTick(), "MOVEMENT", "session_fatigue_leak",
+                leak, 0.0, leak, pos, player, player.getServerWorld());
         }
     }
 }

@@ -10,14 +10,28 @@ import java.util.Set;
 
 /**
  * A connected component of active chunks.
+ * Regions are views over substrate history — they summarize, not own, state.
+ * All tension values are derived metrics computed from substrate variables.
  */
 public final class Region {
     private final int id;
     private final RegistryKey<World> worldKey;
     private final Set<ChunkPos> chunks;
     private final int chunkCount;
-    private final double averageTension;
+
+    // Derived tension statistics (T = computeLocalTension() per chunk)
+    private final double meanTension;
     private final double maxTension;
+    private final double varianceTension;
+    private final double activeFraction;
+
+    // Substrate field statistics
+    private final double meanDepth;
+    private final double meanMemory;
+    private final double meanActivation;
+    private final double maxActivation;
+
+    // Legacy geometry
     private final int fracturedChunks;
     private final int decoupledChunks;
     private final int stormChunks;
@@ -39,8 +53,14 @@ public final class Region {
         int id,
         RegistryKey<World> worldKey,
         Set<ChunkPos> chunks,
-        double averageTension,
+        double meanTension,
         double maxTension,
+        double varianceTension,
+        double activeFraction,
+        double meanDepth,
+        double meanMemory,
+        double meanActivation,
+        double maxActivation,
         int fracturedChunks,
         int decoupledChunks,
         int stormChunks,
@@ -54,8 +74,14 @@ public final class Region {
         this.worldKey = worldKey;
         this.chunks = Collections.unmodifiableSet(new HashSet<>(chunks));
         this.chunkCount = this.chunks.size();
-        this.averageTension = averageTension;
+        this.meanTension = meanTension;
         this.maxTension = maxTension;
+        this.varianceTension = varianceTension;
+        this.activeFraction = activeFraction;
+        this.meanDepth = meanDepth;
+        this.meanMemory = meanMemory;
+        this.meanActivation = meanActivation;
+        this.maxActivation = maxActivation;
         this.fracturedChunks = fracturedChunks;
         this.decoupledChunks = decoupledChunks;
         this.stormChunks = stormChunks;
@@ -67,65 +93,43 @@ public final class Region {
         this.potential = 0.0;
     }
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public RegistryKey<World> getWorldKey() { return worldKey; }
+    public Set<ChunkPos> getChunks() { return chunks; }
+    public int getChunkCount() { return chunkCount; }
 
-    public RegistryKey<World> getWorldKey() {
-        return worldKey;
-    }
+    /** Mean derived tension T = F(A,M,D,C,R) over all region chunks. */
+    public double getMeanTension() { return meanTension; }
+    /** Peak derived tension over all region chunks. */
+    public double getMaxTension() { return maxTension; }
+    /** Variance of derived tension — distinguishes uniform vs hotspot. */
+    public double getVarianceTension() { return varianceTension; }
+    /** Fraction of chunks above ACTIVE_TENSION_THRESHOLD. */
+    public double getActiveFraction() { return activeFraction; }
+    /** Mean substrate field depth — historical age of the region. */
+    public double getMeanDepth() { return meanDepth; }
+    /** Mean substrate memory — persistence of disturbance. */
+    public double getMeanMemory() { return meanMemory; }
+    /** Mean substrate activation. */
+    public double getMeanActivation() { return meanActivation; }
+    /** Peak substrate activation. */
+    public double getMaxActivation() { return maxActivation; }
 
-    public Set<ChunkPos> getChunks() {
-        return chunks;
-    }
+    /**
+     * @deprecated Use {@link #getMeanTension()} — tension is now a derived metric.
+     */
+    @Deprecated
+    public double getAverageTension() { return meanTension; }
 
-    public int getChunkCount() {
-        return chunkCount;
-    }
-
-    public double getAverageTension() {
-        return averageTension;
-    }
-
-    public double getMaxTension() {
-        return maxTension;
-    }
-
-    public int getFracturedChunks() {
-        return fracturedChunks;
-    }
-
-    public int getDecoupledChunks() {
-        return decoupledChunks;
-    }
-
-    public int getStormChunks() {
-        return stormChunks;
-    }
-
-    public double getCentroidX() {
-        return centroidX;
-    }
-
-    public double getCentroidZ() {
-        return centroidZ;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public long getLastUpdatedTick() {
-        return lastUpdatedTick;
-    }
-
-    public double getMaturity() {
-        return maturity;
-    }
-
-    public double getPotential() {
-        return potential;
-    }
+    public int getFracturedChunks() { return fracturedChunks; }
+    public int getDecoupledChunks() { return decoupledChunks; }
+    public int getStormChunks() { return stormChunks; }
+    public double getCentroidX() { return centroidX; }
+    public double getCentroidZ() { return centroidZ; }
+    public int getAge() { return age; }
+    public long getLastUpdatedTick() { return lastUpdatedTick; }
+    public double getMaturity() { return maturity; }
+    public double getPotential() { return potential; }
 
     public double getFracturedDensity() {
         return chunkCount > 0 ? fracturedChunks / (double) chunkCount : 0.0;
@@ -137,21 +141,21 @@ public final class Region {
 
     public double computePotential() {
         double sizeScale = Math.sqrt(Math.max(1, chunkCount));
-        double densityBonus = 1.0 + FRACTURED_DENSITY_BONUS * getFracturedDensity() + STORM_DENSITY_BONUS * getStormDensity();
-        return averageTension * sizeScale * densityBonus;
+        double densityBonus = 1.0 + FRACTURED_DENSITY_BONUS * getFracturedDensity()
+                                  + STORM_DENSITY_BONUS * getStormDensity();
+        return meanTension * sizeScale * densityBonus;
     }
 
     public void updateMaturity(long tick) {
-    double potential = computePotential();
-    this.potential = potential;
-
-    this.maturity += MATURITY_ALPHA * (potential - this.maturity);
-
-    this.lastUpdatedTick = tick;
+        double p = computePotential();
+        this.potential = p;
+        this.maturity += MATURITY_ALPHA * (p - this.maturity);
+        this.lastUpdatedTick = tick;
     }
 
     public double getContribution() {
-        double densityBonus = 1.0 + CONTRIBUTION_FRACTURED_BONUS * getFracturedDensity() + CONTRIBUTION_STORM_BONUS * getStormDensity();
+        double densityBonus = 1.0 + CONTRIBUTION_FRACTURED_BONUS * getFracturedDensity()
+                                  + CONTRIBUTION_STORM_BONUS * getStormDensity();
         return maturity * densityBonus;
     }
 
@@ -159,19 +163,17 @@ public final class Region {
         if (maturity > 2.25 && age > 3200) {
             return RegionState.ANCIENT;
         }
-
-        if (averageTension >= 1.05 && chunkCount >= 6 && fracturedChunks >= Math.max(1, chunkCount / 8)) {
+        if (meanTension >= 1.05 && chunkCount >= 6
+                && fracturedChunks >= Math.max(1, chunkCount / 8)) {
             return RegionState.FRACTURED;
         }
-
-        if (averageTension >= 0.78 || maturity > 1.15 || getFracturedDensity() > 0.16 || getStormDensity() > 0.12) {
+        if (meanTension >= 0.78 || maturity > 1.15
+                || getFracturedDensity() > 0.16 || getStormDensity() > 0.12) {
             return RegionState.STRAINED;
         }
-
-        if (averageTension >= 0.35 || maturity > 0.5 || age > 900) {
+        if (meanTension >= 0.35 || maturity > 0.5 || age > 900) {
             return RegionState.GROWING;
         }
-
         return RegionState.DORMANT;
     }
 }

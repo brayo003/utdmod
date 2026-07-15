@@ -1,0 +1,321 @@
+{
+  "field_ticks": [
+    1000,
+    2000,
+    3000,
+    4000,
+    5000,
+    6000,
+    7000
+  ],
+  "region_count_series": [
+    1,
+    2,
+    3,
+    3,
+    4,
+    4,
+    4
+  ],
+  "activation_mean_series": [
+    0.08789063161175939,
+    0.09810322520856293,
+    0.1486373611123139,
+    0.117848057836196,
+    0.1529266893419349,
+    0.22987955595830886,
+    0.17530585508560803
+  ],
+  "memory_mean_series": [
+    0.045705467761238495,
+    0.09704604760737187,
+    0.18023658250205923,
+    0.17210086825181833,
+    0.24994640674437527,
+    0.35370028852078483,
+    0.43370148525225294
+  ],
+  "stability_series": [
+    0.5194032180504103,
+    0.5280741832850399,
+    0.5237457226853612,
+    0.539946856037961,
+    0.5515681832441981,
+    0.5645551907903449,
+    0.585149631708392
+  ],
+  "stress_series": [
+    0.7234552158312078,
+    0.7692937112082142,
+    0.8397844114476655,
+    0.7234006600652163,
+    0.7513529173100392,
+    0.7511936027693514,
+    0.7460878537106856
+  ],
+  "per_region": {
+    "1": {
+      "tick_range": [
+        1000,
+        7000
+      ],
+      "tick_count": 7,
+      "chunk_count_final": 4,
+      "states": [
+        "DORMANT",
+        "DORMANT",
+        "DORMANT",
+        "DORMANT",
+        "DORMANT",
+        "GROWING",
+        "GROWING"
+      ],
+      "state_transitions": 1,
+      "centroid_x_series": [
+        -0.5,
+        -0.5,
+        -0.5,
+        -0.5,
+        -0.5,
+        -0.5,
+        -0.5
+      ],
+      "centroid_z_series": [
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "centroid_drift": 0.0,
+      "maturity_series": [
+        0.0315,
+        0.1353,
+        0.2393,
+        0.3313,
+        0.4095,
+        0.4746,
+        0.528
+      ],
+      "maturity_slope": 0.083512,
+      "maturity_r2": 0.9863,
+      "depth_series": [
+        0.588,
+        1.0177,
+        1.1668,
+        1.2406,
+        1.285,
+        1.3141,
+        1.3339
+      ],
+      "memory_series": [
+        0.1143,
+        0.3063,
+        0.4698,
+        0.5938,
+        0.6859,
+        0.754,
+        0.8045
+      ],
+      "activation_series": [
+        0.2197,
+        0.2498,
+        0.2555,
+        0.2547,
+        0.2534,
+        0.2524,
+        0.2516
+      ]
+    },
+    "2": {
+      "tick_range": [
+        2000,
+        7000
+      ],
+      "tick_count": 6,
+      "chunk_count_final": 4,
+      "states": [
+        "DORMANT",
+        "DORMANT",
+        "DORMANT",
+        "DORMANT",
+        "GROWING",
+        "GROWING"
+      ],
+      "state_transitions": 1,
+      "centroid_x_series": [
+        6.67,
+        6.8,
+        7.25,
+        7.25,
+        5.5,
+        5.5
+      ],
+      "centroid_z_series": [
+        0.67,
+        -0.2,
+        -7.0,
+        -7.0,
+        -23.5,
+        -23.5
+      ],
+      "centroid_drift": 17.959,
+      "maturity_series": [
+        0.0473,
+        0.1343,
+        0.1299,
+        0.2765,
+        0.1254,
+        0.2906
+      ],
+      "maturity_slope": 0.038176,
+      "maturity_r2": 0.5573,
+      "depth_series": [
+        0.6193,
+        0.7663,
+        0.7992,
+        0.9662,
+        0.5781,
+        0.6913
+      ],
+      "memory_series": [
+        0.1585,
+        0.2342,
+        0.2049,
+        0.4111,
+        0.513,
+        0.974
+      ],
+      "activation_series": [
+        0.1554,
+        0.1867,
+        0.2487,
+        0.2759,
+        0.9475,
+        0.5132
+      ]
+    },
+    "3": {
+      "tick_range": [
+        3000,
+        7000
+      ],
+      "tick_count": 5,
+      "chunk_count_final": 8,
+      "states": [
+        "DORMANT",
+        "DORMANT",
+        "DORMANT",
+        "DORMANT",
+        "GROWING"
+      ],
+      "state_transitions": 1,
+      "centroid_x_series": [
+        7.0,
+        6.8,
+        6.8,
+        7.25,
+        7.25
+      ],
+      "centroid_z_series": [
+        -8.0,
+        -0.2,
+        -0.2,
+        -7.0,
+        -7.0
+      ],
+      "centroid_drift": 10.3597,
+      "maturity_series": [
+        0.0229,
+        0.2289,
+        0.3147,
+        0.4125,
+        0.5294
+      ],
+      "maturity_slope": 0.119666,
+      "maturity_r2": 0.9719,
+      "depth_series": [
+        0.4569,
+        0.8717,
+        0.8993,
+        1.0009,
+        1.0165
+      ],
+      "memory_series": [
+        0.107,
+        0.3675,
+        0.4733,
+        0.5692,
+        0.6821
+      ],
+      "activation_series": [
+        0.1807,
+        0.1992,
+        0.2016,
+        0.2795,
+        0.2801
+      ]
+    },
+    "4": {
+      "tick_range": [
+        5000,
+        7000
+      ],
+      "tick_count": 3,
+      "chunk_count_final": 5,
+      "states": [
+        "DORMANT",
+        "DORMANT",
+        "DORMANT"
+      ],
+      "state_transitions": 0,
+      "centroid_x_series": [
+        5.0,
+        6.8,
+        6.8
+      ],
+      "centroid_z_series": [
+        -23.0,
+        -0.2,
+        -0.2
+      ],
+      "centroid_drift": 22.8709,
+      "maturity_series": [
+        0.0029,
+        0.3881,
+        0.4493
+      ],
+      "maturity_slope": 0.22321,
+      "maturity_r2": 0.8506,
+      "depth_series": [
+        0.2696,
+        0.9069,
+        0.9077
+      ],
+      "memory_series": [
+        0.0763,
+        0.5517,
+        0.6086
+      ],
+      "activation_series": [
+        0.4648,
+        0.2021,
+        0.2023
+      ]
+    }
+  },
+  "largest_region_final": {
+    "region_id": 3,
+    "chunk_count": 8,
+    "mean_depth": 1.0165,
+    "mean_activation": 0.2801
+  },
+  "region_persistence_fraction": {
+    "1": 1.0,
+    "2": 0.857,
+    "3": 0.714,
+    "4": 0.429
+  }
+}

@@ -1,19 +1,21 @@
 package com.utdmod.research.player;
 
+import com.utdmod.research.experiment.ResearchExperimentConfig;
+import com.utdmod.research.experiment.ResearchExperimentManager;
 import com.utdmod.UTDMod;
 import com.utdmod.research.ResearchConfig;
+import com.utdmod.research.agent.ResearchClientAgentManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * Lifecycle manager for the deterministic research survival player.
+ * Lifecycle manager for research client agents.
  * ResearchBotManager delegates here — no direct perturbation injection.
  */
 public final class ResearchPlayerController {
   private static final ResearchPlayerFsm FSM = new ResearchPlayerFsm();
-  // Multi-agent: one context per research-player UUID.
   private static final java.util.Map<java.util.UUID, ResearchPlayerContext> ACTIVE_CONTEXTS =
       new java.util.HashMap<>();
 
@@ -27,6 +29,9 @@ public final class ResearchPlayerController {
     boolean anyRunning = false;
     for (ServerPlayerEntity player : ResearchPlayerRegistry.getAll()) {
       if (player.getServerWorld() != world || !player.isAlive()) {
+        continue;
+      }
+      if (!ResearchClientAgentManager.isClientConnected(player)) {
         continue;
       }
       java.util.UUID uuid = player.getUuid();
@@ -43,7 +48,6 @@ public final class ResearchPlayerController {
         ACTIVE_CONTEXTS.put(uuid, ctx);
       }
 
-      player.playerTick();
       FSM.tick(ctx, tick);
       persistence.saveSnapshot(snapshot);
     }
@@ -54,40 +58,47 @@ public final class ResearchPlayerController {
   }
 
   public static boolean spawn(ServerWorld world, int botSeed) {
-    BlockPos spawnPos = ResearchPlayerEntityFactory.defaultSpawn(world, botSeed);
-    ServerPlayerEntity player = ResearchPlayerEntityFactory.spawn(world, botSeed, spawnPos);
-    if (player == null) {
-      return false;
+    return spawn(world, ResearchPlayerEntityFactory.DEFAULT_AGENT_ID, botSeed,
+        ResearchPlayerEntityFactory.defaultSpawn(world, botSeed));
+  }
+
+  public static boolean spawn(ServerWorld world, String agentId, int botSeed, BlockPos spawnPos) {
+    ResearchPlayerSnapshot template = new ResearchPlayerSnapshot();
+    template.agentId = agentId;
+    template.botSeed = botSeed;
+    template.spawned = true;
+    template.state = ResearchPlayerState.INITIALIZE;
+    template.previousState = ResearchPlayerState.IDLE;
+    template.transitionReason = "spawn";
+    template.stateTicks = 0;
+    template.running = true;
+    template.paused = false;
+    template.homePos = spawnPos.toImmutable();
+    template.protocolId = template.protocolId == null ? "PASSIVE_WANDER" : template.protocolId;
+    template.experimentId = template.experimentId == null ? "default_experiment" : template.experimentId;
+
+    ResearchExperimentConfig cfg = ResearchExperimentConfig.fromSnapshot(template, spawnPos);
+    ResearchExperimentManager.reserveClientAgent(world, agentId, cfg, spawnPos);
+
+    ServerPlayerEntity player = ResearchClientAgentManager.findLinkedPlayer(world, agentId);
+    if (player != null) {
+      ResearchPlayerContext ctx = new ResearchPlayerContext(world, player, ResearchPlayerPersistence.get(world, player.getUuid()).snapshot());
+      ACTIVE_CONTEXTS.put(player.getUuid(), ctx);
     }
 
-    ResearchPlayerPersistence persistence = ResearchPlayerPersistence.get(world, player.getUuid());
-    ResearchPlayerSnapshot snapshot = persistence.snapshot();
-    snapshot.agentId = ResearchPlayerEntityFactory.DEFAULT_AGENT_ID;
-    snapshot.botSeed = botSeed;
-    snapshot.spawned = true;
-    snapshot.state = ResearchPlayerState.INITIALIZE;
-    snapshot.previousState = ResearchPlayerState.IDLE;
-    snapshot.transitionReason = "spawn";
-    snapshot.stateTicks = 0;
-    snapshot.running = true;
-    snapshot.paused = false;
-    snapshot.homePos = spawnPos.toImmutable();
-    snapshot.protocolId = snapshot.protocolId == null ? "PASSIVE_WANDER" : snapshot.protocolId;
-    snapshot.experimentId = snapshot.experimentId == null ? "default_experiment" : snapshot.experimentId;
-
-    persistence.saveSnapshot(snapshot);
-
-    ResearchPlayerContext ctx = new ResearchPlayerContext(world, player, snapshot);
-    ACTIVE_CONTEXTS.put(player.getUuid(), ctx);
-
     ResearchPlayerLogger.initialize(botSeed);
-    ResearchPlayerLogger.setEnabled(snapshot.loggingEnabled);
+    ResearchPlayerLogger.setEnabled(template.loggingEnabled);
+    ResearchConfig.setBotEnabled(true);
+    UTDMod.LOGGER.info("[UTD] Reserved research client agent slot {} (awaiting client connection)", agentId);
     return true;
   }
 
   public static void remove(ServerWorld world) {
-    ResearchPlayerEntityFactory.remove(world);
-    ServerPlayerEntity player = ResearchPlayerRegistry.get(world);
+    remove(world, ResearchPlayerEntityFactory.DEFAULT_AGENT_ID);
+  }
+
+  public static void remove(ServerWorld world, String agentId) {
+    ServerPlayerEntity player = ResearchClientAgentManager.findLinkedPlayer(world, agentId);
     if (player != null) {
       ResearchPlayerPersistence persistence = ResearchPlayerPersistence.get(world, player.getUuid());
       ResearchPlayerSnapshot snapshot = persistence.snapshot();
@@ -95,6 +106,7 @@ public final class ResearchPlayerController {
       snapshot.running = false;
       persistence.saveSnapshot(snapshot);
       ACTIVE_CONTEXTS.remove(player.getUuid());
+      ResearchPlayerRegistry.unregister(player);
     }
     ResearchPlayerLogger.close();
   }
@@ -102,6 +114,7 @@ public final class ResearchPlayerController {
   public static void start(ServerWorld world) {
     ServerPlayerEntity player = ResearchPlayerRegistry.get(world);
     if (player == null) {
+      ResearchConfig.setBotEnabled(true);
       return;
     }
     ResearchPlayerPersistence persistence = ResearchPlayerPersistence.get(world, player.getUuid());
@@ -109,9 +122,7 @@ public final class ResearchPlayerController {
     snapshot.running = true;
     snapshot.paused = false;
     snapshot.stateTicks = 0;
-    if (!snapshot.spawned) {
-      spawn(world, snapshot.botSeed != 0 ? snapshot.botSeed : ResearchConfig.getBotSeed());
-    } else if (snapshot.state == ResearchPlayerState.IDLE) {
+    if (snapshot.state == ResearchPlayerState.IDLE) {
       snapshot.state = ResearchPlayerState.RESUME_PREVIOUS_TASK;
     }
     persistence.saveSnapshot(snapshot);
@@ -121,6 +132,7 @@ public final class ResearchPlayerController {
   public static void stop(ServerWorld world) {
     ServerPlayerEntity player = ResearchPlayerRegistry.get(world);
     if (player == null) {
+      ResearchConfig.setBotEnabled(false);
       return;
     }
     ResearchPlayerPersistence persistence = ResearchPlayerPersistence.get(world, player.getUuid());

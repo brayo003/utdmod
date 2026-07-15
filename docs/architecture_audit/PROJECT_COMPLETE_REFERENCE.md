@@ -1,3 +1,8 @@
+> **[HISTORICAL — PRE-REFACTOR — DO NOT USE AS CURRENT REFERENCE]**
+> This document is a consolidated reference for the old scalar ODE tension system. Parameters,
+> equations, and file paths here largely do not reflect the current codebase. For a current
+> reference start with `docs/INDEX.md` and `docs/architecture_audit/EQUATIONS.md`.
+
 # UTD Mod — Complete Project Reference (Paste-Ready)
 
 **Purpose of this document:** Give a third party (human or AI) full context on what this Minecraft Fabric mod is, what it is trying to achieve, how it is built, every major parameter, and what is wired vs placeholder.

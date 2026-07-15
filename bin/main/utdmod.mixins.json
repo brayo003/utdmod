@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "package": "com.utdmod.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "SpawnHelperMixin"
+  ],
+  "client": [],
+  "injectors": { "defaultRequire": 1 }
+}

@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 /** Deterministic ore mining until inventory goal is reached. */
 public final class MiningExperiment extends TimedExperiment {
   private final Item targetDropItem;
+  private boolean miningStarted;
 
   public MiningExperiment(Item targetDropItem) {
     this.targetDropItem = targetDropItem;
@@ -25,7 +26,8 @@ public final class MiningExperiment extends TimedExperiment {
   public void initialize(ResearchPlayerContext ctx, long tick) {
     ctx.snapshot.stateTicks = 0;
     ctx.snapshot.transitionReason = "mining init";
-    ctx.navigation.stop();
+    ctx.controller.stop();
+    miningStarted = false;
     ctx.currentTarget = null;
   }
 
@@ -39,38 +41,38 @@ public final class MiningExperiment extends TimedExperiment {
       return;
     }
 
-    int radiusChunks = Math.max(1, ctx.snapshot.allowedRadiusChunks);
-    BlockPos target = targetDropItem == Items.COAL
-        ? ctx.vision.findNearestCoal()
-        : ctx.vision.findNearestIron();
-
-    if (target == null || !ResearchExperimentLibrary.withinRadiusChunks(
-        target, ctx.snapshot.homePos, radiusChunks)) {
-      // Fallback: keep exploring deterministically until ore is seen.
-      BlockPos wp = ctx.exploration.nextWaypoint();
-      if (ResearchExperimentLibrary.withinRadiusChunks(wp, ctx.snapshot.homePos, radiusChunks)) {
-        ctx.currentTarget = wp;
-        ctx.navigation.setTarget(wp);
+    if (!miningStarted) {
+      if (targetDropItem == Items.COAL) {
+        ctx.controller.mineByName("coal_ore", "deepslate_coal_ore");
       } else {
-        ctx.navigation.setTarget(ctx.snapshot.homePos);
+        ctx.controller.mineByName("iron_ore", "deepslate_iron_ore");
       }
-      ctx.navigation.tick();
-      ctx.snapshot.transitionReason = "mining exploring fallback";
-      return;
-    }
-
-    ctx.currentTarget = target;
-    ctx.navigation.setTarget(target);
-
-    if (!ctx.mining.isBreaking() && ctx.navigation.isAtTarget(3.5)) {
-      ctx.mining.start(target, ctx.navigation, ctx.inventory);
+      miningStarted = true;
       ctx.snapshot.transitionReason = "mining start";
     }
 
-    // Run both movement and mining; mining will stop itself when block breaks.
-    ctx.navigation.tick();
-    ctx.mining.tick(ctx.navigation);
-    ctx.snapshot.transitionReason = "mining tick";
+    int radiusChunks = Math.max(1, ctx.snapshot.allowedRadiusChunks);
+    if (!ResearchExperimentLibrary.withinRadiusChunks(
+        ctx.player.getBlockPos(), ctx.snapshot.homePos, radiusChunks)) {
+      ctx.controller.setTarget(ctx.snapshot.homePos);
+      ctx.snapshot.transitionReason = "mining radius recall";
+    } else if (targetDropItem == Items.COAL ? ctx.vision.findNearestCoal() == null : ctx.vision.findNearestIron() == null) {
+      BlockPos wp = ctx.controller.nextExplorationWaypoint();
+      if (ResearchExperimentLibrary.withinRadiusChunks(wp, ctx.snapshot.homePos, radiusChunks)) {
+        ctx.currentTarget = wp;
+        ctx.controller.setTarget(wp);
+      } else {
+        ctx.controller.setTarget(ctx.snapshot.homePos);
+      }
+      ctx.snapshot.transitionReason = "mining exploring fallback";
+    }
+
+    ctx.controller.tick();
+    if (!ctx.snapshot.transitionReason.equals("mining start")
+        && !ctx.snapshot.transitionReason.equals("mining exploring fallback")
+        && !ctx.snapshot.transitionReason.equals("mining radius recall")) {
+      ctx.snapshot.transitionReason = "mining tick";
+    }
   }
 
   @Override
@@ -83,9 +85,9 @@ public final class MiningExperiment extends TimedExperiment {
 
   @Override
   public void shutdown(ResearchPlayerContext ctx, long tick) {
-    ctx.navigation.stop();
-    ctx.mining.stop();
+    ctx.controller.stop();
+    ctx.controller.stopMining();
+    miningStarted = false;
     ctx.snapshot.transitionReason = "mining shutdown";
   }
 }
-

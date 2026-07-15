@@ -1,7 +1,8 @@
 package com.utdmod.core;
 
-import com.utdmod.config.UTDConfig;
 import com.utdmod.tension.ChunkTensionData;
+import com.utdmod.tension.SubstrateObservationModel;
+import com.utdmod.tension.SubstrateState;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
@@ -20,7 +21,9 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Builds and exposes live region aggregates from active chunk tension entries.
+ * Builds and exposes live region aggregates from substrate state.
+ * Regions are connected components of chunks whose derived tension T(x) exceeds the active threshold.
+ * All statistics are computed from substrate variables — no legacy tension map is consulted.
  */
 public final class RegionManager {
     private static final int[] DX = {1, -1, 0, 0};
@@ -59,12 +62,7 @@ public final class RegionManager {
         return regions;
     }
 
-    /**
-     * Return the active Region containing the given chunk in the given world, or null.
-     * This is intentionally O(n) over active regions because it's only called on the
-     * server side infrequently (per-player sync, every 20 ticks).
-     */
-    public static Region getRegionForChunk(net.minecraft.server.world.ServerWorld world, net.minecraft.util.math.ChunkPos chunkPos) {
+    public static Region getRegionForChunk(ServerWorld world, ChunkPos chunkPos) {
         if (world == null) return null;
         var rlist = regions;
         for (Region r : rlist) {
@@ -82,38 +80,39 @@ public final class RegionManager {
 
         for (ServerWorld world : server.getWorlds()) {
             ChunkTensionData chunkData = ChunkTensionData.getServerState(world);
-            Map<ChunkPos, Double> tensionMap = chunkData.getTensionMap();
+            Map<ChunkPos, SubstrateState> substrateView = chunkData.getSubstrateStatesView();
+
+            // Build active-chunk map: T(x) > threshold, chunk loaded
             Map<ChunkPos, Double> activeChunks = new HashMap<>();
-
-            for (Map.Entry<ChunkPos, Double> entry : tensionMap.entrySet()) {
-                ChunkPos chunkPos = entry.getKey();
-                if (!world.isChunkLoaded(chunkPos.x, chunkPos.z)) {
-                    continue;
-                }
-                double tension = entry.getValue();
-                if (tension > UTDConfig.regionActiveTensionThreshold) {
-                    activeChunks.put(chunkPos, tension);
+            for (Map.Entry<ChunkPos, SubstrateState> entry : substrateView.entrySet()) {
+                ChunkPos pos = entry.getKey();
+                if (!world.isChunkLoaded(pos.x, pos.z)) continue;
+                double t = SubstrateObservationModel.computeLocalTension(entry.getValue());
+                if (t > SubstrateState.ACTIVE_TENSION_THRESHOLD) {
+                    activeChunks.put(pos, t);
                 }
             }
 
-            if (activeChunks.isEmpty()) {
-                continue;
-            }
+            if (activeChunks.isEmpty()) continue;
 
             Set<ChunkPos> visited = new HashSet<>();
             Deque<ChunkPos> queue = new ArrayDeque<>();
 
             for (ChunkPos seed : activeChunks.keySet()) {
-                if (!visited.add(seed)) {
-                    continue;
-                }
+                if (!visited.add(seed)) continue;
 
                 queue.clear();
                 queue.add(seed);
 
                 Set<ChunkPos> regionChunks = new HashSet<>();
                 double tensionSum = 0.0;
+                double tensionSumSq = 0.0;
                 double tensionMax = 0.0;
+                int activeCount = 0;
+                double depthSum = 0.0;
+                double memorySum = 0.0;
+                double activationSum = 0.0;
+                double activationMax = 0.0;
                 int fracturedCount = 0;
                 int decoupledCount = 0;
                 int stormCount = 0;
@@ -124,21 +123,27 @@ public final class RegionManager {
                     ChunkPos current = queue.removeFirst();
                     regionChunks.add(current);
 
-                    double tension = activeChunks.get(current);
-                    tensionSum += tension;
-                    tensionMax = Math.max(tensionMax, tension);
+                    double t = activeChunks.get(current);
+                    tensionSum += t;
+                    tensionSumSq += t * t;
+                    if (t > tensionMax) tensionMax = t;
+                    if (t > SubstrateState.ACTIVE_TENSION_THRESHOLD) activeCount++;
                     centroidSumX += current.x;
                     centroidSumZ += current.z;
 
+                    SubstrateState ss = substrateView.get(current);
+                    if (ss != null) {
+                        depthSum += ss.getFieldDepth();
+                        memorySum += ss.getMemory();
+                        double a = ss.getActivation();
+                        activationSum += a;
+                        if (a > activationMax) activationMax = a;
+                    }
+
                     ChunkTensionData.ChunkState state = chunkData.getChunkState(current);
-                    if (state == ChunkTensionData.ChunkState.FRACTURED) {
-                        fracturedCount++;
-                    } else if (state == ChunkTensionData.ChunkState.DECOUPLED) {
-                        decoupledCount++;
-                    }
-                    if (chunkData.isStormActive(current)) {
-                        stormCount++;
-                    }
+                    if (state == ChunkTensionData.ChunkState.FRACTURED) fracturedCount++;
+                    else if (state == ChunkTensionData.ChunkState.DECOUPLED) decoupledCount++;
+                    if (chunkData.isStormActive(current)) stormCount++;
 
                     for (int i = 0; i < DX.length; i++) {
                         ChunkPos neighbor = new ChunkPos(current.x + DX[i], current.z + DZ[i]);
@@ -148,19 +153,23 @@ public final class RegionManager {
                     }
                 }
 
-                int chunkCount = regionChunks.size();
-                double average = chunkCount > 0 ? tensionSum / chunkCount : 0.0;
-                double centroidX = chunkCount > 0 ? centroidSumX / chunkCount : 0.0;
-                double centroidZ = chunkCount > 0 ? centroidSumZ / chunkCount : 0.0;
+                int n = regionChunks.size();
+                double mean = n > 0 ? tensionSum / n : 0.0;
+                double variance = n > 1 ? (tensionSumSq / n) - (mean * mean) : 0.0;
+                double activeFraction = n > 0 ? (double) activeCount / n : 0.0;
+                double meanDepth = n > 0 ? depthSum / n : 0.0;
+                double meanMemory = n > 0 ? memorySum / n : 0.0;
+                double meanActivation = n > 0 ? activationSum / n : 0.0;
+                double centroidX = n > 0 ? centroidSumX / n : 0.0;
+                double centroidZ = n > 0 ? centroidSumZ / n : 0.0;
 
+                // Inherit age and maturity from best-overlap predecessor
                 Region previousRegion = null;
                 int bestOverlap = 0;
                 Map<Region, Integer> overlapCounts = new HashMap<>();
                 for (ChunkPos chunk : regionChunks) {
                     Region candidate = previousRegionByChunk.get(new ChunkKey(world.getRegistryKey(), chunk));
-                    if (candidate == null) {
-                        continue;
-                    }
+                    if (candidate == null) continue;
                     int overlap = overlapCounts.getOrDefault(candidate, 0) + 1;
                     overlapCounts.put(candidate, overlap);
                     if (overlap > bestOverlap) {
@@ -180,16 +189,11 @@ public final class RegionManager {
                     nextId++,
                     world.getRegistryKey(),
                     regionChunks,
-                    average,
-                    tensionMax,
-                    fracturedCount,
-                    decoupledCount,
-                    stormCount,
-                    centroidX,
-                    centroidZ,
-                    age,
-                    tick,
-                    maturity
+                    mean, tensionMax, variance, activeFraction,
+                    meanDepth, meanMemory, meanActivation, activationMax,
+                    fracturedCount, decoupledCount, stormCount,
+                    centroidX, centroidZ,
+                    age, tick, maturity
                 );
                 region.updateMaturity(tick);
                 nextRegions.add(region);
@@ -200,6 +204,7 @@ public final class RegionManager {
             }
         }
 
+        // Lifecycle events
         List<Region> previousRegions = new ArrayList<>(regions);
         Map<Integer, Region> previousRegionsByIdSnapshot = new HashMap<>(previousRegionsById);
         previousRegionsById.clear();
@@ -207,71 +212,30 @@ public final class RegionManager {
             previousRegionsById.put(region.getId(), region);
         }
 
-        for (Region previousRegion : previousRegions) {
-            boolean stillPresent = nextRegions.stream().anyMatch(region -> region.getId() == previousRegion.getId());
-            if (stillPresent) {
-                continue;
-            }
-
+        for (Region prev : previousRegions) {
+            boolean stillPresent = nextRegions.stream().anyMatch(r -> r.getId() == prev.getId());
+            if (stillPresent) continue;
             Region mergedInto = nextRegions.stream()
-                .filter(region -> region.getChunks().containsAll(previousRegion.getChunks()))
-                .findFirst()
-                .orElse(null);
+                .filter(r -> r.getChunks().containsAll(prev.getChunks()))
+                .findFirst().orElse(null);
             if (mergedInto != null) {
-                com.utdmod.diag.DiagnosticLogs.regionMerged(previousRegion.getId(), mergedInto.getId());
+                com.utdmod.diag.DiagnosticLogs.regionMerged(prev.getId(), mergedInto.getId());
             } else {
-                com.utdmod.diag.DiagnosticLogs.regionDestroyed(previousRegion.getId(), previousRegion.getChunkCount());
+                com.utdmod.diag.DiagnosticLogs.regionDestroyed(prev.getId(), prev.getChunkCount());
             }
         }
 
         for (Region region : nextRegions) {
-            Region previousRegion = previousRegionsByIdSnapshot.get(region.getId());
-            if (previousRegion == null) {
+            Region prev = previousRegionsByIdSnapshot.get(region.getId());
+            if (prev == null) {
                 com.utdmod.diag.DiagnosticLogs.regionCreated(region.getId(), region.getChunkCount(), region.getState().name());
-            } else if (!previousRegion.getState().equals(region.getState())) {
-                com.utdmod.diag.DiagnosticLogs.regionStateChanged(region.getId(), previousRegion.getState().name(), region.getState().name());
+            } else if (!prev.getState().equals(region.getState())) {
+                com.utdmod.diag.DiagnosticLogs.regionStateChanged(region.getId(), prev.getState().name(), region.getState().name());
             }
         }
 
         regions = Collections.unmodifiableList(nextRegions);
         previousRegionByChunk.clear();
         previousRegionByChunk.putAll(nextRegionByChunk);
-    }
-
-    private static void logDiagnostics(List<Region> regionList) {
-        System.out.println("[REGIONS]");
-        System.out.printf("count=%d%n", regionList.size());
-
-        int largestId = 0;
-        int largestSize = 0;
-        double largestAvg = 0.0;
-        double largestMaturity = 0.0;
-
-        for (Region region : regionList) {
-            if (region.getChunkCount() > largestSize) {
-                largestSize = region.getChunkCount();
-                largestId = region.getId();
-                largestAvg = region.getAverageTension();
-                largestMaturity = region.getMaturity();
-            }
-        }
-
-        System.out.printf("largest=%d%n", largestId);
-        System.out.printf("largestSize=%d%n", largestSize);
-        System.out.printf("largestAvg=%.4f%n", largestAvg);
-        System.out.printf("largestMaturity=%.4f%n", largestMaturity);
-
-        for (Region region : regionList) {
-            System.out.printf("id=%d size=%d avg=%.4f maturity=%.4f age=%d state=%s fractured=%d storm=%d%n",
-                region.getId(),
-                region.getChunkCount(),
-                region.getAverageTension(),
-                region.getMaturity(),
-                region.getAge(),
-                region.getState(),
-                region.getFracturedChunks(),
-                region.getStormChunks()
-            );
-        }
     }
 }

@@ -26,12 +26,12 @@ public final class MobBehaviorActuator implements FieldActuator {
   private static final UUID UTD_FOLLOW = UUID.fromString("6d2c3b1d-0b0a-4c2e-9f1a-000000000002");
 
   @Override
-  public void actuate(ServerWorld world, ChunkInterpretation interpretation) {
+  public com.utdmod.experiment.ActuatorOutcome actuate(ServerWorld world, ChunkInterpretation interpretation) {
     if (world == null || interpretation == null || interpretation.semantics == null) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
     if (!SpatialBehaviorHelper.isChunkLoaded(world, interpretation.chunkPos)) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
 
     ChunkPos chunkPos = interpretation.chunkPos;
@@ -42,16 +42,21 @@ public final class MobBehaviorActuator implements FieldActuator {
         chunkPos.getStartX(), world.getBottomY(), chunkPos.getStartZ(),
         chunkPos.getStartX() + 16, world.getTopY(), chunkPos.getStartZ() + 16);
 
+    boolean acted = false;
     for (MobEntity mob : world.getEntitiesByClass(MobEntity.class, chunkArea, MobEntity::isAlive)) {
       if (mob instanceof VillagerEntity || mob.getNavigation() == null) {
         continue;
       }
       if (mob instanceof AnimalEntity animal) {
         actuatePassive(world, animal, semantics, intent, interpretation);
+        acted = true;
       } else if (mob instanceof HostileEntity hostile) {
         actuateHostile(world, hostile, semantics, intent, interpretation);
+        acted = true;
       }
     }
+    return acted ? com.utdmod.experiment.ActuatorOutcome.SUCCESS
+                 : com.utdmod.experiment.ActuatorOutcome.NO_TARGET;
   }
 
   private void actuatePassive(ServerWorld world, AnimalEntity mob, SubstrateSemantics semantics, IntentType intent,

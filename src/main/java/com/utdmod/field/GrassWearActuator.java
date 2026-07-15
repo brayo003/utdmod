@@ -12,12 +12,12 @@ import net.minecraft.server.world.ServerWorld;
 public final class GrassWearActuator implements FieldActuator {
 
   @Override
-  public void actuate(ServerWorld world, ChunkInterpretation interpretation) {
+  public com.utdmod.experiment.ActuatorOutcome actuate(ServerWorld world, ChunkInterpretation interpretation) {
     if (world == null || interpretation == null || interpretation.semantics == null) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
     if (!SpatialBehaviorHelper.isChunkLoaded(world, interpretation.chunkPos)) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
 
     SubstrateSemantics semantics = interpretation.semantics;
@@ -25,7 +25,7 @@ public final class GrassWearActuator implements FieldActuator {
     if (intent != IntentType.CREATE_ROAD
         && semantics.roadFormationTendency < 0.45
         && semantics.corridorStrength < 0.02) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
 
     int steps = Math.max(1, (int) Math.ceil(semantics.roadFormationTendency * 8.0));
@@ -33,6 +33,7 @@ public final class GrassWearActuator implements FieldActuator {
       steps = Math.max(steps, 4);
     }
     SpatialBehaviorHelper.wearCorridorSegment(world, interpretation.chunkPos, interpretation, steps);
+    return com.utdmod.experiment.ActuatorOutcome.SUCCESS;
   }
 
   @Override

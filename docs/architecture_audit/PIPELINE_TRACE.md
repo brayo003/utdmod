@@ -1,3 +1,8 @@
+> **[HISTORICAL — PRE-REFACTOR — DO NOT USE AS CURRENT REFERENCE]**
+> This trace follows the old pipeline through `TensionServerTick.tickChunkTension()` which no
+> longer exists. The current pipeline runs through `TensionServerTick.tickSubstrate()` →
+> `ChunkTensionData.integrateAllSubstrateStates()`. See `docs/architecture_audit/00_EXECUTION_PIPELINE.md`.
+
 # Runtime Pipeline Trace
 
 Complete causal chains from player/world events through tension, storms, sync, and feedback. Format: **trigger → class.method → purpose**.

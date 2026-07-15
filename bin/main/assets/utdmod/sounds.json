@@ -1,0 +1,27 @@
+{
+  "ritual_activate": {
+    "category": "block",
+    "subtitle": "subtitles.utdmod.ritual_activate",
+    "sounds": [ "utdmod:ritual_activate" ]
+  },
+  "ritual_ambient": {
+    "category": "block",
+    "subtitle": "subtitles.utdmod.ritual_ambient",
+    "sounds": [ "utdmod:ritual_ambient" ]
+  },
+  "tension_increase": {
+    "category": "player",
+    "subtitle": "subtitles.utdmod.tension_increase",
+    "sounds": [ "utdmod:heartbeat_fast" ]
+  },
+  "serpent_ambient": {
+    "category": "hostile",
+    "subtitle": "subtitles.utdmod.serpent_ambient",
+    "sounds": [ "utdmod:serpent_groan_1", "utdmod:serpent_groan_2" ]
+  },
+  "wraith_scream": {
+    "category": "hostile",
+    "subtitle": "subtitles.utdmod.wraith_scream",
+    "sounds": [ "utdmod:wraith_scream" ]
+  }
+}

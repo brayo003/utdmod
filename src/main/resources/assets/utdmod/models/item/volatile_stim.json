@@ -1,0 +1,7 @@
+{
+  "_comment": "Item model for the Impulse Generator (registry: utdmod:volatile_stim). Handheld perturbation device used to apply a controlled external input to the local substrate field for experimental purposes.",
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "utdmod:item/volatile_stim"
+  }
+}

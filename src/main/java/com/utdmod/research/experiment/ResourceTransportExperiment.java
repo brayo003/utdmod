@@ -22,7 +22,7 @@ public final class ResourceTransportExperiment extends TimedExperiment {
   public void initialize(ResearchPlayerContext ctx, long tick) {
     ctx.snapshot.stateTicks = 0;
     ctx.snapshot.transitionReason = "transport init";
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.currentTarget = ctx.snapshot.homePos;
   }
 
@@ -35,7 +35,7 @@ public final class ResourceTransportExperiment extends TimedExperiment {
       double biasX = interp != null && interp.semantics != null ? interp.semantics.transportBiasX : 0.0;
       double biasZ = interp != null && interp.semantics != null ? interp.semantics.transportBiasZ : 0.0;
 
-      int step = 16; // one chunk-size stride
+      int step = 16;
       int dx = biasX == 0.0 ? 0 : (biasX > 0 ? step : -step);
       int dz = biasZ == 0.0 ? 0 : (biasZ > 0 ? step : -step);
 
@@ -46,21 +46,20 @@ public final class ResourceTransportExperiment extends TimedExperiment {
 
       int radiusChunks = Math.max(1, ctx.snapshot.allowedRadiusChunks);
       if (!ResearchExperimentLibrary.withinRadiusChunks(candidate, ctx.snapshot.homePos, radiusChunks)) {
-        candidate = ctx.exploration.nextWaypoint();
+        candidate = ctx.controller.nextExplorationWaypoint();
       }
 
       ctx.currentTarget = candidate;
-      ctx.navigation.setTarget(candidate);
+      ctx.controller.setTarget(candidate);
       ctx.snapshot.transitionReason = "transport biased target";
     }
 
-    ctx.navigation.tick();
+    ctx.controller.tick();
   }
 
   @Override
   public void shutdown(ResearchPlayerContext ctx, long tick) {
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.snapshot.transitionReason = "transport shutdown";
   }
 }
-

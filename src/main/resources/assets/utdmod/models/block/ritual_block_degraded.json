@@ -1,8 +1,7 @@
 {
+  "_comment": "Model for the Substrate Node in its degraded (decoupled) state. Field-coupling capacity is below nominal; local dynamics revert toward free equations. Texture artwork will be updated separately. References only textures confirmed present in assets/utdmod/textures/block/.",
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "utdmod:block/ritual_block_degraded",
-    "up": "utdmod:block/ritual_block_degraded_top",
-    "down": "utdmod:block/ritual_block_bottom"
+    "all": "utdmod:block/ritual_degrade"
   }
 }

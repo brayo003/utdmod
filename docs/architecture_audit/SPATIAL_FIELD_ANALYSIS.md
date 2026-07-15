@@ -1,3 +1,8 @@
+> **[HISTORICAL — PRE-REFACTOR — DO NOT USE AS CURRENT REFERENCE]**
+> This spatial analysis references the old reaction-diffusion PDE (D=0.012, α=0.009, β=0.055, γ=0.045).
+> The current system uses substrate transport via `SubstrateTransport.computeIncoming()` and
+> `FieldDerivative.computeUnified()`. See `docs/architecture_audit/EQUATIONS.md`.
+
 # SPATIAL FIELD ANALYSIS: Coupled Distributed Dynamics
 
 ---

@@ -14,7 +14,7 @@ public final class CombatExperiment extends TimedExperiment {
   public void initialize(ResearchPlayerContext ctx, long tick) {
     ctx.snapshot.stateTicks = 0;
     ctx.snapshot.transitionReason = "combat init";
-    ctx.navigation.stop();
+    ctx.controller.stop();
   }
 
   @Override
@@ -23,23 +23,21 @@ public final class CombatExperiment extends TimedExperiment {
     if (hostile != null) {
       ctx.currentTarget = hostile.getBlockPos();
     }
-    boolean resolved = ctx.combat.tickCombat(ctx.inventory, ctx.navigation);
+    boolean resolved = ctx.combat.tickCombat(ctx.inventory, ctx.controller);
     if (resolved) {
-      // No hostile: advance exploration deterministically so the bot still perturbs substrate.
       if ((ctx.snapshot.stateTicks % 160) == 0) {
-        var wp = ctx.exploration.nextWaypoint();
+        var wp = ctx.controller.nextExplorationWaypoint();
         ctx.currentTarget = wp;
-        ctx.navigation.setTarget(wp);
+        ctx.controller.setTarget(wp);
       }
     }
-    ctx.navigation.tick();
+    ctx.controller.tick();
     ctx.snapshot.transitionReason = resolved ? "combat no hostile" : "combat tick";
   }
 
   @Override
   public void shutdown(ResearchPlayerContext ctx, long tick) {
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.snapshot.transitionReason = "combat shutdown";
   }
 }
-

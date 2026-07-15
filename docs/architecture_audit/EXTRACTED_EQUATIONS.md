@@ -1,3 +1,9 @@
+> **[HISTORICAL — PRE-REFACTOR — DO NOT USE AS CURRENT REFERENCE]**
+> This document describes the old scalar ODE tension system that was replaced by the substrate
+> refactor. The equations here (`G += -λG + αG² + I`, `L += D·L̄ + α·L² - β·L³ + γ·G - λ·L`)
+> do not exist in the current codebase. For current equations see `docs/architecture_audit/EQUATIONS.md`.
+> See `docs/archive/README.md` for context on what changed.
+
 # EXTRACTED EQUATIONS REFERENCE
 ## Mathematical Formalization of the World-State Simulation
 

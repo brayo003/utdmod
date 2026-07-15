@@ -3,6 +3,7 @@ package com.utdmod.core;
 import com.utdmod.diag.DiagnosticLogs;
 import com.utdmod.tension.ChunkTensionData;
 import com.utdmod.tension.ChunkTensionManager;
+import com.utdmod.tension.SubstrateObservationModel;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
@@ -106,13 +107,14 @@ public final class RegionDiagnosticsManager {
 
         for (ServerWorld sw : server.getWorlds()) {
             ChunkTensionData data = ChunkTensionData.getServerState(sw);
-            Map<ChunkPos, Double> map = data.getTensionMap();
+            Map<ChunkPos, com.utdmod.tension.SubstrateState> substrateView = data.getSubstrateStatesView();
             Map<Long, Agg> aggs = new HashMap<>(128);
 
-            for (Map.Entry<ChunkPos, Double> e : map.entrySet()) {
+            for (Map.Entry<ChunkPos, com.utdmod.tension.SubstrateState> e : substrateView.entrySet()) {
                 ChunkPos pos = e.getKey();
                 if (!sw.isChunkLoaded(pos.x, pos.z)) continue;
-                double t = e.getValue();
+                // Tension is a derived metric from substrate state
+                double t = SubstrateObservationModel.computeLocalTension(e.getValue());
                 if (t <= 0.0) continue;
                 int rx = Math.floorDiv(pos.x, REGION_SIZE);
                 int rz = Math.floorDiv(pos.z, REGION_SIZE);
@@ -121,7 +123,7 @@ public final class RegionDiagnosticsManager {
                 a.sum += t;
                 a.n++;
                 a.max = Math.max(a.max, t);
-                ChunkTensionData.ChunkState st = ChunkTensionManager.getChunkState(sw, pos);
+                ChunkTensionData.ChunkState st = data.getChunkState(pos);
                 if (st == ChunkTensionData.ChunkState.FRACTURED || st == ChunkTensionData.ChunkState.DECOUPLED) {
                     a.fractured++;
                 } else if (st == ChunkTensionData.ChunkState.STRAINED) {

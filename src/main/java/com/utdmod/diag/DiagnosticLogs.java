@@ -92,12 +92,17 @@ public final class DiagnosticLogs {
 
     static String formatRegionSummaryLine(int index, Region region) {
         return String.format(
-            "[REGIONS]Region %dstate=%ssize=%dage=%daverageTension=%.4f maturity=%.4f contribution=%.4f fractured=%d storms=%d centroid=(%.1f,%.1f)",
+            "[REGIONS]Region %d state=%s size=%d age=%d meanT=%.4f maxT=%.4f varT=%.4f activeFrac=%.3f meanDepth=%.4f meanMem=%.4f maturity=%.4f contribution=%.4f fractured=%d storms=%d centroid=(%.1f,%.1f)",
             index,
             region.getState().name(),
             region.getChunkCount(),
             region.getAge(),
-            region.getAverageTension(),
+            region.getMeanTension(),
+            region.getMaxTension(),
+            region.getVarianceTension(),
+            region.getActiveFraction(),
+            region.getMeanDepth(),
+            region.getMeanMemory(),
             region.getMaturity(),
             region.getContribution(),
             region.getFracturedChunks(),

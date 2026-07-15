@@ -1,14 +1,38 @@
 {
-  "subtitles.utdmod.storm_ambient": "Storm rumbles",
-  "subtitles.utdmod.tension_pulse": "Tension pulses",
-  "subtitles.utdmod.tension_pulse_high": "Tension surges",
-  "subtitles.utdmod.cave_echo": "Echo pulses",
+  "_comment": "UTD Mod — en_us localization. All names and descriptions reflect the substrate architecture: Activation (A), Memory (M), Field Depth (D), Baseline (B). Nothing here implies direct scalar tension manipulation.",
 
-  "itemGroup.utdmod.utd_group": "Under the Dome: Artifacts",
+  "itemGroup.utdmod.utd_group": "Substrate Field Instruments",
 
-  "block.utdmod.ritual_block": "Ceremonial Ritual Slab",
-  
-  "item.utdmod.signal_probe": "Signal Probe",
-  "item.utdmod.volatile_stim": "Volatile Stimulant",
-  "item.utdmod.stability_tonic": "Stability Tonic"
+  "block.utdmod.ritual_block": "Substrate Node",
+
+  "item.utdmod.signal_probe": "Field Probe",
+  "item.utdmod.volatile_stim": "Impulse Generator",
+  "item.utdmod.stability_tonic": "Relaxation Agent",
+  "item.utdmod.warding_crystal": "Boundary Modulator",
+  "item.utdmod.tension_stabilizer": "Damping Rod",
+
+  "entity.utdmod.tension_serpent": "Coherence Serpent",
+  "entity.utdmod.tension_wraith": "Fracture Wraith",
+
+  "item.utdmod.tension_serpent_spawn_egg": "Coherence Serpent Spawn Egg",
+  "item.utdmod.tension_wraith_spawn_egg": "Fracture Wraith Spawn Egg",
+
+  "subtitles.utdmod.substrate_ambient": "Substrate resonates",
+  "subtitles.utdmod.substrate_state_shift": "Field state transitions",
+  "subtitles.utdmod.activation_pulse": "Activation propagates",
+  "subtitles.utdmod.activation_peak": "Activation peaks",
+  "subtitles.utdmod.node_couple": "Node couples to field",
+  "subtitles.utdmod.node_decouple": "Node decouples",
+  "subtitles.utdmod.field_echo": "Field echoes",
+  "subtitles.utdmod.transport_surge": "Transport surges",
+  "subtitles.utdmod.coherence_serpent_ambient": "Deep field resonates",
+  "subtitles.utdmod.coherence_serpent_attack": "Coherent structure disrupted",
+  "subtitles.utdmod.fracture_wraith_attack": "Gradient fractures",
+  "subtitles.utdmod.fracture_wraith_death": "Instability collapses",
+  "subtitles.utdmod.penalty_diffuse": "Field diffuses",
+
+  "subtitles.utdmod.storm_ambient": "Field oscillates",
+  "subtitles.utdmod.tension_pulse": "Activation propagates",
+  "subtitles.utdmod.tension_pulse_high": "Activation peaks",
+  "subtitles.utdmod.cave_echo": "Field echoes"
 }

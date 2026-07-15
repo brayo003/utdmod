@@ -52,10 +52,8 @@ public final class ResearchObserver {
         for (ServerWorld world : server.getWorlds()) {
             ChunkTensionData data = ChunkTensionData.getServerState(world);
             List<ResearchObservationEntry> entries = new ArrayList<>();
-            for (ChunkPos pos : data.getTensionMap().keySet()) {
-                if (!world.isChunkLoaded(pos.x, pos.z)) {
-                    continue;
-                }
+            for (ChunkPos pos : data.getActiveChunkPositions()) {
+                if (!world.isChunkLoaded(pos.x, pos.z)) continue;
                 double tension = ChunkTensionManager.getLocalTension(world, pos);
                 ChunkTensionData.ChunkState state = data.getChunkState(pos);
                 SubstrateState substrateState = data.getOrCreateSubstrateState(pos);

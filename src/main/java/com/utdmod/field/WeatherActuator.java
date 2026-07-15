@@ -10,8 +10,9 @@ import net.minecraft.server.world.ServerWorld;
 public final class WeatherActuator implements FieldActuator {
 
   @Override
-  public void actuate(ServerWorld world, ChunkInterpretation interpretation) {
+  public com.utdmod.experiment.ActuatorOutcome actuate(ServerWorld world, ChunkInterpretation interpretation) {
     // Regional weather applied once per world tick in TensionServerTick.
+    return com.utdmod.experiment.ActuatorOutcome.NO_CHANGE;
   }
 
   @Override

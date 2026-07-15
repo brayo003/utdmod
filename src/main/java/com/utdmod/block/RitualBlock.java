@@ -53,7 +53,8 @@ public class RitualBlock extends BlockWithEntity {
             ServerWorld sw = (ServerWorld) world;
             ChunkPos cp = new ChunkPos(pos);
             double before = ChunkTensionManager.getLocalTension(sw, cp);
-            ChunkTensionManager.addLocalTension(sw, cp, 0.03);
+            // Inject as substrate impulse
+            com.utdmod.tension.ChunkTensionData.getServerState(sw).addInstantaneousImpulse(cp, 0.03);
             double after = ChunkTensionManager.getLocalTension(sw, cp);
             TensionActivityLedger.addRitual(0.03);
             TensionLogger.log(TensionTraceClock.getServerTick(), "RITUAL", "ritual_block_activation", 0.03, before, after, cp, sp, sw);

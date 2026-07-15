@@ -1,3 +1,7 @@
+> **[HISTORICAL — PRE-REFACTOR — DO NOT USE AS CURRENT REFERENCE]**
+> This is the initial reverse-engineering of the old scalar ODE system. Not valid for current code.
+> For current architecture see `docs/INDEX.md`.
+
 # PHASE 1: SYSTEM DISCOVERY
 ## Complete Extraction of World-State Simulation Architecture
 

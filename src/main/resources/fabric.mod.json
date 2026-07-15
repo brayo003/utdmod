@@ -3,7 +3,7 @@
     "id": "utdmod",
     "version": "1.0.0",
     "name": "UTD Mod",
-    "description": "Internal UTD systems.",
+    "description": "Unified Tension Dynamics — a server-authoritative substrate field system. Activation, Memory, Field Depth, and Baseline evolve as coupled state variables. Structures and entities emerge from field dynamics rather than being scripted by player actions.",
     "authors": ["brayo"],
     "environment": "*",
     "entrypoints": {

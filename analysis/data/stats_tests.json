@@ -1,0 +1,122 @@
+{
+  "run3_memory_equation_r": -0.00977299074031635,
+  "run3_memory_equation_p": 0.7730776548705144,
+  "run4_memory_equation_r": -0.3141082366452511,
+  "run4_memory_equation_p": 7.278058764462279e-31,
+  "run4_memory_expected_asymptote": 2.5902246696383897,
+  "run4_memory_actual_final": 0.44062086371654424,
+  "run1_depth_slope": -6.417826295853223e-08,
+  "run1_depth_r2": 0.6697635411653937,
+  "run1_depth_p": 9.684953620487522e-65,
+  "run1_depth_ci95": 5.46733309530573e-09,
+  "run2_depth_slope": -1.646129175356043e-06,
+  "run2_depth_r2": 0.11493341536952603,
+  "run2_depth_p": 2.905377787735938e-07,
+  "run2_depth_ci95": 6.091972357367827e-07,
+  "run3_depth_slope": 9.699449182339085e-05,
+  "run3_depth_r2": 0.6524411069718419,
+  "run3_depth_p": 1.5229050908304141e-202,
+  "run3_depth_ci95": 4.696124112459811e-06,
+  "run4_depth_slope": 9.556725261559651e-07,
+  "run4_depth_r2": 0.10420486543570828,
+  "run4_depth_p": 1.2066206374368643e-32,
+  "run4_depth_ci95": 1.5308627301706232e-07,
+  "run1_transport_CV": null,
+  "run1_transport_mean": 0.0,
+  "run2_transport_CV": 0.7490798086334743,
+  "run2_transport_mean": 5.487113799302539e-06,
+  "run2_transport_act_corr": -0.60435234806096,
+  "run2_transport_act_p": 4.277847599751652e-23,
+  "run3_transport_CV": 0.7266079508515771,
+  "run3_transport_mean": 0.007039314421718623,
+  "run3_transport_act_corr": 0.7497535380638367,
+  "run3_transport_act_p": 1.0069803187199569e-158,
+  "run4_transport_CV": 0.04463608599655519,
+  "run4_transport_mean": 0.007945574315489184,
+  "run4_transport_act_corr": 0.9801136768157465,
+  "run4_transport_act_p": 0.0,
+  "hysteresis": {
+    "run1_final": {
+      "activation": 3.976652961338067e-11,
+      "memory": 0.0,
+      "depth": 3.3248994997279945e-07
+    },
+    "run4_final": {
+      "activation": 0.12824835425907954,
+      "memory": 0.4406171068628562,
+      "depth": 0.4978608872406151
+    },
+    "delta_activation": 0.12824835421931302,
+    "delta_memory": 0.4406171068628562,
+    "delta_depth": 0.49786055475066515,
+    "attractor_shifted": true
+  },
+  "autonomous_run4": {
+    "external_input_mean": 0.0,
+    "external_input_max": 0.0,
+    "activation_mean": 0.12951123348191948,
+    "activation_std": 0.006873290435333325,
+    "memory_mean": 0.4300652691606079,
+    "depth_mean": 0.4900480079807863,
+    "nonzero_field_with_zero_input": true
+  },
+  "run1_convergence_mean": 0.9961105392298146,
+  "run1_convergence_std": 0.06154002992062193,
+  "run2_convergence_mean": 0.9942056048096289,
+  "run2_convergence_std": 0.0057480126530195085,
+  "run3_convergence_mean": 0.6797355616382551,
+  "run3_convergence_std": 0.22709951793541797,
+  "run4_convergence_mean": 0.6862040277803448,
+  "run4_convergence_std": 0.012212828277031944,
+  "run3_oscillation": {
+    "dominant_freq": 0.234375,
+    "peak_psd": 3.862858531790329,
+    "peak_fraction": 0.18316212637305898,
+    "verdict": "OSCILLATORY"
+  },
+  "run4_oscillation": {
+    "dominant_freq": 0.0078125,
+    "peak_psd": 0.0003152075767288892,
+    "peak_fraction": 0.4537149621990425,
+    "verdict": "OSCILLATORY"
+  },
+  "observer_verdicts": {
+    "depth_increasing_run3": {
+      "statement": "Field depth increasing steadily (Run 3)",
+      "slope": 9.699449182339085e-05,
+      "p_value": 1.5229050908304141e-202,
+      "r2": 0.6524411069718419,
+      "ci95": 4.696124112459811e-06,
+      "verdict": "SUPPORTED"
+    },
+    "synchronization_emerging": {
+      "statement": "Synchronization emerging between regions (Run 3/4)",
+      "pairwise_mean_corr": 0.5565987089999989,
+      "n_pairs": 3,
+      "verdict": "SUPPORTED"
+    },
+    "equilibrium_run4": {
+      "statement": "Transitioning toward equilibrium (Run 4)",
+      "slope": -2.713352056536827e-07,
+      "p_value": 4.459019146359665e-27,
+      "r2": 0.08631121320882733,
+      "verdict": "SUPPORTED"
+    },
+    "oscillation": {
+      "statement": "Oscillation inferred (Run 3/4)",
+      "run3": {
+        "dominant_freq": 0.234375,
+        "peak_psd": 3.862858531790329,
+        "peak_fraction": 0.18316212637305898,
+        "verdict": "OSCILLATORY"
+      },
+      "run4": {
+        "dominant_freq": 0.0078125,
+        "peak_psd": 0.0003152075767288892,
+        "peak_fraction": 0.4537149621990425,
+        "verdict": "OSCILLATORY"
+      },
+      "verdict": "SUPPORTED"
+    }
+  }
+}

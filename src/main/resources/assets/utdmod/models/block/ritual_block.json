@@ -1,4 +1,5 @@
 {
+  "_comment": "Model for the Substrate Node in its nominal (coupled) state. Rendered as a full cube. Texture artwork will be updated separately to reflect its role as persistent field infrastructure.",
   "parent": "minecraft:block/cube_all",
   "textures": {
     "all": "utdmod:block/ritual_degrade"

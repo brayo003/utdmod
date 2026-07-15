@@ -3,7 +3,7 @@ package com.utdmod.research.experiment;
 import com.utdmod.config.UTDConfig;
 import com.utdmod.research.PerturbationType;
 import com.utdmod.research.ResearchConfig;
-import com.utdmod.research.player.ResearchPlayerContext;
+import com.utdmod.research.agent.ResearchClientAgentManager;
 import com.utdmod.research.player.ResearchPlayerEntityFactory;
 import com.utdmod.research.player.ResearchPlayerPersistence;
 import com.utdmod.research.player.ResearchPlayerRegistry;
@@ -15,9 +15,9 @@ import net.minecraft.util.math.BlockPos;
 
 /**
  * Central orchestration layer for experiment injection.
- * Schedules and assigns deterministic protocols to Batimore agents.
+ * Schedules and assigns deterministic protocols to research client agents.
  *
- * It does not implement gameplay logic; gameplay happens in the player executor
+ * It does not implement gameplay logic; gameplay happens on connected clients
  * via injected {@link ResearchExperiment} protocols.
  */
 public final class ResearchExperimentManager {
@@ -39,44 +39,29 @@ public final class ResearchExperimentManager {
     }
   }
 
+  public static void reserveClientAgent(ServerWorld world, String agentId, ResearchExperimentConfig cfg, BlockPos start) {
+    if (cfg == null) return;
+    if (agentId == null || agentId.isBlank()) agentId = "agent0";
+    applyFieldEnabled(cfg.fieldEnabled);
+    applyCouplingPreset(cfg.couplingPresetId);
+    ResearchClientAgentManager.reserveAgent(world, agentId, cfg, start);
+  }
+
   public static void spawnAgent(ServerWorld world, String agentId, ResearchExperimentConfig cfg) {
     if (cfg == null) return;
     if (agentId == null || agentId.isBlank()) agentId = "agent0";
 
-    applyFieldEnabled(cfg.fieldEnabled);
-    applyCouplingPreset(cfg.couplingPresetId);
-
     BlockPos start = cfg.startingPos != null ? cfg.startingPos : ResearchPlayerEntityFactory.defaultSpawn(world, cfg.botSeed);
-    ServerPlayerEntity player = ResearchPlayerEntityFactory.spawn(world, agentId, cfg.botSeed, start);
-    if (player == null) return;
+    reserveClientAgent(world, agentId, cfg, start);
 
-    ResearchPlayerPersistence persistence = ResearchPlayerPersistence.get(world, player.getUuid());
-    ResearchPlayerSnapshot snapshot = persistence.snapshot();
-    snapshot.agentId = agentId;
-    snapshot.botSeed = cfg.botSeed;
-    snapshot.experimentId = cfg.experimentId;
-    snapshot.protocolId = cfg.protocolId;
-    snapshot.previousProtocolId = cfg.protocolId;
-    snapshot.loggingLabel = cfg.loggingLabel;
-    snapshot.allowedRadiusChunks = cfg.allowedRadiusChunks;
-    snapshot.durationTicks = cfg.durationTicks;
-    snapshot.experimentSeed = cfg.experimentSeed;
+    ServerPlayerEntity player = ResearchClientAgentManager.findLinkedPlayer(world, agentId);
+    if (player != null) {
+      ResearchPlayerSnapshot snapshot = ResearchPlayerPersistence.get(world, player.getUuid()).snapshot();
+      snapshot.transitionReason = "experiment spawn";
+      ResearchPlayerPersistence.get(world, player.getUuid()).saveSnapshot(snapshot);
+    }
 
-    snapshot.miningOreId = cfg.miningOreId;
-    snapshot.miningGoalCount = cfg.miningGoalCount;
-
-    snapshot.stateTicks = 0;
-    snapshot.running = true;
-    snapshot.paused = false;
-    snapshot.spawned = true;
-    snapshot.homePos = start.toImmutable();
-    snapshot.transitionReason = "experiment spawn";
-    persistence.saveSnapshot(snapshot);
-
-    // Ensure bot executor runs.
     ResearchConfig.setBotEnabled(true);
-
-    // Ensure protocol observability logging is enabled.
     ResearchPlayerLogger.initialize(cfg.botSeed);
     ResearchPlayerLogger.setEnabled(true);
   }
@@ -144,13 +129,7 @@ public final class ResearchExperimentManager {
   }
 
   private static ServerPlayerEntity findAgent(ServerWorld world, String agentId) {
-    for (ServerPlayerEntity p : ResearchPlayerRegistry.getAll()) {
-      if (p.getServerWorld() != world || !p.isAlive()) continue;
-      if (agentId.equals(ResearchPlayerRegistry.getAgentId(p))) {
-        return p;
-      }
-    }
-    return null;
+    return ResearchClientAgentManager.findLinkedPlayer(world, agentId);
   }
 
   public static ResearchPlayerSnapshot status(ServerWorld world, String agentId) {
@@ -161,4 +140,3 @@ public final class ResearchExperimentManager {
     return ResearchPlayerPersistence.get(world, player.getUuid()).snapshot();
   }
 }
-

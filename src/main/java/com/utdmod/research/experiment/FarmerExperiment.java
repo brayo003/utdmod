@@ -20,7 +20,7 @@ public final class FarmerExperiment extends TimedExperiment {
   public void initialize(ResearchPlayerContext ctx, long tick) {
     ctx.snapshot.stateTicks = 0;
     ctx.snapshot.transitionReason = "farmer init";
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.currentTarget = ctx.snapshot.homePos;
   }
 
@@ -29,30 +29,28 @@ public final class FarmerExperiment extends TimedExperiment {
     AnimalEntity animal = ctx.vision.findNearestPassiveFood();
     if (animal != null) {
       ctx.currentTarget = animal.getBlockPos();
-      ctx.navigation.setTarget(ctx.currentTarget);
-      ctx.navigation.face(ctx.currentTarget);
+      ctx.controller.setTarget(ctx.currentTarget);
+      ctx.controller.face(ctx.currentTarget);
       if (ctx.player.squaredDistanceTo(animal) <= 2.5) {
         ctx.player.attack(animal);
       } else {
-        ctx.navigation.tick();
+        ctx.controller.tick();
       }
       ctx.snapshot.transitionReason = "farmer target";
     } else {
-      // Default to exploration waypoints so the agent perturbs substrate.
       if ((ctx.snapshot.stateTicks % 180) == 0) {
-        var wp = ctx.exploration.nextWaypoint();
+        var wp = ctx.controller.nextExplorationWaypoint();
         ctx.currentTarget = wp;
-        ctx.navigation.setTarget(wp);
+        ctx.controller.setTarget(wp);
       }
-      ctx.navigation.tick();
+      ctx.controller.tick();
       ctx.snapshot.transitionReason = "farmer wander";
     }
   }
 
   @Override
   public void shutdown(ResearchPlayerContext ctx, long tick) {
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.snapshot.transitionReason = "farmer shutdown";
   }
 }
-

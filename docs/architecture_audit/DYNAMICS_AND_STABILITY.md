@@ -1,3 +1,8 @@
+> **[HISTORICAL — PRE-REFACTOR — DO NOT USE AS CURRENT REFERENCE]**
+> This stability analysis references the old scalar ODE system. The current system uses
+> `FieldDerivative.computeUnified()`. For current behavior see `docs/architecture_audit/EQUATIONS.md`
+> and `analysis/UTD_TELEMETRY_REPORT.md`.
+
 # DYNAMICS AND STABILITY: Convergence & Regime Analysis
 
 ---

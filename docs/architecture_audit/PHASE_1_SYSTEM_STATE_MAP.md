@@ -1,3 +1,7 @@
+> **[HISTORICAL — PRE-REFACTOR — DO NOT USE AS CURRENT REFERENCE]**
+> State variables listed here reflect the old system. Current state variables are in `SubstrateState`.
+> See `docs/architecture_audit/02_LOCAL_FIELD.md`.
+
 # PHASE 1: SYSTEM STATE MAP
 ## Complete Inventory of State Variables
 

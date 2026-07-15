@@ -1,3 +1,7 @@
+> **[HISTORICAL — PRE-REFACTOR — DO NOT USE AS CURRENT REFERENCE]**
+> This document describes the old scalar ODE tension system. For current equations see
+> `docs/architecture_audit/EQUATIONS.md`.
+
 # PHASE 1: EXTRACTED EQUATIONS
 ## Complete Mathematical Formulation
 

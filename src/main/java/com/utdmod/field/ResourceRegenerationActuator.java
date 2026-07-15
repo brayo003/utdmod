@@ -22,17 +22,16 @@ import net.minecraft.util.math.ChunkPos;
 public final class ResourceRegenerationActuator implements FieldActuator {
 
   @Override
-  public void actuate(ServerWorld world, ChunkInterpretation interpretation) {
+  public com.utdmod.experiment.ActuatorOutcome actuate(ServerWorld world, ChunkInterpretation interpretation) {
     if (world == null || interpretation == null || interpretation.semantics == null
         || interpretation.substrate == null) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
     if (!com.utdmod.interpretation.SpatialBehaviorHelper.isChunkLoaded(world, interpretation.chunkPos)) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
 
     ChunkPos chunkPos = interpretation.chunkPos;
-
     SubstrateState substrate = interpretation.substrate;
     SubstrateSemantics semantics = interpretation.semantics;
     IntentType intent = interpretation.primaryIntent != null ? interpretation.primaryIntent.type : null;
@@ -45,13 +44,18 @@ public final class ResourceRegenerationActuator implements FieldActuator {
     double miningPotential = depth * 0.35 + memory * 0.40 + activation * 0.25;
     double successionPotential = semantics.recoveryState * 0.45 + capacity * 0.35 + semantics.prosperityPotential * 0.20;
 
+    boolean acted = false;
     if (intent == IntentType.CONTINUE_MINING || miningPotential > 0.45) {
       regenerateOres(world, chunkPos, miningPotential, substrate, semantics);
+      acted = true;
     }
     if (intent == IntentType.RECOVER || successionPotential > 0.42) {
       regenerateCrops(world, chunkPos, successionPotential, substrate);
       regenerateSurfaceRecovery(world, chunkPos, semantics);
+      acted = true;
     }
+    return acted ? com.utdmod.experiment.ActuatorOutcome.SUCCESS
+                 : com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
   }
 
   private void regenerateOres(ServerWorld world, ChunkPos chunkPos, double potential,

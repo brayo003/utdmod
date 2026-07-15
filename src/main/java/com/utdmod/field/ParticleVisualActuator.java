@@ -15,24 +15,27 @@ import net.minecraft.util.math.ChunkPos;
 public final class ParticleVisualActuator implements FieldActuator {
 
   @Override
-  public void actuate(ServerWorld world, ChunkInterpretation interpretation) {
+  public com.utdmod.experiment.ActuatorOutcome actuate(ServerWorld world, ChunkInterpretation interpretation) {
     if (world == null || interpretation == null || interpretation.semantics == null
         || interpretation.chunkPos == null) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
     if (!SpatialBehaviorHelper.isChunkLoaded(world, interpretation.chunkPos)) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
 
     SubstrateSemantics semantics = interpretation.semantics;
     ChunkPos chunkPos = interpretation.chunkPos;
     BlockPos center = new BlockPos(chunkPos.getStartX() + 8, world.getSeaLevel(), chunkPos.getStartZ() + 8);
 
+    boolean spawned = false;
     if (semantics.ecologicalStress > 0.55) {
       spawn(world, center, ParticleTypes.SMOKE, (int) (semantics.ecologicalStress * 3));
+      spawned = true;
     }
     if (semantics.prosperityPotential > 0.5) {
       spawn(world, center, ParticleTypes.HAPPY_VILLAGER, (int) (semantics.prosperityPotential * 2));
+      spawned = true;
     }
     if (semantics.corridorStrength > 0.03) {
       var dir = SpatialBehaviorHelper.resolveCorridorDirection(world, interpretation);
@@ -41,14 +44,19 @@ public final class ParticleVisualActuator implements FieldActuator {
       BlockPos drift = new BlockPos(center.getX() + offsetX, center.getY(), center.getZ() + offsetZ);
       if (SpatialBehaviorHelper.isChunkLoaded(world, drift.getX(), drift.getZ())) {
         spawn(world, drift, ParticleTypes.CLOUD, 1);
+        spawned = true;
       }
     }
     if (semantics.recoveryState > 0.55) {
       spawn(world, center, ParticleTypes.COMPOSTER, 1);
+      spawned = true;
     }
     if (semantics.collapseTendency > 0.6) {
       spawn(world, center, ParticleTypes.ASH, 2);
+      spawned = true;
     }
+    return spawned ? com.utdmod.experiment.ActuatorOutcome.SUCCESS
+                   : com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
   }
 
   private void spawn(ServerWorld world, BlockPos center, ParticleEffect particle, int count) {

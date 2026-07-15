@@ -14,5 +14,4 @@ rootProject.name = "utdmod"
 
 // Include external projects if necessary
 // include "other-project"
-
-includeBuild("../baritone")
+// baritone/ is reference-only; resolved via baritone_api_jar in gradle.properties

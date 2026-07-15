@@ -17,7 +17,7 @@ public final class TradeExperiment extends TimedExperiment {
   public void initialize(ResearchPlayerContext ctx, long tick) {
     ctx.snapshot.stateTicks = 0;
     ctx.snapshot.transitionReason = "trade init";
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.currentTarget = ctx.snapshot.homePos;
   }
 
@@ -33,27 +33,26 @@ public final class TradeExperiment extends TimedExperiment {
     if (!villagers.isEmpty()) {
       var v = villagers.get(0);
       ctx.currentTarget = v.getBlockPos();
-      ctx.navigation.setTarget(ctx.currentTarget);
-      ctx.navigation.face(ctx.currentTarget);
-      ctx.navigation.tick();
+      ctx.controller.setTarget(ctx.currentTarget);
+      ctx.controller.face(ctx.currentTarget);
+      ctx.controller.tick();
       ctx.snapshot.transitionReason = "trade approach villager";
       return;
     }
 
     if ((ctx.snapshot.stateTicks % 180) == 0) {
-      var wp = ctx.exploration.nextWaypoint();
+      var wp = ctx.controller.nextExplorationWaypoint();
       ctx.currentTarget = wp;
-      ctx.navigation.setTarget(wp);
+      ctx.controller.setTarget(wp);
       ctx.snapshot.transitionReason = "trade wander waypoint";
     }
-    ctx.navigation.tick();
+    ctx.controller.tick();
     ctx.snapshot.transitionReason = ctx.snapshot.transitionReason.isEmpty() ? "trade tick" : ctx.snapshot.transitionReason;
   }
 
   @Override
   public void shutdown(ResearchPlayerContext ctx, long tick) {
-    ctx.navigation.stop();
+    ctx.controller.stop();
     ctx.snapshot.transitionReason = "trade shutdown";
   }
 }
-

@@ -20,12 +20,12 @@ import java.util.List;
 public final class VillageActuator implements FieldActuator {
 
   @Override
-  public void actuate(ServerWorld world, ChunkInterpretation interpretation) {
+  public com.utdmod.experiment.ActuatorOutcome actuate(ServerWorld world, ChunkInterpretation interpretation) {
     if (world == null || interpretation == null || interpretation.semantics == null) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
     if (!SpatialBehaviorHelper.isChunkLoaded(world, interpretation.chunkPos)) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
 
     ChunkPos chunkPos = interpretation.chunkPos;
@@ -38,9 +38,11 @@ public final class VillageActuator implements FieldActuator {
     List<VillagerEntity> villagers = world.getEntitiesByClass(
         VillagerEntity.class, chunkArea, v -> v.isAlive() && v.getNavigation() != null);
 
+    if (villagers.isEmpty()) return com.utdmod.experiment.ActuatorOutcome.NO_TARGET;
     for (VillagerEntity villager : villagers) {
       actuateVillager(world, villager, interpretation, semantics, intent);
     }
+    return com.utdmod.experiment.ActuatorOutcome.SUCCESS;
   }
 
   private void actuateVillager(ServerWorld world, VillagerEntity villager, ChunkInterpretation interpretation,

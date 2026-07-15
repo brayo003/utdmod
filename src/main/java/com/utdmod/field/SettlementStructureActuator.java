@@ -20,27 +20,33 @@ import net.minecraft.util.math.ChunkPos;
 public final class SettlementStructureActuator implements FieldActuator {
 
   @Override
-  public void actuate(ServerWorld world, ChunkInterpretation interpretation) {
+  public com.utdmod.experiment.ActuatorOutcome actuate(ServerWorld world, ChunkInterpretation interpretation) {
     if (world == null || interpretation == null || interpretation.semantics == null) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
     if (!SpatialBehaviorHelper.isChunkLoaded(world, interpretation.chunkPos)) {
-      return;
+      return com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
     }
 
     SubstrateSemantics semantics = interpretation.semantics;
     IntentType intent = interpretation.primaryIntent != null ? interpretation.primaryIntent.type : null;
     ChunkPos chunkPos = interpretation.chunkPos;
 
+    boolean acted = false;
     if (intent == IntentType.CREATE_SETTLEMENT || semantics.settlementTendency > 0.58) {
       placeSettlementMarker(world, chunkPos, semantics, interpretation.substrate);
+      acted = true;
     }
     if (intent == IntentType.EXPAND_TERRITORY || semantics.expansionTendency > 0.55) {
       placeFrontierMarker(world, chunkPos, semantics);
+      acted = true;
     }
     if (intent == IntentType.COLLAPSE || semantics.collapseTendency > 0.72) {
       markAbandonment(world, chunkPos);
+      acted = true;
     }
+    return acted ? com.utdmod.experiment.ActuatorOutcome.SUCCESS
+                 : com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
   }
 
   private void placeSettlementMarker(ServerWorld world, ChunkPos chunkPos, SubstrateSemantics semantics,

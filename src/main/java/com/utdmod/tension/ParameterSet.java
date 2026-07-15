@@ -11,9 +11,6 @@ import java.util.List;
 public class ParameterSet {
     public static final double DEFAULT_D = 0.012;
     public static final double DEFAULT_LAMBDA = 0.0006;
-    public static final double DEFAULT_ALPHA = 0.009;
-    public static final double DEFAULT_BETA = 0.055;
-    public static final double DEFAULT_GAMMA = 0.045;
     public static final double DEFAULT_STORM_DRAIN = 0.002;
     public static final double DEFAULT_STORM_THRESHOLD = 0.95;
     public static final double DEFAULT_STORM_END_THRESHOLD = 0.25;
@@ -24,9 +21,6 @@ public class ParameterSet {
 
     public double D;
     public double lambda;
-    public double alpha;
-    public double beta;
-    public double gamma;
     public double stormDrain;
     public double stormThreshold;
     public double stormEndThreshold;
@@ -34,10 +28,6 @@ public class ParameterSet {
     public double t1;
     public double t2;
     public double t3;
-    public boolean diffusionEnabled;
-    public boolean decayEnabled;
-    public boolean globalCouplingEnabled;
-    public boolean nonlinearEnabled;
     public boolean stormEnabled;
     public boolean clampEnabled;
     public double v2TransportGain;
@@ -50,6 +40,8 @@ public class ParameterSet {
     public double v2MemoryEffectK;
     public double memoryFormationGain;
     public double memoryMaximum;
+    public double depthMaximum;
+    public double depthCapacityFromMemory;
     public double memoryFormationThreshold;
     public double memoryDiffusionGain;
     public double memoryDepthRetentionGain;
@@ -91,6 +83,12 @@ public class ParameterSet {
     public double readinessMemoryScale;
     public double readinessFieldScale;
     public double readinessTransitionWidth;
+    // Tension metric weights (used by SubstrateState.computeLocalTension)
+    public double tensionActivationWeight;
+    public double tensionMemoryWeight;
+    public double tensionDepthWeight;
+    public double tensionReadinessWeight;
+    public double tensionCapacityWeight;
     public long seed;
     public double validationMaxHotspotRadius;
     public CouplingMatrix couplingMatrix;
@@ -98,22 +96,18 @@ public class ParameterSet {
     private static ParameterSet runtimeInstance;
 
     public ParameterSet() {
-        this(DEFAULT_D, DEFAULT_LAMBDA, DEFAULT_ALPHA, DEFAULT_BETA, DEFAULT_GAMMA,
+        this(DEFAULT_D, DEFAULT_LAMBDA,
                 DEFAULT_STORM_DRAIN, DEFAULT_STORM_THRESHOLD, DEFAULT_STORM_END_THRESHOLD,
                 DEFAULT_REGION_ACTIVE_TENSION_THRESHOLD, DEFAULT_T1, DEFAULT_T2, DEFAULT_T3,
-                true, true, true, true, true, true, 12345L);
+                true, true, 12345L);
     }
 
-    public ParameterSet(double D, double lambda, double alpha, double beta, double gamma,
+    public ParameterSet(double D, double lambda,
                         double stormDrain, double stormThreshold, double stormEndThreshold,
                         double regionActiveThreshold, double t1, double t2, double t3,
-                        boolean diffusionEnabled, boolean decayEnabled, boolean globalCouplingEnabled,
-                        boolean nonlinearEnabled, boolean stormEnabled, boolean clampEnabled, long seed) {
+                        boolean stormEnabled, boolean clampEnabled, long seed) {
         this.D = D;
         this.lambda = lambda;
-        this.alpha = alpha;
-        this.beta = beta;
-        this.gamma = gamma;
         this.stormDrain = stormDrain;
         this.stormThreshold = stormThreshold;
         this.stormEndThreshold = stormEndThreshold;
@@ -121,10 +115,6 @@ public class ParameterSet {
         this.t1 = t1;
         this.t2 = t2;
         this.t3 = t3;
-        this.diffusionEnabled = diffusionEnabled;
-        this.decayEnabled = decayEnabled;
-        this.globalCouplingEnabled = globalCouplingEnabled;
-        this.nonlinearEnabled = nonlinearEnabled;
         this.stormEnabled = stormEnabled;
         this.clampEnabled = clampEnabled;
         this.seed = seed;
@@ -136,11 +126,13 @@ public class ParameterSet {
         this.v2MemoryEffectK = 0.1;
         this.memoryFormationGain = 0.02;
         this.memoryMaximum = 2.0;
+        this.depthMaximum  = 2.0;
+        this.depthCapacityFromMemory = 1.0;
         this.memoryFormationThreshold = 0.05;
         this.memoryDiffusionGain = 0.002;
         this.memoryDepthRetentionGain = 0.8;
         this.memoryDecayRate = 0.001;
-        this.v2ClampMax = 1.5;
+        this.v2ClampMax = 4.0;  // Safety valve only; must exceed memoryMaximum (2.0) and depthMaximum (2.0)
         this.v3FieldDepthGain = 0.005;
         this.depthGrowthGain = 0.04;
         this.depthErosionGain = 0.03;
@@ -177,6 +169,11 @@ public class ParameterSet {
         this.readinessMemoryScale = 1.0;
         this.readinessFieldScale = 1.0;
         this.readinessTransitionWidth = 1.0;
+        this.tensionActivationWeight = 0.40;
+        this.tensionMemoryWeight     = 0.25;
+        this.tensionDepthWeight      = 0.20;
+        this.tensionReadinessWeight  = 0.10;
+        this.tensionCapacityWeight   = 0.05;
         this.validationMaxHotspotRadius = 10.0;
         this.couplingMatrix = new CouplingMatrix();
         initializeDefaultCouplingMatrix();
@@ -211,9 +208,8 @@ public class ParameterSet {
     }
 
     public ParameterSet copy() {
-        ParameterSet copy = new ParameterSet(D, lambda, alpha, beta, gamma, stormDrain, stormThreshold,
+        ParameterSet copy = new ParameterSet(D, lambda, stormDrain, stormThreshold,
                 stormEndThreshold, regionActiveThreshold, t1, t2, t3,
-                diffusionEnabled, decayEnabled, globalCouplingEnabled, nonlinearEnabled,
                 stormEnabled, clampEnabled, seed);
         copy.v2TransportGain = this.v2TransportGain;
         copy.v2ActivationDecay = this.v2ActivationDecay;
@@ -223,6 +219,8 @@ public class ParameterSet {
         copy.v2MemoryEffectK = this.v2MemoryEffectK;
         copy.memoryFormationGain = this.memoryFormationGain;
         copy.memoryMaximum = this.memoryMaximum;
+        copy.depthMaximum  = this.depthMaximum;
+        copy.depthCapacityFromMemory = this.depthCapacityFromMemory;
         copy.memoryFormationThreshold = this.memoryFormationThreshold;
         copy.memoryDiffusionGain = this.memoryDiffusionGain;
         copy.memoryDepthRetentionGain = this.memoryDepthRetentionGain;
@@ -264,6 +262,11 @@ public class ParameterSet {
         copy.readinessMemoryScale = this.readinessMemoryScale;
         copy.readinessFieldScale = this.readinessFieldScale;
         copy.readinessTransitionWidth = this.readinessTransitionWidth;
+        copy.tensionActivationWeight = this.tensionActivationWeight;
+        copy.tensionMemoryWeight     = this.tensionMemoryWeight;
+        copy.tensionDepthWeight      = this.tensionDepthWeight;
+        copy.tensionReadinessWeight  = this.tensionReadinessWeight;
+        copy.tensionCapacityWeight   = this.tensionCapacityWeight;
         copy.validationMaxHotspotRadius = this.validationMaxHotspotRadius;
         copy.copyUnifiedDynamicsFrom(this);
         return copy;
@@ -315,9 +318,6 @@ public class ParameterSet {
         List<String> lines = new ArrayList<>();
         lines.add("D=" + D);
         lines.add("lambda=" + lambda);
-        lines.add("alpha=" + alpha);
-        lines.add("beta=" + beta);
-        lines.add("gamma=" + gamma);
         lines.add("stormDrain=" + stormDrain);
         lines.add("stormThreshold=" + stormThreshold);
         lines.add("stormEndThreshold=" + stormEndThreshold);

@@ -1,27 +1,72 @@
 {
+  "_comment": "UTD Mod sound event definitions. Event names match registered SoundEvent identifiers in ModSounds.java and must not be renamed. Subtitle keys point to en_us.json entries. Categories reflect the nature of the event rather than tension-as-threat framing. ritual_block_activate.ogg is registered as a second variant of the node_couple event so the file is reachable at runtime. magic.ogg is a zero-byte placeholder retained for compatibility; it is intentionally not assigned to any event.",
+
+  "block_ritual_degrade": {
+    "category": "block",
+    "subtitle": "subtitles.utdmod.node_decouple",
+    "sounds": [ "utdmod:ritual_block_degrade" ]
+  },
+
   "ritual_activate": {
     "category": "block",
-    "subtitle": "subtitles.utdmod.ritual_activate",
-    "sounds": [ "utdmod:ritual_activate" ]
+    "subtitle": "subtitles.utdmod.node_couple",
+    "sounds": [
+      "utdmod:ritual_activate",
+      { "name": "utdmod:ritual_block_activate", "volume": 0.7, "pitch": 1.0 }
+    ]
   },
+
   "ritual_ambient": {
     "category": "block",
-    "subtitle": "subtitles.utdmod.ritual_ambient",
+    "subtitle": "subtitles.utdmod.substrate_ambient",
     "sounds": [ "utdmod:ritual_ambient" ]
   },
+
   "tension_increase": {
     "category": "player",
-    "subtitle": "subtitles.utdmod.tension_increase",
+    "subtitle": "subtitles.utdmod.activation_peak",
     "sounds": [ "utdmod:heartbeat_fast" ]
   },
+
+  "entity_serpent_ambient": {
+    "category": "neutral",
+    "subtitle": "subtitles.utdmod.coherence_serpent_ambient",
+    "sounds": [ "utdmod:serpent_ambient_loop" ]
+  },
+
+  "entity_serpent_attack": {
+    "category": "neutral",
+    "subtitle": "subtitles.utdmod.coherence_serpent_attack",
+    "sounds": [ "utdmod:serpent_attack_roar" ]
+  },
+
   "serpent_ambient": {
-    "category": "hostile",
-    "subtitle": "subtitles.utdmod.serpent_ambient",
+    "category": "neutral",
+    "subtitle": "subtitles.utdmod.coherence_serpent_ambient",
     "sounds": [ "utdmod:serpent_groan_1", "utdmod:serpent_groan_2" ]
   },
+
+  "entity_wraith_attack": {
+    "category": "hostile",
+    "subtitle": "subtitles.utdmod.fracture_wraith_attack",
+    "sounds": [ "utdmod:wraith_attack_scream" ]
+  },
+
+  "entity_wraith_death": {
+    "category": "hostile",
+    "subtitle": "subtitles.utdmod.fracture_wraith_death",
+    "sounds": [ "utdmod:wraith_death_vanish" ]
+  },
+
   "wraith_scream": {
     "category": "hostile",
-    "subtitle": "subtitles.utdmod.wraith_scream",
+    "subtitle": "subtitles.utdmod.fracture_wraith_attack",
     "sounds": [ "utdmod:wraith_scream" ]
+  },
+
+  "penalty_villager_low": {
+    "category": "ambient",
+    "subtitle": "subtitles.utdmod.penalty_diffuse",
+    "sounds": [ "utdmod:villager_penalty_low" ]
   }
 }

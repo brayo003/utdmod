@@ -1,6 +1,7 @@
 {
+  "_comment": "Blockstate definition for the Substrate Node (registry: utdmod:ritual_block). The 'degraded' property reflects whether the node's field-coupling capacity has been reduced below its baseline structural integrity. False = nominal coupling; true = reduced capacity.",
   "variants": {
     "degraded=false": { "model": "utdmod:block/ritual_block" },
-    "degraded=true": { "model": "utdmod:block/ritual_block_degraded" }
+    "degraded=true":  { "model": "utdmod:block/ritual_block_degraded" }
   }
 }

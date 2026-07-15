@@ -27,19 +27,9 @@ public final class ChunkTensionManager {
         return data.getOrCreateSubstrateState(pos);
     }
 
-    public static void setLocalTension(ServerWorld world, ChunkPos pos, double tension) {
-        ChunkTensionData data = ChunkTensionData.getServerState(world);
-        data.setLocalTension(pos, tension, world);
-    }
-
-    public static void addLocalTension(ServerWorld world, ChunkPos pos, double amount) {
-        ChunkTensionData data = ChunkTensionData.getServerState(world);
-        data.addLocalTension(pos, amount, world);
-    }
-
     /**
-     * Mining contribution: higher for coal/ores and much higher for deepslate, diamond, and ancient debris
-     * so extraction feels progressively dangerous (bounded by cubic BETA in the chunk tick).
+     * Mining contribution injected as a substrate impulse.
+     * The impulse is consumed during the next substrate integration tick.
      */
     public static void addMiningTension(ServerWorld world, ChunkPos pos, String blockId) {
         String id = blockId.toLowerCase();
@@ -65,35 +55,27 @@ public final class ChunkTensionManager {
         }
 
         ChunkTensionData data = ChunkTensionData.getServerState(world);
-        data.addMiningTension(pos, baseAmount, world);
+        double currentRate = data.getRecentMiningRate(pos);
+        double multiplier = 1.0 + (currentRate * 0.12);
+        double applied = baseAmount * multiplier;
+        com.utdmod.core.TensionActivityLedger.addMining(applied);
+        data.setRecentMiningRate(pos, currentRate + 1.0);
+        // Inject as substrate impulse — consumed by integrateAllSubstrateStates
+        data.addInstantaneousImpulse(pos, applied);
         if (com.utdmod.UTDMod.LOGGER.isDebugEnabled()) {
-            com.utdmod.UTDMod.LOGGER.debug("Mining {} +{} local @ {},{}", blockId, baseAmount, pos.x, pos.z);
+            com.utdmod.UTDMod.LOGGER.debug("Mining {} +{} impulse @ {},{}", blockId, applied, pos.x, pos.z);
         }
     }
 
     public static void addForestryTension(ServerWorld world, ChunkPos pos, boolean matureTree) {
         double baseAmount = matureTree ? 0.0085 : 0.0055;
-        applyWeightedLocalTension(world, pos, baseAmount, 1.0);
-
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                if (dx == 0 && dz == 0) {
-                    continue;
-                }
-                ChunkPos neighbor = new ChunkPos(pos.x + dx, pos.z + dz);
-                double weight = Math.abs(dx) + Math.abs(dz) == 1 ? 0.42 : 0.22;
-                applyWeightedLocalTension(world, neighbor, baseAmount, weight);
-            }
-        }
-    }
-
-    private static void applyWeightedLocalTension(ServerWorld world, ChunkPos pos, double baseAmount, double weight) {
-        if (world == null || pos == null) {
-            return;
-        }
         ChunkTensionData data = ChunkTensionData.getServerState(world);
-        double amount = baseAmount * weight;
-        data.addLocalTension(pos, amount, world);
+        data.addInstantaneousImpulse(pos, baseAmount);
+        // Spread weaker impulse to cardinal neighbors
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+        for (int[] d : dirs) {
+            data.addInstantaneousImpulse(new ChunkPos(pos.x + d[0], pos.z + d[1]), baseAmount * 0.42);
+        }
     }
 
     public static void addDeforestationTension(ServerWorld world, ChunkPos pos) {
@@ -111,12 +93,9 @@ public final class ChunkTensionManager {
         else if (id.contains("ender_dragon") || id.contains("wither")) amount = 0.2;
 
         TensionActivityLedger.addCombat(amount);
-        addLocalTension(world, pos, amount);
-    }
-
-    public static void reduceLocalTension(ServerWorld world, ChunkPos pos, double amount) {
-        double current = getLocalTension(world, pos);
-        setLocalTension(world, pos, Math.max(0, current - amount));
+        // Inject as substrate impulse
+        ChunkTensionData data = ChunkTensionData.getServerState(world);
+        data.addInstantaneousImpulse(pos, amount);
     }
 
     public static int pruneInactive(ServerWorld world, long timeoutMs) {

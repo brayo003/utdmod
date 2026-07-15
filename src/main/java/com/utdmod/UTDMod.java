@@ -12,6 +12,9 @@ import com.utdmod.experiment.ExperimentLogger;
 import com.utdmod.field.FieldActuatorRegistry;
 import com.utdmod.network.DebugSpikeTensionPacket;
 import com.utdmod.network.ExperimentClientReportPacket;
+import com.utdmod.network.ResearchAgentRegisterPacket;
+import com.utdmod.network.ResearchAgentStatusPacket;
+import com.utdmod.research.agent.ResearchClientAgentManager;
 import com.utdmod.network.UseCrystalPacket;
 import com.utdmod.registry.ModBlockEntities;
 import com.utdmod.registry.ModBlocks;
@@ -19,6 +22,7 @@ import com.utdmod.registry.ModEntityAttributes;
 import com.utdmod.registry.ModItemGroups;
 import com.utdmod.registry.ModItems;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +52,10 @@ public class UTDMod implements ModInitializer {
         ResearchCommands.register();
         ResearchBotCommands.register();
         ExperimentClientReportPacket.registerServer();
+        ResearchAgentRegisterPacket.registerServer();
+        ResearchAgentStatusPacket.registerServer();
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
+            ResearchClientAgentManager.onPlayerDisconnect(handler.player));
         // Independent ecology/supplemental spawn systems are disabled in the deterministic substrate validation path.
         // TensionSpawnEcology.register();
         // RegionEcologyManager.register();

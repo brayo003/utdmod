@@ -1,5 +1,7 @@
 package com.utdmod.research.player;
 
+import com.utdmod.research.agent.RemoteResearchController;
+import com.utdmod.research.agent.ResearchAgentController;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -11,14 +13,11 @@ public final class ResearchPlayerContext {
   public final DeterministicRandom random;
   public final ResearchPlayerSnapshot snapshot;
 
-  public ResearchPlayerNavigation navigation;
+  public final ResearchAgentController controller;
   public ResearchPlayerVision vision;
   public ResearchPlayerInventoryManager inventory;
   public ResearchPlayerCrafting crafting;
-  public ResearchPlayerBuilding building;
-  public ResearchPlayerExploration exploration;
   public ResearchPlayerCombat combat;
-  public ResearchPlayerMining mining;
 
   public BlockPos currentTarget = null;
   public String lastFailure = "";
@@ -33,14 +32,11 @@ public final class ResearchPlayerContext {
                 : snapshot.botSeed)
             .nextLong()
         : snapshot.rngState);
-    this.navigation = new ResearchPlayerNavigation(world, player);
+    this.controller = new RemoteResearchController(world, player, snapshot);
     this.vision = new ResearchPlayerVision(world, player);
     this.inventory = new ResearchPlayerInventoryManager(player);
     this.crafting = new ResearchPlayerCrafting(player);
-    this.building = new ResearchPlayerBuilding(world, player, snapshot);
-    this.exploration = new ResearchPlayerExploration(world, snapshot);
     this.combat = new ResearchPlayerCombat(world, player);
-    this.mining = new ResearchPlayerMining(world, player);
   }
 
   public void syncRng() {

@@ -14,7 +14,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +43,6 @@ public class ChunkTensionData extends PersistentState {
         null // DataFixer, null for now
     );
 
-    // Map of ChunkPos to local tension value
-    private final Map<ChunkPos, Double> localTensions = new HashMap<>();
     // Map of ChunkPos to chunk state
     private final Map<ChunkPos, ChunkState> chunkStates = new HashMap<>();
     // Map of ChunkPos to recent mining activity (decays over time)
@@ -68,8 +65,8 @@ public class ChunkTensionData extends PersistentState {
         return manager.getOrCreate(TYPE, "chunk_tension_data");
     }
 
-    public Map<ChunkPos, Double> getTensionMap() {
-        return new HashMap<>(localTensions);
+    public java.util.Set<ChunkPos> getActiveChunkPositions() {
+        return substrateStates.keySet();
     }
 
     public SubstrateState getOrCreateSubstrateState(ChunkPos pos) {
@@ -87,8 +84,8 @@ public class ChunkTensionData extends PersistentState {
     }
 
     public double getLocalTension(ChunkPos pos) {
-        touch(pos);
-        return localTensions.getOrDefault(pos, 0.0);
+        SubstrateState ss = substrateStates.get(pos);
+        return ss != null ? SubstrateObservationModel.computeLocalTension(ss) : 0.0;
     }
 
     public double getRecentMiningRate(ChunkPos pos) {
@@ -124,74 +121,33 @@ public class ChunkTensionData extends PersistentState {
         return chunkStates.getOrDefault(pos, ChunkState.STABLE);
     }
 
-    public void addMiningTension(ChunkPos pos, double baseAmount, ServerWorld world) {
-        // Increment recent mining rate
-        double currentRate = recentMiningRate.getOrDefault(pos, 0.0);
-        recentMiningRate.put(pos, currentRate + 1.0);
-
-        double multiplier = 1.0 + (currentRate * 0.12);
-        double applied = baseAmount * multiplier;
-        com.utdmod.core.TensionActivityLedger.addMining(applied);
-
-        addLocalTension(pos, applied, world);
-        touch(pos);
-    }
-
-    public void setLocalTension(ChunkPos pos, double tension) {
-        setLocalTension(pos, tension, null);
-    }
-
-    public void setLocalTension(ChunkPos pos, double tension, ServerWorld world) {
+    /**
+     * Update ChunkState classification from the derived tension metric.
+     * Called by TensionServerTick after computing T(x) from substrate.
+     * No tension value is stored — classification only.
+     */
+    public void updateChunkClassification(ChunkPos pos, double tension, ServerWorld world) {
         ChunkState oldState = getChunkState(pos);
-
         if (tension <= 0.0) {
-            localTensions.remove(pos);
             chunkStates.remove(pos);
             stormActive.remove(pos);
-            contaminationPeak.remove(pos);
-            contaminationLevel.remove(pos);
-            substrateStates.remove(pos);
         } else {
-            localTensions.put(pos, tension);
             updateContaminationMemory(pos, tension);
             ChunkState newState = calculateState(tension, oldState);
             if (newState != oldState) {
                 chunkStates.put(pos, newState);
                 long wtick = world != null ? world.getTime() : TensionTraceClock.getServerTick();
                 com.utdmod.diag.DiagnosticLogs.tensionState(
-                    pos,
-                    oldState,
-                    newState,
-                    tension,
-                    wtick,
-                    "STATE_HYSTERESIS=" + STATE_HYSTERESIS
-                );
-
+                    pos, oldState, newState, tension, wtick,
+                    "STATE_HYSTERESIS=" + STATE_HYSTERESIS);
                 if (world != null) {
                     ExperimentTelemetry.onChunkStateTransition(pos, oldState, newState, tension, wtick);
-                }
-
-                // Trigger effects for state transitions
-                if (world != null) {
                     triggerStateTransitionEffects(world, pos, oldState, newState);
                 }
             }
         }
         touch(pos);
         markDirty();
-    }
-
-    public void addLocalTension(ChunkPos pos, double amount) {
-        addLocalTension(pos, amount, null);
-    }
-
-    public void addLocalTension(ChunkPos pos, double amount, ServerWorld world) {
-        if (amount > 0.0) {
-            addInstantaneousImpulse(pos, amount);
-        }
-        double current = getLocalTension(pos);
-        setLocalTension(pos, current + amount, world);
-        touch(pos);
     }
 
     public void addInstantaneousImpulse(ChunkPos pos, double amount) {
@@ -325,23 +281,17 @@ public class ChunkTensionData extends PersistentState {
         for (java.util.Map.Entry<ChunkPos, Long> e : lastAccessMs.entrySet()) {
             ChunkPos pos = e.getKey();
             long age = now - e.getValue();
-            double t = getLocalTension(pos);
+            // Use derived tension for TTL extension
+            SubstrateState ss = substrateStates.get(pos);
+            double t = ss != null ? SubstrateObservationModel.computeLocalTension(ss) : 0.0;
             int cLv = getContaminationLevel(pos);
             long effectiveTimeout = timeoutMs;
-            if (t >= 0.85) {
-                effectiveTimeout = Math.max(effectiveTimeout, 4L * 60L * 60L * 1000L);
-            }
-            if (cLv >= 2) {
-                effectiveTimeout = Math.max(effectiveTimeout, 6L * 60L * 60L * 1000L);
-            } else if (cLv >= 1) {
-                effectiveTimeout = Math.max(effectiveTimeout, 5L * 60L * 60L * 1000L);
-            }
-            if (age > effectiveTimeout) {
-                toRemove.add(pos);
-            }
+            if (t >= 0.85) effectiveTimeout = Math.max(effectiveTimeout, 4L * 60L * 60L * 1000L);
+            if (cLv >= 2)  effectiveTimeout = Math.max(effectiveTimeout, 6L * 60L * 60L * 1000L);
+            else if (cLv >= 1) effectiveTimeout = Math.max(effectiveTimeout, 5L * 60L * 60L * 1000L);
+            if (age > effectiveTimeout) toRemove.add(pos);
         }
         for (ChunkPos pos : toRemove) {
-            localTensions.remove(pos);
             chunkStates.remove(pos);
             recentMiningRate.remove(pos);
             stormActive.remove(pos);
@@ -355,12 +305,9 @@ public class ChunkTensionData extends PersistentState {
         if (removed > 0) {
             markDirty();
             TensionTraceLogger.traceSystem(
-                TensionTraceClock.getServerTick(),
-                "CHUNK_PRUNE",
+                TensionTraceClock.getServerTick(), "CHUNK_PRUNE",
                 "removed=" + removed + " timeoutMs=" + timeoutMs,
-                TensionManager.getTension(),
-                "ttl_prune"
-            );
+                TensionManager.getTension(), "ttl_prune");
         }
         return removed;
     }
@@ -398,63 +345,53 @@ public class ChunkTensionData extends PersistentState {
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
-        NbtList tensionList = new NbtList();
-        for (Map.Entry<ChunkPos, Double> entry : localTensions.entrySet()) {
+        NbtList chunkList = new NbtList();
+        for (Map.Entry<ChunkPos, SubstrateState> entry : substrateStates.entrySet()) {
+            ChunkPos pos = entry.getKey();
+            SubstrateState ss = entry.getValue();
             NbtCompound chunkNbt = new NbtCompound();
-            chunkNbt.putInt("x", entry.getKey().x);
-            chunkNbt.putInt("z", entry.getKey().z);
-            chunkNbt.putDouble("tension", entry.getValue());
-            chunkNbt.putInt("state", getChunkState(entry.getKey()).ordinal());
-            chunkNbt.putDouble("miningRate", recentMiningRate.getOrDefault(entry.getKey(), 0.0));
-            chunkNbt.putDouble("cPeak", contaminationPeak.getOrDefault(entry.getKey(), 0.0));
-            chunkNbt.putByte("cLv", contaminationLevel.getOrDefault(entry.getKey(), (byte) 0));
-            chunkNbt.putBoolean("stormActive", stormActive.getOrDefault(entry.getKey(), false));
-            SubstrateState substrateState = substrateStates.get(entry.getKey());
-            if (substrateState != null) {
-                chunkNbt.putDouble("sActivation", substrateState.getActivation());
-                chunkNbt.putDouble("sMemory", substrateState.getMemory());
-                chunkNbt.putDouble("sTransport", substrateState.getTransport());
-                chunkNbt.putDouble("sFieldDepth", substrateState.getFieldDepth());
-                chunkNbt.putDouble("sBaseline", substrateState.getBaseline());
-                chunkNbt.putDouble("sExternalInput", substrateState.getExternalInput());
-                chunkNbt.putDouble("sReadiness", substrateState.getReadiness());
-                chunkNbt.putDouble("sRadius", substrateState.getRadius());
-                chunkNbt.putDouble("sCapacity", substrateState.getCapacity());
-                chunkNbt.putDouble("sPeakActivation", substrateState.getPeakActivation());
-                chunkNbt.putDouble("sConvergence", substrateState.getConvergence());
-            }
-            tensionList.add(chunkNbt);
+            chunkNbt.putInt("x", pos.x);
+            chunkNbt.putInt("z", pos.z);
+            chunkNbt.putInt("state", getChunkState(pos).ordinal());
+            chunkNbt.putDouble("miningRate", recentMiningRate.getOrDefault(pos, 0.0));
+            chunkNbt.putDouble("cPeak", contaminationPeak.getOrDefault(pos, 0.0));
+            chunkNbt.putByte("cLv", contaminationLevel.getOrDefault(pos, (byte) 0));
+            chunkNbt.putBoolean("stormActive", stormActive.getOrDefault(pos, false));
+            chunkNbt.putDouble("sActivation", ss.getActivation());
+            chunkNbt.putDouble("sMemory", ss.getMemory());
+            chunkNbt.putDouble("sTransport", ss.getTransport());
+            chunkNbt.putDouble("sFieldDepth", ss.getFieldDepth());
+            chunkNbt.putDouble("sBaseline", ss.getBaseline());
+            chunkNbt.putDouble("sExternalInput", ss.getExternalInput());
+            chunkNbt.putDouble("sReadiness", ss.getReadiness());
+            chunkNbt.putDouble("sRadius", ss.getRadius());
+            chunkNbt.putDouble("sCapacity", ss.getCapacity());
+            chunkNbt.putDouble("sPeakActivation", ss.getPeakActivation());
+            chunkNbt.putDouble("sConvergence", ss.getConvergence());
+            chunkList.add(chunkNbt);
         }
-        nbt.put("localTensions", tensionList);
+        nbt.put("substrateChunks", chunkList);
         return nbt;
     }
 
     public static ChunkTensionData fromNbt(NbtCompound nbt) {
         ChunkTensionData data = new ChunkTensionData();
-        NbtList tensionList = nbt.getList("localTensions", 10); // 10 = NbtCompound type
-        for (int i = 0; i < tensionList.size(); i++) {
-            NbtCompound chunkNbt = tensionList.getCompound(i);
+        // Support both new key and legacy key for forward/backward compat on load
+        NbtList chunkList = nbt.contains("substrateChunks")
+            ? nbt.getList("substrateChunks", 10)
+            : nbt.getList("localTensions", 10);
+        for (int i = 0; i < chunkList.size(); i++) {
+            NbtCompound chunkNbt = chunkList.getCompound(i);
             int x = chunkNbt.getInt("x");
             int z = chunkNbt.getInt("z");
-            double tension = chunkNbt.getDouble("tension");
-            int stateOrdinal = chunkNbt.getInt("state");
-            double miningRate = chunkNbt.getDouble("miningRate");
-            boolean storm = chunkNbt.getBoolean("stormActive");
             ChunkPos pos = new ChunkPos(x, z);
-            data.localTensions.put(pos, tension);
+            int stateOrdinal = chunkNbt.getInt("state");
             data.chunkStates.put(pos, ChunkState.values()[stateOrdinal]);
-            if (miningRate > 0) {
-                data.recentMiningRate.put(pos, miningRate);
-            }
-            if (storm) {
-                data.stormActive.put(pos, true);
-            }
-            if (chunkNbt.contains("cPeak")) {
-                data.contaminationPeak.put(pos, chunkNbt.getDouble("cPeak"));
-            }
-            if (chunkNbt.contains("cLv")) {
-                data.contaminationLevel.put(pos, chunkNbt.getByte("cLv"));
-            }
+            double miningRate = chunkNbt.getDouble("miningRate");
+            if (miningRate > 0) data.recentMiningRate.put(pos, miningRate);
+            if (chunkNbt.getBoolean("stormActive")) data.stormActive.put(pos, true);
+            if (chunkNbt.contains("cPeak")) data.contaminationPeak.put(pos, chunkNbt.getDouble("cPeak"));
+            if (chunkNbt.contains("cLv"))  data.contaminationLevel.put(pos, chunkNbt.getByte("cLv"));
             if (chunkNbt.contains("sActivation")) {
                 SubstrateState loaded = new SubstrateState(
                     chunkNbt.getDouble("sActivation"),

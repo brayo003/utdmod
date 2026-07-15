@@ -403,15 +403,10 @@ public final class ExperimentLogger {
         
         for (ServerWorld world : server.getWorlds()) {
             ChunkTensionData data = ChunkTensionData.getServerState(world);
-            for (ChunkPos chunkPos : data.getTensionMap().keySet()) {
-                if (!world.isChunkLoaded(chunkPos.x, chunkPos.z)) {
-                    continue;
-                }
+            for (ChunkPos chunkPos : data.getActiveChunkPositions()) {
+                if (!world.isChunkLoaded(chunkPos.x, chunkPos.z)) continue;
                 SubstrateState substrate = data.getSubstrateState(chunkPos);
-                if (substrate == null) {
-                    continue;
-                }
-                
+                if (substrate == null) continue;
                 double activation = substrate.getActivation();
                 sumActivation += activation;
                 sumSqActivation += activation * activation;
@@ -491,7 +486,15 @@ public final class ExperimentLogger {
                 }});
                 regionEntry.put("chunk_count", region.getChunkCount());
                 regionEntry.put("state", region.getState().name());
-                regionEntry.put("average_tension", region.getAverageTension());
+                // Full substrate statistics — tension is a derived metric
+                regionEntry.put("mean_tension", region.getMeanTension());
+                regionEntry.put("max_tension", region.getMaxTension());
+                regionEntry.put("variance_tension", region.getVarianceTension());
+                regionEntry.put("active_fraction", region.getActiveFraction());
+                regionEntry.put("mean_depth", region.getMeanDepth());
+                regionEntry.put("mean_memory", region.getMeanMemory());
+                regionEntry.put("mean_activation", region.getMeanActivation());
+                regionEntry.put("max_activation", region.getMaxActivation());
                 regionEntry.put("average_maturity", region.getMaturity());
                 regionEntry.put("fractured_chunks", region.getFracturedChunks());
                 regionEntry.put("storm_chunks", region.getStormChunks());
@@ -616,11 +619,9 @@ public final class ExperimentLogger {
                 if (data == null) {
                     continue;
                 }
-                for (ChunkPos chunk : data.getTensionMap().keySet()) {
+                for (ChunkPos chunk : data.getActiveChunkPositions()) {
                     SubstrateState substrate = data.getSubstrateState(chunk);
-                    if (substrate == null) {
-                        continue;
-                    }
+                    if (substrate == null) continue;
                     double activation = substrate.getActivation();
                     double readiness = substrate.getReadiness();
                     double depth = substrate.getFieldDepth();
@@ -651,7 +652,18 @@ public final class ExperimentLogger {
             cover.append("Crop interventions: ").append(cropEvents).append('\n');
             cover.append("Mob interventions: ").append(mobEvents).append('\n');
             cover.append("Threshold crossings: not recorded\n");
-            cover.append("Determinism: ").append("completed".equals(status) ? "PASS" : "FAIL").append('\n');
+            // NOTE: "Determinism" previously reflected whether the run ended cleanly,
+            // not whether the substrate field reproduced bit-for-bit across runs.
+            // The substrate integration (A/M/D/B via FieldDerivative.computeUnified) is
+            // deterministic given fixed player inputs and chunk-loading sequence.
+            // Known inter-run variation sources (do NOT affect substrate field values):
+            //   - ecology block mutations: world.random (RegionEcologyManager)
+            //   - TTL pruning decision: System.currentTimeMillis() (ChunkTensionData)
+            //   - world/player list iteration order: varies with Minecraft chunk loading
+            cover.append("Run completed cleanly: ").append("completed".equals(status) ? "YES" : "NO").append('\n');
+            cover.append("Determinism: NOT_MEASURED\n");
+            cover.append("Determinism note: substrate field (A/M/D/B) is deterministic given fixed inputs; ")
+                 .append("ecology block mutations and TTL pruning use wall-clock time and world.random.\n");
             cover.append("Warnings: none\n");
 
             Path coverFile = experimentDir.resolve("cover_sheet.txt");
@@ -796,14 +808,21 @@ public final class ExperimentLogger {
     private static void exportRegionSummary() {
         try {
             StringBuilder csv = new StringBuilder();
-            csv.append("region_id,chunk_count,state,avg_tension,fractured_chunks,storm_chunks\n");
+            csv.append("region_id,chunk_count,state,mean_tension,max_tension,variance_tension,active_fraction,mean_depth,mean_memory,mean_activation,max_activation,fractured_chunks,storm_chunks\n");
             List<Region> regions = RegionManager.getRegions();
             for (Region region : regions) {
-                csv.append(String.format("%d,%d,%s,%.5f,%d,%d\n",
+                csv.append(String.format("%d,%d,%s,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%d,%d\n",
                     region.getId(),
                     region.getChunkCount(),
                     region.getState().name(),
-                    region.getAverageTension(),
+                    region.getMeanTension(),
+                    region.getMaxTension(),
+                    region.getVarianceTension(),
+                    region.getActiveFraction(),
+                    region.getMeanDepth(),
+                    region.getMeanMemory(),
+                    region.getMeanActivation(),
+                    region.getMaxActivation(),
                     region.getFracturedChunks(),
                     region.getStormChunks()
                 ));

@@ -1,0 +1,122 @@
+{
+  "_format": "utdmod-resource-manifest-v1",
+  "_description": "Declarative record of every resource in assets/utdmod and its intended semantic role within the Unified Tension Dynamics substrate architecture. This file is documentation only; it is not loaded at runtime.",
+
+  "substrate_variables": {
+    "A": "Activation — transient excitation of the local field",
+    "M": "Memory — accumulated history of past activation",
+    "D": "Field Depth — structural maturity; persists after memory fades",
+    "B": "Baseline — resting equilibrium level of the field"
+  },
+
+  "semantic_roles": {
+    "observer":              "Exposes existing substrate state. Never writes state.",
+    "actuator":              "Injects a controlled external input. State evolves from that input via normal equations.",
+    "boundary_modifier":     "Alters local equation coefficients while present. Removing it restores original dynamics.",
+    "emergent_phenomenon":   "Arises from the field reaching a specific dynamical regime. Participates as an ordinary actor."
+  },
+
+  "items": {
+    "signal_probe": {
+      "display_name": "Field Probe",
+      "role": "observer",
+      "reads": ["A", "M", "D", "B", "transport", "region_identity", "maturity"],
+      "writes": [],
+      "note": "Scientific instrumentation. Never creates or destroys field state."
+    },
+    "volatile_stim": {
+      "display_name": "Impulse Generator",
+      "role": "actuator",
+      "reads": [],
+      "writes": ["external_input"],
+      "note": "Applies a single instantaneous impulse to the local substrate chunk. Suitable for impulse-response and propagation experiments."
+    },
+    "stability_tonic": {
+      "display_name": "Relaxation Agent",
+      "role": "actuator",
+      "reads": [],
+      "writes": ["damping_modifier", "forgetting_rate_modifier"],
+      "note": "Transiently modifies dissipation and forgetting coefficients. Does not delete existing field state; modifies the governing dynamics while active."
+    },
+    "warding_crystal": {
+      "display_name": "Boundary Modulator",
+      "role": "boundary_modifier",
+      "reads": [],
+      "writes": ["local_equation_coefficients"],
+      "note": "Changes local substrate physics while held or placed. When removed, normal equations resume. Analogous to introducing a controlled field or catalyst."
+    },
+    "tension_stabilizer": {
+      "display_name": "Damping Rod",
+      "role": "boundary_modifier",
+      "reads": [],
+      "writes": ["damping_coefficient"],
+      "note": "Increases local dissipation. Does not remove state; increases the rate at which activation decays toward baseline."
+    }
+  },
+
+  "blocks": {
+    "ritual_block": {
+      "display_name": "Substrate Node",
+      "role": "boundary_modifier",
+      "blockstate_property": "degraded",
+      "property_semantics": {
+        "false": "Nominal coupling — node influences local field equations at full structural capacity.",
+        "true":  "Reduced capacity — structural integrity has been compromised; field coupling is below nominal."
+      },
+      "note": "Persistent infrastructure. Not a ritual object. Players construct engineered dynamical landscapes by placing networks of nodes. The block does not inject activation; it modifies the equations that govern how activation propagates and persists locally."
+    }
+  },
+
+  "entities": {
+    "tension_serpent": {
+      "display_name": "Coherence Serpent",
+      "role": "emergent_phenomenon",
+      "emergence_conditions": ["mature_region", "sustained_activation_history", "coherent_transport", "developed_field_depth"],
+      "influence_mechanism": "participates_via_ordinary_coupling",
+      "note": "Emerges when a specific organized dynamical regime is established. After appearing it acts as an ordinary participant in the substrate — contributing movement impulses and territorial behaviour through normal coupling paths. Never directly overwrites substrate state."
+    },
+    "tension_wraith": {
+      "display_name": "Fracture Wraith",
+      "role": "emergent_phenomenon",
+      "emergence_conditions": ["fragmented_region", "unstable_transport", "competing_gradients", "incoherent_memory"],
+      "influence_mechanism": "participates_via_ordinary_coupling",
+      "note": "Emerges from disordered, high-gradient, or oscillatory field regimes. Represents the field in a fragmentation state. Like the Coherence Serpent it participates rather than controls."
+    }
+  },
+
+  "sounds": {
+    "block_ritual_degrade":   { "semantic": "Substrate Node structural capacity reduced",                  "files": ["ritual_block_degrade.ogg"] },
+    "ritual_activate":        { "semantic": "Substrate Node establishing field coupling",                   "files": ["ritual_activate.ogg", "ritual_block_activate.ogg"] },
+    "ritual_ambient":         { "semantic": "Substrate Node maintaining steady-state field coupling",       "files": ["ritual_ambient.ogg"] },
+    "tension_increase":       { "semantic": "Local activation approaching peak",                           "files": ["heartbeat_fast.ogg"] },
+    "entity_serpent_ambient": { "semantic": "Organized field region resonating",                           "files": ["serpent_ambient_loop.ogg"] },
+    "entity_serpent_attack":  { "semantic": "Coherent structure disrupted by external force",              "files": ["serpent_attack_roar.ogg"] },
+    "serpent_ambient":        { "semantic": "Organized field region resonating (legacy alias)",             "files": ["serpent_groan_1.ogg", "serpent_groan_2.ogg"] },
+    "entity_wraith_attack":   { "semantic": "Gradient fracture event",                                     "files": ["wraith_attack_scream.ogg"] },
+    "entity_wraith_death":    { "semantic": "Instability regime collapsing",                               "files": ["wraith_death_vanish.ogg"] },
+    "wraith_scream":          { "semantic": "Gradient fracture event (legacy alias)",                      "files": ["wraith_scream.ogg"] },
+    "penalty_villager_low":   { "semantic": "Field energy diffusing through inhabited area",               "files": ["villager_penalty_low.ogg"] }
+  },
+
+  "unregistered_sound_files": {
+    "magic.ogg": "Zero-byte placeholder. Retained for compatibility. Not assigned to any sound event because an empty file is not valid OGG and would produce a runtime error if played."
+  },
+
+  "textures": {
+    "note": "All PNG artwork is placeholder. Artwork will be replaced manually. File names must remain stable as they are referenced by model JSON. Do not rename texture files; update their contents instead.",
+    "audit_notes": {
+      "textures/item/ritual_block.png": "Correctly used. The item model models/item/ritual_block.json inherits its texture from the block model via 'parent: utdmod:block/ritual_block' rather than declaring a textures key directly. This is standard Minecraft block-item idiom; the PNG is reachable at runtime.",
+      "textures/entity/tension_serpent.png": "Used directly by the renderer (TensionSerpentRenderer / TensionSerpentModel). Not referenced by JSON models.",
+      "textures/entity/tension_wraith.png": "Used directly by the renderer (TensionWraithRenderer / TensionWraithModel). Not referenced by JSON models.",
+      "textures/entity/*.bbmodel": "Blockbench source files. Not loaded at runtime. Stored alongside project for future artwork revision."
+    }
+  },
+
+  "design_invariants": [
+    "No resource implies direct manipulation of a scalar tension value.",
+    "Every item occupies exactly one of the four semantic roles: observer, actuator, boundary_modifier, or emergent_phenomenon.",
+    "Registry identifiers (item/block/entity/sound names) match ModItems, ModBlocks, ModEntities, and ModSounds exactly and must not change.",
+    "Display names and descriptions in lang/ may evolve freely as long as they communicate the substrate architecture.",
+    "The feedback loop is: world dynamics → substrate evolves → structures emerge → entities emerge → entities participate → substrate evolves further."
+  ]
+}

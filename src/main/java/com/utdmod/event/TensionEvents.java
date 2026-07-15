@@ -235,7 +235,8 @@ public final class TensionEvents {
         ChunkPos chunkPos = new ChunkPos(pos);
         double g0 = TensionManager.getTension();
         double before = ChunkTensionManager.getLocalTension(sw, chunkPos);
-        ChunkTensionManager.addLocalTension(sw, chunkPos, amount);
+        // Inject as substrate impulse
+        com.utdmod.tension.ChunkTensionData.getServerState(sw).addInstantaneousImpulse(chunkPos, amount);
         double after = ChunkTensionManager.getLocalTension(sw, chunkPos);
         double g1 = TensionManager.getTension();
         if (UTDMod.LOGGER.isDebugEnabled()) {
@@ -249,40 +250,16 @@ public final class TensionEvents {
             TensionActivityLedger.addMovement(amount);
         }
         TensionLogger.traceWithGlobals(
-            TensionTraceClock.getServerTick(),
-            source,
-            source,
-            detail,
-            chunkPos,
-            player,
-            sw,
-            after - before,
-            after,
-            g0,
-            g1
-        );
+            TensionTraceClock.getServerTick(), source, source, detail,
+            chunkPos, player, sw, after - before, after, g0, g1);
     }
 
     private static void reduceLocal(ServerWorld sw, BlockPos pos, double amount, ServerPlayerEntity player, String source, String detail) {
+        // Tension reduction has no substrate equivalent; log only
         ChunkPos chunkPos = new ChunkPos(pos);
-        double g0 = TensionManager.getTension();
-        double before = ChunkTensionManager.getLocalTension(sw, chunkPos);
-        ChunkTensionManager.reduceLocalTension(sw, chunkPos, amount);
-        double after = ChunkTensionManager.getLocalTension(sw, chunkPos);
-        double g1 = TensionManager.getTension();
-        double localDelta = after - before;
+        double t = ChunkTensionManager.getLocalTension(sw, chunkPos);
         TensionLogger.traceWithGlobals(
-            TensionTraceClock.getServerTick(),
-            source,
-            source,
-            detail,
-            chunkPos,
-            player,
-            sw,
-            localDelta,
-            after,
-            g0,
-            g1
-        );
+            TensionTraceClock.getServerTick(), source, source, detail,
+            chunkPos, player, sw, 0.0, t, TensionManager.getTension(), TensionManager.getTension());
     }
 }

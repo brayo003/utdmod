@@ -1,3 +1,8 @@
+> **[HISTORICAL — PRE-REFACTOR — DO NOT USE AS CURRENT REFERENCE]**
+> This coupling analysis describes the old scalar G↔L ODE pair. The current coupling runs
+> through the `CouplingMatrix` in `FieldDerivative.computeUnified()` and `SubstrateTransport`.
+> See `docs/architecture_audit/EQUATIONS.md`.
+
 # Distributed Coupling & Scar Memory — Code Audit (May 2026)
 
 ## Design intent (from product spec)
