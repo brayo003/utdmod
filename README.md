@@ -4,13 +4,11 @@
 
 A server-authoritative substrate simulation for Minecraft that enables the world to accumulate memory, organize into persistent spatial regions, and evolve in response to player activity.
 
-Unlike conventional sandbox mechanics that respond only to the current game state, UTD introduces a persistent dynamical field distributed across chunks. Every meaningful player action perturbs this field. Over time those perturbations accumulate into long-lived spatial structure that can influence gameplay through ecology, weather, entities, resources, and presentation.
+Unlike conventional sandbox mechanics that respond only to the current game state, UTD introduces a persistent dynamical field distributed across chunks. Every meaningful player action perturbs this field, producing long-lived spatial structure that can influence gameplay through ecology, weather, entities, resources, and presentation.
 
-The project combines a nonlinear substrate simulation, a gameplay interpretation layer, and a complete telemetry pipeline for analysing the behaviour of the field inside a live Minecraft world.
+The project combines a nonlinear substrate simulation, a gameplay interpretation layer, and a complete telemetry pipeline for analysing field behaviour inside a live Minecraft world.
 
-For the theoretical foundation see:
-
-**Substrate X — Theory of Information Gravity**
+The theoretical foundation is described in **Substrate X — Theory of Information Gravity**:
 
 https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
 
@@ -20,17 +18,17 @@ https://github.com/brayo003/Substrate-X-Theory-of-Information-Gravity
 
 ---
 
-## Motivation
+# Motivation
 
-Sandbox worlds typically respond only to immediate player actions. Once an event has ended, the world rapidly returns to its previous state.
+Most sandbox worlds respond only to current player actions. Once an event ends, the world rapidly returns to its previous state.
 
-UTD Mod investigates an alternative approach: treating the world as a persistent dynamical system whose internal state evolves continuously over time. Rather than scripting behaviours directly, gameplay systems derive their behaviour from an underlying substrate that accumulates memory, develops spatial organisation, and retains the effects of historical activity.
+UTD explores an alternative architecture in which the world itself possesses persistent state. Rather than scripting behaviours directly, gameplay systems observe an evolving substrate that accumulates memory, develops spatial organisation, and continuously influences the simulation.
 
-Minecraft serves as the initial implementation and experimental environment for the substrate architecture.
+Minecraft serves as the initial implementation and experimental environment for this architecture.
 
 ---
 
-## Substrate Model
+# Substrate Model
 
 Each active chunk stores four coupled state variables.
 
@@ -41,7 +39,7 @@ Each active chunk stores four coupled state variables.
 | **Depth (D)** | Long-term structural consolidation of disturbance. |
 | **Baseline (B)** | Slowly adapting equilibrium state. |
 
-From these variables several observables are derived:
+From these variables the system derives:
 
 - Local tension **T(x)**
 - Readiness **R**
@@ -49,114 +47,62 @@ From these variables several observables are derived:
 - Global field statistics
 - Storm and corruption metrics
 
-These variables evolve together as one coupled nonlinear dynamical system rather than a collection of independent gameplay counters.
+The substrate integrates these variables every five server ticks using nonlinear activation dynamics, thresholded memory formation, logistic saturation, depth-dependent retention, spatial transport, diffusion, anti-diffusion sharpening, and adaptive baseline evolution.
 
----
-
-## Dynamical Model
-
-Every five server ticks the substrate integrates the coupled state variables for every active chunk.
-
-The implementation includes:
-
-- nonlinear activation dynamics
-- thresholded memory formation
-- logistic saturation
-- depth-dependent retention
-- inter-chunk transport
-- spatial diffusion
-- anti-diffusion sharpening
-- adaptive baseline evolution
-
-Higher-level gameplay systems are derived from these evolving fields rather than driving them directly.
-
-Complete equations, parameters and implementation details are documented in:
+Complete equations and parameter documentation are available in:
 
 - `docs/architecture_audit/EQUATIONS.md`
 - `docs/architecture_audit/PARAMETER_CATALOG.md`
 
 ---
 
-## Architecture
+# Architecture
+
+The runtime executes on the server thread through a single `END_SERVER_TICK` handler.
 
 ```text
 Player Actions
-        │
-        ▼
-   Perturbations
-        │
-        ▼
-Substrate Dynamics
-   (A, M, D, B)
-        │
-        ▼
-     Regions
-        │
-        ▼
- Interpretation
-        │
-        ▼
-Gameplay Systems
-```
-
-The runtime pipeline executes on the server thread through a single `END_SERVER_TICK` handler.
-
-```text
-Player action
 (mining / movement / combat / ritual)
         │
         ▼
-Perturbation injection
-addInstantaneousImpulse(chunk, amount)
-[ChunkTensionManager / TensionEvents]
+Perturbation Injection
         │
         ▼
-Chunk substrate integration (every 5 ticks)
-integrateAllSubstrateStates()
-FieldDerivative.computeUnified(...)
-SubstrateTransport.computeIncoming(...)
-[ChunkTensionData]
+Substrate Integration
+A, M, D, B
         │
         ▼
-Interpretation layer
-SubstrateInterpretationEngine
-RegionalWeatherCoordinator
-WorldPresentationState
+Interpretation Layer
         │
         ▼
-Gameplay actuators
+Gameplay Actuators
 Weather
 Ecology
 Resources
-Mobs
+Entities
 Villages
 Particles
         │
         ▼
-Chunk classification
-STABLE / STRAINED / FRACTURED / DECOUPLED
+Chunk Classification
         │
         ▼
-Region reconstruction (every 20 ticks)
+Region Reconstruction
         │
         ▼
-Global metric aggregation
+Global Metrics
         │
         ▼
-Ecology updates
-        │
-        ▼
-Client synchronisation
-TensionSyncPacket → TensionSyncState
+Client Synchronisation
 ```
 
-The server is authoritative. Clients never simulate the substrate. They render a synchronised snapshot received from the server for HUD, presentation, audio and visual feedback.
+The server is authoritative. Clients never simulate the substrate; they render synchronized state received from the server for HUD, audio, and visual presentation.
 
 ---
 
-## Implemented Systems
+# Implemented Systems
 
-### Simulation
+## Simulation
 
 - Persistent four-state substrate (A, M, D, B)
 - Coupled nonlinear field integration
@@ -164,7 +110,7 @@ The server is authoritative. Clients never simulate the substrate. They render a
 - Region reconstruction
 - Persistent save/load support
 
-### Gameplay Integration
+## Gameplay Integration
 
 - Ecology mutations
 - Weather coupling
@@ -173,9 +119,9 @@ The server is authoritative. Clients never simulate the substrate. They render a
 - Villager behaviour modifiers
 - Interpretation layer connecting substrate state to gameplay systems
 
-### Research Infrastructure
+## Research Infrastructure
 
-- Complete JSONL telemetry pipeline
+- JSONL telemetry pipeline
 - Automated experiment player
 - Region statistics
 - Time-series analysis
@@ -184,21 +130,21 @@ The server is authoritative. Clients never simulate the substrate. They render a
 
 ---
 
-## Experimental Validation
+# Experimental Validation
 
 Four controlled Minecraft server experiments were analysed using the integrated telemetry pipeline (42,071 ticks and 67,279 substrate snapshots).
 
-The complete report is available in:
+The complete analysis is available in:
 
 `analysis/UTD_TELEMETRY_REPORT.md`
 
-Key findings supported by measured telemetry:
+Measured results include:
 
-- **Bistability confirmed.** Small perturbations decay naturally, while sufficiently large perturbations move the substrate into a distinct stable attractor. This provides a mechanism for persistent progression without scripted state machines.
-- **Hysteresis confirmed.** After 25,786 ticks of zero external input following a large perturbation run, the field remained in the non-trivial attractor rather than returning to baseline.
-- **Autonomous organisation.** Transport variability decreased from 0.73 during externally driven activity to 0.045 during relaxation, indicating self-organised internal dynamics without direct player input.
-- **Stable spatial topology.** Four regions persisted throughout the relaxation experiment with no births, merges, splits or deletions.
-- **Temporal scale hierarchy.** Activation evolves over ticks, memory over hundreds of ticks and depth over thousands of ticks, producing layered temporal behaviour suitable for long-term gameplay systems.
+- **Bistability.** Small perturbations decay naturally, while sufficiently large perturbations move the substrate into a distinct stable attractor.
+- **Hysteresis.** After 25,786 ticks of zero external input following a large perturbation run, the field remained in the non-trivial attractor rather than returning to baseline.
+- **Autonomous organisation.** Transport variability decreased from 0.73 during externally driven activity to 0.045 during relaxation, indicating self-organised internal dynamics.
+- **Stable spatial topology.** Four regions persisted throughout the relaxation experiment with no births, merges, splits, or deletions.
+- **Temporal scale hierarchy.** Activation evolves over ticks, memory over hundreds of ticks, and depth over thousands of ticks.
 
 Known implementation investigations are documented in:
 
@@ -206,17 +152,7 @@ Known implementation investigations are documented in:
 
 ---
 
-## Why this Architecture?
-
-Traditional sandbox mechanics typically rely on scripted triggers, timers and handcrafted event logic.
-
-UTD separates simulation from gameplay.
-
-The substrate evolves continuously according to its own state equations. Gameplay systems observe the evolving field and translate its current state into world behaviour. Multiple gameplay systems therefore share the same underlying world state while remaining loosely coupled.
-
----
-
-## Research Questions
+# Research Questions
 
 This project investigates whether a persistent nonlinear substrate can:
 
@@ -228,23 +164,23 @@ This project investigates whether a persistent nonlinear substrate can:
 
 ---
 
-## Repository Layout
+# Repository Layout
 
 | Directory | Purpose |
 |-----------|---------|
 | `src/` | Minecraft implementation |
 | `docs/` | Verified technical documentation |
-| `analysis/` | Telemetry extraction, statistics and plotting |
+| `analysis/` | Telemetry extraction, statistics, and plotting |
 | `simulation_lab/` | Standalone parameter-characterisation environment |
 | `tools/` | Development utilities |
 
-Detailed documentation begins with:
+Documentation begins with:
 
 `docs/INDEX.md`
 
 ---
 
-## Building
+# Building
 
 ```bash
 ./gradlew build
@@ -264,54 +200,44 @@ To start a development server:
 
 ---
 
-## Current Status
+# Current Status
 
 The substrate architecture is implemented and operational.
 
-Current validation demonstrates:
+Current development focuses on:
 
-- persistent chunk memory
-- stable regional organisation
-- nonlinear transport dynamics
-- hysteresis
-- bistability
-- autonomous organisation following perturbation
-
-Four controlled experiments have been analysed using the integrated telemetry framework. The measured behaviour is consistent with a persistent dynamical field rather than a collection of scripted gameplay events.
-
-Current development is focused on:
-
-- gameplay integration
+- expanding gameplay systems
 - parameter balancing
 - presentation and visualisation
 - optimisation
+- large-scale evaluation
 - external technical review
 
 ---
 
-## Collaboration
+# Collaboration
 
 The project welcomes contributions from several disciplines.
 
 **Minecraft / Fabric developers**
 
-Gameplay integration, UI, entities, networking and engine integration.
+Gameplay integration, UI, networking, entities, and engine integration.
 
 **Game systems engineers**
 
-Balancing parameters and designing gameplay systems that respond to substrate state.
+Designing gameplay systems that respond to substrate state and balancing field parameters.
 
 **Simulation and dynamical systems researchers**
 
-Reviewing the equations, analysing parameter space and evaluating emergent behaviour.
+Reviewing equations, analysing parameter space, and evaluating emergent behaviour.
 
 **Artificial life and complex systems researchers**
 
-Studying bistability, hysteresis, spatial self-organisation and long-term memory.
+Studying bistability, hysteresis, spatial self-organisation, and persistent memory.
 
 **Engine programmers**
 
-Performance optimisation, scalability and deterministic replay.
+Performance optimisation, scalability, and deterministic replay.
 
 Areas where technical review is particularly valuable:
 
@@ -320,4 +246,4 @@ Areas where technical review is particularly valuable:
 - gameplay implications of persistent world memory
 - relationship between the standalone simulation and the Minecraft implementation
 
-Issues, pull requests and technical discussion are welcome.
+Issues, pull requests, and technical discussion are welcome.
