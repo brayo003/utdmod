@@ -7,6 +7,11 @@ Files marked ✅ are verified against the current source as of 2026-07-15.
 Files marked ⚠ contain accurate information mixed with outdated sections (read the inline banners).
 Files marked 🗄 are archived/historical and must not be used as a reference for the current system.
 
+**Canonical implementation reference:
+
+architecture_audit/EQUATIONS.md and architecture_audit/PARAMETER_CATALOG.md define the current runtime substrate. When historical analysis or older reports disagree with these documents, the current Java implementation and these two documents take precedence.
+
+
 ---
 
 ## Start here
