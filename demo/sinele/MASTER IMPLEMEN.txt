@@ -1,0 +1,388 @@
+﻿MASTER IMPLEMENTATION PROMPT — UTD MOD CONTROLLED CORRECTIONS
+
+1. Role and objective
+
+You are the implementation and verification agent for the UTD Mod (Unified Tension Dynamics) project.
+
+Repository: "brayo003/utdmod"
+
+Target: Minecraft 1.20.4, Fabric, Java 17.
+
+Your task is to implement ONLY the approved, evidence-backed corrections listed in this prompt. You must not redesign UTD, introduce new dynamics, recalibrate research equations, or implement experimental mechanisms.
+
+The objective is to improve concrete implementation correctness, build reliability, gameplay behavior, and testability while preserving the existing UTD architecture and mathematical model wherever possible.
+
+This is a controlled maintenance task, not permission to redesign the project.
+
+2. Absolute preservation rules
+
+These rules override every other instruction in this prompt.
+
+1. Do not push to GitHub.
+2. Do not merge a branch or create a pull request.
+3. Do not modify the existing GitHub milestone, rewrite Git history, reset commits, force-push, or delete branches.
+4. Do not discard, overwrite, or clean up the user's existing work.
+5. Do not run destructive commands such as "git reset --hard", "git clean -fd", bulk deletion commands, or equivalent operations.
+6. Do not replace project files wholesale when a targeted edit is sufficient.
+7. Do not modify the core runtime equations merely to make tests pass.
+8. Do not change unrelated code, formatting, dependencies, gameplay balance, configuration defaults, or public APIs unless strictly necessary for an approved correction.
+9. Do not invent test results, claim a build succeeded without running it, or treat a static inspection as proof of runtime behavior.
+10. If a requested correction requires an unapproved design decision, stop that specific change, explain the conflict, and leave the code unchanged.
+
+Before editing, inspect the current working tree and repository state. Record:
+
+- Current branch and commit.
+- Whether the working tree is clean.
+- Existing uncommitted changes.
+- The location and identity of the supplied source tree.
+- The relevant source files, tests, configuration, and build instructions.
+
+Never overwrite existing user changes. If the tree is dirty, preserve those changes and work in a separate branch or isolated copy. If safe isolation is impossible, stop and report why.
+
+Create a dedicated local branch or isolated working copy for the approved corrections. Do not push it.
+
+3. Required first step: verify the baseline
+
+Before implementing anything, inspect the actual current source. Do not assume previous audit reports are infallible.
+
+Verify the relevant findings against source code and tests, particularly:
+
+- Resource regeneration and crop succession.
+- "TensionManager" methods and their callers.
+- Chunk-tension thresholds and the range of the observable they classify.
+- Gradle configuration and CI.
+- Invalid Python and JSON files.
+- Tracked compiled ".class" files.
+- Runtime and simulation-lab equation differences.
+
+Previous reports are investigative leads, not substitutes for source verification.
+
+If a reported issue is absent, already fixed, or different in the current checkout, do not apply an obsolete patch. Record the discrepancy.
+
+4. APPROVED CHANGE A — Resource-regeneration correctness
+
+Investigate the resource-regeneration actuator and its crop-succession logic.
+
+The previous audit found that a pristine chunk could satisfy the crop-succession trigger despite having no prior activity or developed substrate. It also found that an actuator could report that it acted even when no block actually changed.
+
+Required actions:
+
+1. Trace the full execution path from the substrate observations through the resource-regeneration decision to the actual world modification.
+2. Identify the exact conditions under which a pristine chunk can trigger succession.
+3. Determine whether the current behavior violates the intended design by inspecting existing code, documentation, and tests.
+4. If confirmed, implement the smallest targeted correction that prevents unintended progression in a pristine chunk.
+5. Preserve legitimate regeneration and recovery behavior in previously active or developed regions.
+6. Ensure action status accurately reflects whether the intended operation actually occurred. Do not report a successful world modification when no modification occurred.
+7. Add or update tests for:
+   - A pristine chunk.
+   - A previously active or organized chunk.
+   - A depleted or damaged chunk.
+   - A recovering chunk.
+   - A succession attempt that makes no actual world change.
+8. Test relevant boundary values and ensure the fix does not accidentally disable normal resource regeneration.
+
+Do not invent a new resource ecology system, new state variables, new crop stages, or new tuning parameters unless existing architecture makes a minimal correction impossible. If that is the case, stop and request approval.
+
+5. APPROVED CHANGE B — "TensionManager" no-op methods
+
+Inspect the actual implementation and all relevant callers of the following methods, where they still exist:
+
+- "setTension"
+- "addEvent"
+- "addMiningTension"
+- "reduceTension"
+- "tickGlobalDynamics"
+- "triggerWraithEvent"
+- "triggerSerpentEvent"
+
+The previous audit found that some of these methods were empty or did not implement their advertised behavior.
+
+Required actions:
+
+1. Verify which methods are currently empty, incomplete, or intentionally unsupported.
+2. Trace every relevant caller, including consumables, rituals, storm handling, and research or testing hooks.
+3. Identify the intended behavior from existing code, comments, interfaces, and established architecture.
+4. Implement only behavior that is unambiguously specified and can be integrated without redesigning the substrate model.
+5. Where behavior cannot safely be inferred, do not invent it. Preserve the existing safe behavior and report the missing specification.
+6. If a feature is deliberately unsupported, make its status explicit through the project's existing conventions rather than pretending it works.
+7. Add targeted tests proving that supported calls produce the expected state change or event and that unsupported functionality is not falsely reported as successful.
+8. Preserve server authority, thread-safety expectations, event semantics, and existing API compatibility.
+
+Do not invent new wraith or serpent mechanics, new global dynamics, or new tension semantics merely to fill empty methods. Ambiguous methods must be reported for a separate design decision.
+
+6. APPROVED CHANGE C — Chunk-tension threshold reachability
+
+Inspect the chunk-tension observable, its normalization and bounds, the existing classification thresholds, and all code that consumes the resulting states.
+
+A previous candidate patch proposed:
+
+- "CHUNK_STRAINED = 0.35"
+- "CHUNK_FRACTURED = 0.60"
+- "CHUNK_DECOUPLED = 0.72"
+- Hysteresis of "0.08"
+
+These values are candidates, not unquestionable requirements.
+
+Required actions:
+
+1. Recompute or verify the attainable range of the observable from the actual implementation.
+2. Establish whether the existing thresholds are unreachable, poorly scaled, or otherwise inconsistent with that range.
+3. Inspect how classification order, hysteresis, state transitions, and neighboring states work.
+4. If the candidate thresholds are still justified, apply the smallest appropriate change.
+5. Check that threshold ordering and hysteresis cannot produce invalid transitions or oscillation around boundaries.
+6. Add boundary tests immediately below, at, and above every relevant threshold, including state transitions in both directions.
+7. Test all relevant consumers so changed classifications do not unexpectedly break gameplay or presentation.
+8. Document the rationale and the observed range of the normalized quantity.
+
+Do not change the underlying observable equation just to make the thresholds convenient. Do not add new chunk states or alter unrelated tuning. If the proposed numbers cannot be justified from the current code, do not apply them automatically; report the evidence and leave the thresholds unchanged until a decision is made.
+
+7. APPROVED CHANGE D — Build configuration and repository hygiene
+
+Fix concrete portability and validation problems confirmed in the current checkout.
+
+Gradle and Java configuration
+
+The previous audit found a machine-specific Java path in "gradle.properties":
+
+"org.gradle.java.home=/usr/lib/jvm/java-17-openjdk-amd64"
+
+It also found a machine-specific Baritone JAR path:
+
+"baritone_api_jar=/home/lenovo/Git/baritone-api-fabric-1.10.4.jar"
+
+Required actions:
+
+1. Verify whether these settings still exist and whether the build actually depends on them.
+2. Remove machine-specific assumptions using the smallest compatible correction.
+3. Prefer standard Gradle Java toolchain or documented project conventions where appropriate, while preserving Java 17 compatibility.
+4. Do not remove Baritone functionality or exclude source files merely to make the build pass.
+5. If the Baritone dependency is unavailable, determine the proper dependency strategy from existing build files and project documentation. If the correct dependency cannot be established, report the blocker instead of fabricating a dependency or silently disabling functionality.
+
+CI
+
+1. Inspect the GitHub Actions workflow and reproduce the reported failure if possible.
+2. Fix the confirmed environment or configuration issue with a minimal change.
+3. Keep the project’s Minecraft, Fabric, Java, and Gradle compatibility requirements intact.
+4. Do not claim CI is fixed unless the relevant workflow actually succeeds or the limitation is clearly stated.
+
+Python and JSON
+
+The previous audit identified an invalid Python file, "regions.py", containing a JavaScript-style comment:
+
+"// Define the Region class here."
+
+It also identified invalid JSON files under ".rmv/config/".
+
+Required actions:
+
+1. Reinspect the current versions and confirm each syntax error.
+2. Correct syntax without inventing missing application logic or changing the meaning of the files.
+3. Validate Python files with Python's compiler or an equivalent syntax check.
+4. Parse JSON files with a real JSON parser.
+5. Do not rewrite entire files simply to repair one syntax error.
+
+Compiled artifacts
+
+The previous audit found approximately 215 tracked ".class" files.
+
+1. Verify the actual tracked files and their locations.
+2. Determine whether they are generated build outputs or intentionally maintained artifacts.
+3. Remove only confirmed generated artifacts that should not be version-controlled.
+4. Update ".gitignore" narrowly and appropriately.
+5. Do not delete source files, bundled dependencies, intentional binary assets, or user-created files.
+6. Do not remove tracked artifacts until their status is established.
+
+8. APPROVED CHANGE E — Documentation accuracy
+
+Correct documentation only where the current evidence demonstrably fails to support a claim.
+
+The previous audit raised concerns about claims of confirmed bistability, hysteresis, stable attractors, and true equilibrium.
+
+Required actions:
+
+1. Locate the exact claims in the README, reports, and relevant documentation.
+2. Compare them with the actual experiment definitions, telemetry, and conclusions.
+3. If a claim overstates the evidence, revise it to distinguish:
+   - What was measured.
+   - What was inferred.
+   - What remains unverified.
+4. Preserve legitimate research findings, numerical results, experiment descriptions, and project goals.
+5. Do not delete research history or rewrite speculative theory as though it never existed.
+6. Do not declare bistability or hysteresis impossible merely because current evidence is insufficient.
+7. Do not change the mathematical model to make the documentation appear consistent.
+
+This change is a correction of evidentiary wording, not a request to conduct a new research program.
+
+9. Simulation-lab scope: preserve the research boundary
+
+The simulation lab is not automatically a faithful copy of the runtime. Verify and document its intended purpose before changing its equations.
+
+The audits identified these differences:
+
+- Runtime memory evolution includes an activity-gated anti-diffusion term; the original lab used an ungated version.
+- A corrected lab experiment removed anti-diffusion from the lab memory equation.
+- The corrected lab added a configured activation-decay term.
+- Runtime depth growth includes activity/history gating; the lab depth equation does not.
+- Runtime and lab clamp settings may differ depending on configuration.
+
+For this task:
+
+1. Do not modify the runtime field equations as part of simulation-lab cleanup.
+2. Do not automatically copy every runtime equation into the lab.
+3. Do not automatically remove anti-diffusion from the runtime.
+4. Do not treat the corrected lab as a faithful runtime replica unless all relevant equation and parameter differences have been verified.
+5. If the lab's intended purpose is clear, document its scope and equation differences.
+6. If the lab is intended to reproduce runtime behavior but that intent cannot be established, report the ambiguity rather than silently choosing a design.
+7. Avoid broad simulation-lab refactoring. Make only narrowly scoped documentation or test changes that directly support the approved maintenance work.
+
+10. EXPLICITLY PROHIBITED CHANGES
+
+Do not implement any of the following in this task, even if you believe they would improve the design.
+
+A. Do not add the experimental stability variable
+
+Do not add "S", an order/stability variable, resistance memory, or an equivalent new substrate dimension.
+
+Do not implement an input rule such as:
+
+"I_effective = I * (1 - rho * S)"
+
+Do not add the experimental "rho" coefficients or the experimental stability lifecycle.
+
+The stability mechanism was explored in a temporary harness only. It is not approved production behavior.
+
+B. Do not change runtime anti-diffusion
+
+Do not remove, disable, strengthen, weaken, or retune the runtime's activity-gated anti-diffusion term.
+
+Do not change its coefficient or gate as part of this task.
+
+The stress test established a possible instability under deliberately isolated conditions, not a confirmed routine gameplay failure. Runtime-specific testing and a separate decision are required.
+
+C. Do not recalibrate the memory equation
+
+Do not change memory formation gain, decay, diffusion, saturation, coupling coefficients, or other parameters just to match reported telemetry.
+
+Do not claim the discrepancy is solved by changing a parameter without tracing the implementation, timestep, clamping, coupling, and telemetry calculations.
+
+Leave the memory-equation discrepancy open and document it if necessary.
+
+D. Do not redesign depth dynamics
+
+Do not modify runtime depth growth, introduce new depth gates, or change depth coefficients.
+
+The lab/runtime difference may require a separate decision about the lab's purpose. Do not use that difference as permission to alter production dynamics.
+
+E. Do not add new substrate variables or reinterpretation systems
+
+Do not add new field dimensions, stability assets, mod-identity channels, new coupling matrices, or new interpretation-layer architecture.
+
+Do not undertake a broad Substrate-X theory redesign.
+
+F. Do not perform unrelated refactors
+
+No sweeping code cleanup, package restructuring, dependency upgrades, API redesign, gameplay rebalance, wholesale formatting changes, or opportunistic fixes outside the approved scope.
+
+If another serious issue is discovered, document it in a separate findings list. Do not fix it without authorization.
+
+11. Testing requirements
+
+Tests must establish the behavior of each change, not merely that the code compiles.
+
+For every approved correction:
+
+1. Identify the original defect and the expected behavior.
+2. Add a regression test that fails against the original defective behavior when practical.
+3. Run the targeted test.
+4. Run relevant existing tests.
+5. Run the full build and test suite if the environment permits.
+6. Record exact commands, exit codes, and relevant output.
+7. Separate tests that passed from tests that could not run.
+8. Never replace a failing test with a weaker test simply to obtain a pass.
+9. Do not modify unrelated tests or production logic merely to hide a failure.
+10. If a test reveals a design ambiguity, stop and report it instead of guessing.
+
+Use the actual project's test framework and existing conventions. Avoid introducing a new testing dependency unless necessary and explicitly justified.
+
+If Gradle cannot run because of unavailable network access or missing dependencies, perform all meaningful offline checks available, identify the exact blocker, and label the build as unverified. Do not report offline syntax checks as a successful full build.
+
+12. Change-management requirements
+
+Keep every approved correction reviewable.
+
+1. Work on a dedicated local branch or isolated copy.
+2. Make small, logically separated commits if the environment supports commits.
+3. Do not push commits.
+4. Keep unrelated corrections out of the same change.
+5. Inspect "git diff" and "git status" before and after every logical change.
+6. Confirm no protected baseline files or pre-existing user edits were accidentally changed.
+7. Do not create a patch for an issue that is already fixed.
+8. Do not remove existing experiments, telemetry, reports, or historical artifacts merely because they are not part of the production implementation.
+9. Preserve a copy of the original source and ensure the new work can be reverted without losing the baseline.
+
+If a branch or isolated copy cannot be created safely, stop before editing and explain the problem.
+
+13. Final deliverables
+
+When finished, provide a factual implementation report containing:
+
+A. Change inventory
+
+For every file changed, list:
+
+- File path.
+- Exact change made.
+- Which approved item authorized it.
+- Why it was necessary.
+- Whether it changes runtime gameplay, tooling, tests, configuration, or documentation.
+
+B. Verification results
+
+For each test and build command, report:
+
+- Exact command.
+- Passed, failed, or not run.
+- Relevant output.
+- Any environmental limitation.
+
+C. Protected items confirmation
+
+Explicitly confirm whether you changed any of these:
+
+- Runtime anti-diffusion equation.
+- Runtime memory equation or parameters.
+- Runtime depth equation or parameters.
+- Stability variable or input-resistance mechanism.
+- Core substrate state dimensions.
+- GitHub remote, branches, tags, or milestone history.
+
+The expected result for the first five protected design areas is no change. The remote and milestone must remain untouched.
+
+D. Outstanding findings
+
+List:
+
+- Issues that were verified but not fixed because they fall outside scope.
+- Issues that could not be verified.
+- Any ambiguous behavior requiring a human design decision.
+- Any build or test blockers.
+
+E. Final diff review
+
+Provide a concise summary of the final diff and verify that every changed file is authorized by this prompt.
+
+If any unauthorized change occurred, do not conceal it. Identify it, explain it, and restore the original content only when doing so is safe and will not overwrite user work.
+
+14. Final decision rule
+
+When uncertain, preserve existing behavior and ask rather than inventing behavior.
+
+The priority order is:
+
+1. Protect the user's work and GitHub milestone.
+2. Fix confirmed, approved defects with minimal edits.
+3. Verify every correction.
+4. Keep research experiments separate from production behavior.
+5. Report unresolved questions honestly.
+
+Begin with inspection and a proposed file-level change plan. Do not begin editing until you have identified the files and confirmed that each planned edit falls within the approved scope. Do not push anything to GitHub.

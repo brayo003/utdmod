@@ -1,0 +1,186 @@
+======================================================================
+PHASE 2 A3: Telemetry Validation
+Run 4: 2026-07-15T14-26-10
+Integration: every 5 ticks, 4 steps per snapshot interval
+v2ClampMax = 4.0 (gameplay tuning disabled)
+======================================================================
+
+======================================================================
+--- Case 1: Inactive chunk (A < 0.05, below formation threshold) ---
+    Chunk (2,0): A=0, M=0, D=0 throughout — pure zero state
+    Snapshots: 1289
+    Available neighbors: []
+    Missing neighbors: [(2, -1), (2, 1), (1, 0), (3, 0)]
+
+      Tick       A_log      M_log      D_log  |      A_pred     M_pred     D_pred  |          ΔA         ΔM         ΔD  | n_neigh
+        20    0.000000   0.000000   0.000000  |    0.000000   0.000000   0.000000  |   +0.000000  +0.000000  +0.000000  |       0
+      6460    0.000000   0.000000   0.000000  |    0.000000   0.000000   0.000000  |   +0.000000  +0.000000  +0.000000  |       0
+     12900    0.000000   0.000000   0.000000  |    0.000000   0.000000   0.000000  |   +0.000000  +0.000000  +0.000000  |       0
+     19340    0.000000   0.000000   0.000000  |    0.000000   0.000000   0.000000  |   +0.000000  +0.000000  +0.000000  |       0
+     25760    0.000000   0.000000   0.000000  |    0.000000   0.000000   0.000000  |   +0.000000  +0.000000  +0.000000  |       0
+
+    Detailed breakdown for tick 20 → 40:
+    Initial: A=0.00000000, M=0.00000000, D=0.00000000, B=0.39603960
+    External=0.0, Transport=0.0
+    Stencil (from 0 neighbors):
+      activationLaplacian=0.00000000
+      memoryLaplacian=0.00000000
+      depthLaplacian=0.00000000
+    dM components (step 1):
+      rawFormation=0.0000000000
+      peakMultiplier=0.300000
+      formation=0.0000000000
+      saturation=0.0000000000
+      forgetting=-0.0000000000
+      antiDiffusion=-0.0000000000
+      diffusionM=0.0000000000
+      dM=0.0000000000
+    Logged next: A=0.00000000, M=0.00000000, D=0.00000000
+
+======================================================================
+--- Case 2: Sustained activation (A > 0.25) ---
+    Chunk (7,-8): A~0.34, M~1.1, D~0.9 — active mining area
+    Snapshots: 1289
+    Available neighbors: [(7, -9), (7, -7), (8, -8)]
+    Missing neighbors: [(6, -8)]
+
+      Tick       A_log      M_log      D_log  |      A_pred     M_pred     D_pred  |          ΔA         ΔM         ΔD  | n_neigh
+        20    0.340795   1.067410   0.879733  |    0.340684   1.069509   0.922635  |   -0.000128  +0.000044  +0.042911  |       3
+      6460    0.339788   1.282378   0.925387  |    0.339676   1.282542   0.968138  |   -0.000109  +0.000045  +0.042646  |       3
+     12900    0.339214   1.296796   0.942335  |    0.339109   1.296851   0.983927  |   -0.000104  +0.000043  +0.041572  |       3
+     19340    0.339129   1.298419   0.945284  |    0.339026   1.298463   0.986663  |   -0.000103  +0.000043  +0.041376  |       3
+     25760    0.339118   1.298675   0.945792  |    0.339015   1.298718   0.987134  |   -0.000103  +0.000043  +0.041342  |       3
+
+    Detailed breakdown for tick 20 → 40:
+    Initial: A=0.34079545, M=1.06740958, D=0.87973257, B=0.94379944
+    External=0.0, Transport=0.025728443516530083
+    Stencil (from 3 neighbors):
+      activationLaplacian=-0.03708828
+      memoryLaplacian=-0.37778578
+      depthLaplacian=0.07300578
+    dM components (step 1):
+      rawFormation=0.0061926382
+      peakMultiplier=0.489380
+      formation=0.0030305541
+      saturation=0.0014131328
+      forgetting=-0.0009967784
+      antiDiffusion=0.0002880701
+      diffusionM=-0.0001888929
+      dM=0.0005155316
+    Logged next: A=0.34081247, M=1.06946464, D=0.87972401
+
+======================================================================
+--- Case 3: Near activation peak with spatial gradient ---
+    Chunk (6,-24): A~0.35, M~0.9, D~0.8, has 3 neighbors — best stencil case
+    Snapshots: 1289
+    Available neighbors: [(6, -23), (5, -24), (7, -24)]
+    Missing neighbors: [(6, -25)]
+
+      Tick       A_log      M_log      D_log  |      A_pred     M_pred     D_pred  |          ΔA         ΔM         ΔD  | n_neigh
+        20    0.380834   0.671485   1.013219  |    0.370102   0.678005   1.039784  |   -0.003984  +0.001857  +0.041553  |       3
+      6460    0.343244   1.186521   0.629461  |    0.343018   1.186940   0.693871  |   -0.000233  +0.000088  +0.064291  |       3
+     12900    0.344661   1.231238   0.651366  |    0.344441   1.231367   0.715029  |   -0.000222  +0.000087  +0.063641  |       3
+     19340    0.344898   1.238143   0.658081  |    0.344679   1.238239   0.721376  |   -0.000219  +0.000086  +0.063282  |       3
+     25760    0.344928   1.239888   0.660417  |    0.344710   1.239976   0.723565  |   -0.000218  +0.000086  +0.063145  |       3
+
+    Detailed breakdown for tick 20 → 40:
+    Initial: A=0.38083371, M=0.67148487, D=1.01321880, B=0.97631539
+    External=0.0, Transport=0.023686811374858584
+    Stencil (from 2 neighbors):
+      activationLaplacian=-0.03370255
+      memoryLaplacian=-0.31919346
+      depthLaplacian=-0.79366058
+    dM components (step 1):
+      rawFormation=0.0069736150
+      peakMultiplier=0.476450
+      formation=0.0033225773
+      saturation=0.0022070471
+      forgetting=-0.0005722496
+      antiDiffusion=0.0002641005
+      diffusionM=-0.0001595967
+      dM=0.0017393013
+    Logged next: A=0.37408672, M=0.67614809, D=0.99823125
+
+======================================================================
+--- Case 4: Substantial neighboring memory gradients ---
+    Chunk (7,-8): M ranges from ~1.07 to ~1.30, neighbors have different M
+    Snapshots: 1289
+    Available neighbors: [(7, -9), (7, -7), (8, -8)]
+    Missing neighbors: [(6, -8)]
+
+      Tick       A_log      M_log      D_log  |      A_pred     M_pred     D_pred  |          ΔA         ΔM         ΔD  | n_neigh
+        20    0.340795   1.067410   0.879733  |    0.340684   1.069509   0.922635  |   -0.000128  +0.000044  +0.042911  |       3
+      6460    0.339788   1.282378   0.925387  |    0.339676   1.282542   0.968138  |   -0.000109  +0.000045  +0.042646  |       3
+     12900    0.339214   1.296796   0.942335  |    0.339109   1.296851   0.983927  |   -0.000104  +0.000043  +0.041572  |       3
+     19340    0.339129   1.298419   0.945284  |    0.339026   1.298463   0.986663  |   -0.000103  +0.000043  +0.041376  |       3
+     25760    0.339118   1.298675   0.945792  |    0.339015   1.298718   0.987134  |   -0.000103  +0.000043  +0.041342  |       3
+
+    Detailed breakdown for tick 20 → 40:
+    Initial: A=0.34079545, M=1.06740958, D=0.87973257, B=0.94379944
+    External=0.0, Transport=0.025728443516530083
+    Stencil (from 3 neighbors):
+      activationLaplacian=-0.03708828
+      memoryLaplacian=-0.37778578
+      depthLaplacian=0.07300578
+    dM components (step 1):
+      rawFormation=0.0061926382
+      peakMultiplier=0.489380
+      formation=0.0030305541
+      saturation=0.0014131328
+      forgetting=-0.0009967784
+      antiDiffusion=0.0002880701
+      diffusionM=-0.0001888929
+      dM=0.0005155316
+    Logged next: A=0.34081247, M=1.06946464, D=0.87972401
+
+======================================================================
+--- Case 5: Relaxation period (late ticks, M slowly decaying) ---
+    Chunk (6,1): A~0.18, M slowly rising then plateauing, D slowly decreasing
+    Snapshots: 1289
+    Available neighbors: [(7, 1)]
+    Missing neighbors: [(6, 0), (6, 2), (5, 1)]
+
+      Tick       A_log      M_log      D_log  |      A_pred     M_pred     D_pred  |          ΔA         ΔM         ΔD  | n_neigh
+        20    0.183049   0.480083   0.668599  |    0.182999   0.480733   0.695076  |   -0.000052  +0.000018  +0.026681  |       1
+      6460    0.183729   0.558808   0.624800  |    0.183668   0.558886   0.656713  |   -0.000063  +0.000024  +0.031985  |       1
+     12900    0.184128   0.564098   0.611925  |    0.184063   0.564123   0.644877  |   -0.000066  +0.000026  +0.032970  |       1
+     19340    0.184253   0.563719   0.608770  |    0.184187   0.563744   0.641927  |   -0.000066  +0.000026  +0.033162  |       1
+     25760    0.184285   0.563454   0.608052  |    0.184219   0.563479   0.641251  |   -0.000067  +0.000026  +0.033200  |       1
+
+    Detailed breakdown for tick 20 → 40:
+    Initial: A=0.18304909, M=0.48008264, D=0.66859850, B=0.75651474
+    External=0.0, Transport=0.007319472137453285
+    Stencil (from 1 neighbors):
+      activationLaplacian=0.02948319
+      memoryLaplacian=0.23306899
+      depthLaplacian=0.31334839
+    dM components (step 1):
+      rawFormation=0.0031013439
+      peakMultiplier=0.300000
+      formation=0.0009304032
+      saturation=0.0007070680
+      forgetting=-0.0005568589
+      antiDiffusion=-0.0001081859
+      diffusionM=0.0001165345
+      dM=0.0001585577
+    Logged next: A=0.18305087, M=0.48071522, D=0.66839547
+
+======================================================================
+SUMMARY OF STENCIL RECONSTRUCTION LIMITATIONS
+======================================================================
+Total chunks in telemetry: 46
+Chunks with 4 neighbors: 0
+Chunks with 3 neighbors: 3
+Chunks with 2 neighbors: 22
+Chunks with 1 neighbor:  11
+Chunks with 0 neighbors: 10
+
+CONCLUSION: No chunk has all 4 neighbors → spatial stencil is always partial.
+Missing neighbors are SKIPPED (not zero-filled) in SpatialStencil.fromChunkNeighbors.
+The Laplacian is computed from available neighbors only (average/count).
+This means predictions with partial stencils will differ from the runtime
+which had access to ALL loaded chunk neighbors, not just those in telemetry.
+
+Additionally, the runtime may have had neighbors not logged in telemetry
+(telemetry only logs chunks with existing substrate state at snapshot period).
+Transport values also change between steps but we use the logged value.

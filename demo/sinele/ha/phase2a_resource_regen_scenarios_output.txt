@@ -1,0 +1,340 @@
+================================================================================
+PHASE 2A — RESOURCE REGENERATION ACTUATOR: BRANCH-LOGIC SCENARIOS
+Evidence type: FORMULA REPRODUCTION + SOURCE INSPECTION
+Limitation: Does NOT execute the production Java actuator.
+           World-state assumptions are stated explicitly per scenario.
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+  Scenario 1: Succession threshold met, no eligible targets
+────────────────────────────────────────────────────────────────────────────────
+  Substrate: A=0.0, M=0.0, D=0.0, B=0.0
+  Derived:   capacity=1.0, convergence=1.0
+             recoveryState=1.0, prosperityPotential=0.3
+  Potentials: mining=0.0 (thr > 0.45), succession=0.86 (thr > 0.42)
+  World assumptions:
+    has_crops: False
+    crop_ages: None
+    has_coarse_dirt: False
+    ore_target_block: AIR
+  Branches: mining=False, succession=True
+  setBlockState calls: NONE
+  World changed: False
+  ACTUAL outcome (production):  SUCCESS
+  CORRECT outcome (per contract): NO_TARGET
+  *** CONTRACT VIOLATION: returns SUCCESS but should return NO_TARGET
+
+────────────────────────────────────────────────────────────────────────────────
+  Scenario 2: Crops found at maximum growth (age 7)
+────────────────────────────────────────────────────────────────────────────────
+  Substrate: A=0.0, M=0.0, D=0.0, B=0.0
+  Derived:   capacity=1.0, convergence=1.0
+             recoveryState=1.0, prosperityPotential=0.3
+  Potentials: mining=0.0 (thr > 0.45), succession=0.86 (thr > 0.42)
+  World assumptions:
+    has_crops: True
+    crop_ages: [7, 7]
+    has_coarse_dirt: False
+    ore_target_block: AIR
+  Branches: mining=False, succession=True
+  setBlockState calls: NONE
+  World changed: False
+  ACTUAL outcome (production):  SUCCESS
+  CORRECT outcome (per contract): NO_CHANGE
+  *** CONTRACT VIOLATION: returns SUCCESS but should return NO_CHANGE
+
+────────────────────────────────────────────────────────────────────────────────
+  Scenario 3: Eligible crop changes (age 3 → advanced)
+────────────────────────────────────────────────────────────────────────────────
+  Substrate: A=0.2, M=0.1, D=0.05, B=0.01
+  Derived:   capacity=0.909091, convergence=0.869565
+             recoveryState=0.899209, prosperityPotential=0.319227
+  Potentials: mining=0.1075 (thr > 0.45), succession=0.786672 (thr > 0.42)
+  World assumptions:
+    has_crops: True
+    crop_ages: [3]
+    has_coarse_dirt: False
+    ore_target_block: AIR
+  Branches: mining=False, succession=True
+  setBlockState calls: ['setBlockState(crop_pos, age=7)']
+  World changed: True
+  ACTUAL outcome (production):  SUCCESS
+  CORRECT outcome (per contract): SUCCESS
+  ✓ No violation
+
+────────────────────────────────────────────────────────────────────────────────
+  Scenario 4: Mining branch, invalid ore target (AIR at target pos)
+────────────────────────────────────────────────────────────────────────────────
+  Substrate: A=0.5, M=0.5, D=0.5, B=0.0
+  Derived:   capacity=0.8, convergence=0.5
+             recoveryState=0.671667, prosperityPotential=0.515
+  Potentials: mining=0.5 (thr > 0.45), succession=0.68525 (thr > 0.42)
+  World assumptions:
+    has_crops: False
+    crop_ages: None
+    has_coarse_dirt: False
+    ore_target_block: AIR
+  Branches: mining=True, succession=True
+  setBlockState calls: NONE
+  World changed: False
+  ACTUAL outcome (production):  SUCCESS
+  CORRECT outcome (per contract): NO_TARGET
+  *** CONTRACT VIOLATION: returns SUCCESS but should return NO_TARGET
+
+────────────────────────────────────────────────────────────────────────────────
+  Scenario 5: Mining branch, successful ore placement (STONE at target)
+────────────────────────────────────────────────────────────────────────────────
+  Substrate: A=0.5, M=0.5, D=0.5, B=0.0
+  Derived:   capacity=0.8, convergence=0.5
+             recoveryState=0.671667, prosperityPotential=0.515
+  Potentials: mining=0.5 (thr > 0.45), succession=0.68525 (thr > 0.42)
+  World assumptions:
+    has_crops: False
+    crop_ages: None
+    has_coarse_dirt: False
+    ore_target_block: STONE
+  Branches: mining=True, succession=True
+  setBlockState calls: ['setBlockState(target_pos, IRON_ORE)']
+  World changed: True
+  ACTUAL outcome (production):  SUCCESS
+  CORRECT outcome (per contract): SUCCESS
+  ✓ No violation
+
+────────────────────────────────────────────────────────────────────────────────
+  Scenario 6: Both branches, no change (no crops, no coarse dirt, DIRT at ore target)
+────────────────────────────────────────────────────────────────────────────────
+  Substrate: A=0.5, M=0.5, D=0.5, B=0.0
+  Derived:   capacity=0.8, convergence=0.5
+             recoveryState=0.671667, prosperityPotential=0.515
+  Potentials: mining=0.5 (thr > 0.45), succession=0.68525 (thr > 0.42)
+  World assumptions:
+    has_crops: False
+    crop_ages: None
+    has_coarse_dirt: False
+    ore_target_block: DIRT
+  Branches: mining=True, succession=True
+  setBlockState calls: NONE
+  World changed: False
+  ACTUAL outcome (production):  SUCCESS
+  CORRECT outcome (per contract): NO_TARGET
+  *** CONTRACT VIOLATION: returns SUCCESS but should return NO_TARGET
+
+
+================================================================================
+JSON OUTPUT
+================================================================================
+[
+  {
+    "label": "Scenario 1: Succession threshold met, no eligible targets",
+    "substrate_inputs": {
+      "A": 0.0,
+      "M": 0.0,
+      "D": 0.0,
+      "B": 0.0
+    },
+    "derived": {
+      "capacity": 1.0,
+      "convergence": 1.0,
+      "recoveryState": 1.0,
+      "prosperityPotential": 0.3
+    },
+    "potentials": {
+      "miningPotential": 0.0,
+      "successionPotential": 0.86
+    },
+    "world_state_assumptions": {
+      "has_crops": false,
+      "crop_ages": null,
+      "has_coarse_dirt": false,
+      "ore_target_block": "AIR"
+    },
+    "branch_decisions": {
+      "mining_branch_entered": false,
+      "succession_branch_entered": true
+    },
+    "setBlockState_calls": [],
+    "world_changed": false,
+    "actual_outcome": "SUCCESS",
+    "correct_outcome_per_contract": "NO_TARGET",
+    "contract_violation": true
+  },
+  {
+    "label": "Scenario 2: Crops found at maximum growth (age 7)",
+    "substrate_inputs": {
+      "A": 0.0,
+      "M": 0.0,
+      "D": 0.0,
+      "B": 0.0
+    },
+    "derived": {
+      "capacity": 1.0,
+      "convergence": 1.0,
+      "recoveryState": 1.0,
+      "prosperityPotential": 0.3
+    },
+    "potentials": {
+      "miningPotential": 0.0,
+      "successionPotential": 0.86
+    },
+    "world_state_assumptions": {
+      "has_crops": true,
+      "crop_ages": [
+        7,
+        7
+      ],
+      "has_coarse_dirt": false,
+      "ore_target_block": "AIR"
+    },
+    "branch_decisions": {
+      "mining_branch_entered": false,
+      "succession_branch_entered": true
+    },
+    "setBlockState_calls": [],
+    "world_changed": false,
+    "actual_outcome": "SUCCESS",
+    "correct_outcome_per_contract": "NO_CHANGE",
+    "contract_violation": true
+  },
+  {
+    "label": "Scenario 3: Eligible crop changes (age 3 \u2192 advanced)",
+    "substrate_inputs": {
+      "A": 0.2,
+      "M": 0.1,
+      "D": 0.05,
+      "B": 0.01
+    },
+    "derived": {
+      "capacity": 0.909091,
+      "convergence": 0.869565,
+      "recoveryState": 0.899209,
+      "prosperityPotential": 0.319227
+    },
+    "potentials": {
+      "miningPotential": 0.1075,
+      "successionPotential": 0.786672
+    },
+    "world_state_assumptions": {
+      "has_crops": true,
+      "crop_ages": [
+        3
+      ],
+      "has_coarse_dirt": false,
+      "ore_target_block": "AIR"
+    },
+    "branch_decisions": {
+      "mining_branch_entered": false,
+      "succession_branch_entered": true
+    },
+    "setBlockState_calls": [
+      "setBlockState(crop_pos, age=7)"
+    ],
+    "world_changed": true,
+    "actual_outcome": "SUCCESS",
+    "correct_outcome_per_contract": "SUCCESS",
+    "contract_violation": false
+  },
+  {
+    "label": "Scenario 4: Mining branch, invalid ore target (AIR at target pos)",
+    "substrate_inputs": {
+      "A": 0.5,
+      "M": 0.5,
+      "D": 0.5,
+      "B": 0.0
+    },
+    "derived": {
+      "capacity": 0.8,
+      "convergence": 0.5,
+      "recoveryState": 0.671667,
+      "prosperityPotential": 0.515
+    },
+    "potentials": {
+      "miningPotential": 0.5,
+      "successionPotential": 0.68525
+    },
+    "world_state_assumptions": {
+      "has_crops": false,
+      "crop_ages": null,
+      "has_coarse_dirt": false,
+      "ore_target_block": "AIR"
+    },
+    "branch_decisions": {
+      "mining_branch_entered": true,
+      "succession_branch_entered": true
+    },
+    "setBlockState_calls": [],
+    "world_changed": false,
+    "actual_outcome": "SUCCESS",
+    "correct_outcome_per_contract": "NO_TARGET",
+    "contract_violation": true
+  },
+  {
+    "label": "Scenario 5: Mining branch, successful ore placement (STONE at target)",
+    "substrate_inputs": {
+      "A": 0.5,
+      "M": 0.5,
+      "D": 0.5,
+      "B": 0.0
+    },
+    "derived": {
+      "capacity": 0.8,
+      "convergence": 0.5,
+      "recoveryState": 0.671667,
+      "prosperityPotential": 0.515
+    },
+    "potentials": {
+      "miningPotential": 0.5,
+      "successionPotential": 0.68525
+    },
+    "world_state_assumptions": {
+      "has_crops": false,
+      "crop_ages": null,
+      "has_coarse_dirt": false,
+      "ore_target_block": "STONE"
+    },
+    "branch_decisions": {
+      "mining_branch_entered": true,
+      "succession_branch_entered": true
+    },
+    "setBlockState_calls": [
+      "setBlockState(target_pos, IRON_ORE)"
+    ],
+    "world_changed": true,
+    "actual_outcome": "SUCCESS",
+    "correct_outcome_per_contract": "SUCCESS",
+    "contract_violation": false
+  },
+  {
+    "label": "Scenario 6: Both branches, no change (no crops, no coarse dirt, DIRT at ore target)",
+    "substrate_inputs": {
+      "A": 0.5,
+      "M": 0.5,
+      "D": 0.5,
+      "B": 0.0
+    },
+    "derived": {
+      "capacity": 0.8,
+      "convergence": 0.5,
+      "recoveryState": 0.671667,
+      "prosperityPotential": 0.515
+    },
+    "potentials": {
+      "miningPotential": 0.5,
+      "successionPotential": 0.68525
+    },
+    "world_state_assumptions": {
+      "has_crops": false,
+      "crop_ages": null,
+      "has_coarse_dirt": false,
+      "ore_target_block": "DIRT"
+    },
+    "branch_decisions": {
+      "mining_branch_entered": true,
+      "succession_branch_entered": true
+    },
+    "setBlockState_calls": [],
+    "world_changed": false,
+    "actual_outcome": "SUCCESS",
+    "correct_outcome_per_contract": "NO_TARGET",
+    "contract_violation": true
+  }
+]
