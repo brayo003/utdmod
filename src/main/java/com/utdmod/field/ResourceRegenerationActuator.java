@@ -46,19 +46,23 @@ public final class ResourceRegenerationActuator implements FieldActuator {
 
     boolean acted = false;
     if (intent == IntentType.CONTINUE_MINING || miningPotential > 0.45) {
-      regenerateOres(world, chunkPos, miningPotential, substrate, semantics);
-      acted = true;
+      if (regenerateOres(world, chunkPos, miningPotential, substrate, semantics)) {
+        acted = true;
+      }
     }
     if (intent == IntentType.RECOVER || successionPotential > 0.42) {
-      regenerateCrops(world, chunkPos, successionPotential, substrate);
-      regenerateSurfaceRecovery(world, chunkPos, semantics);
-      acted = true;
+      if (regenerateCrops(world, chunkPos, successionPotential, substrate)) {
+        acted = true;
+      }
+      if (regenerateSurfaceRecovery(world, chunkPos, semantics)) {
+        acted = true;
+      }
     }
     return acted ? com.utdmod.experiment.ActuatorOutcome.SUCCESS
-                 : com.utdmod.experiment.ActuatorOutcome.THRESHOLD_NOT_MET;
+                 : com.utdmod.experiment.ActuatorOutcome.NO_TARGET;
   }
 
-  private void regenerateOres(ServerWorld world, ChunkPos chunkPos, double potential,
+  private boolean regenerateOres(ServerWorld world, ChunkPos chunkPos, double potential,
                               SubstrateState substrate, SubstrateSemantics semantics) {
     int baseX = chunkPos.getStartX();
     int baseZ = chunkPos.getStartZ();
@@ -72,17 +76,24 @@ public final class ResourceRegenerationActuator implements FieldActuator {
 
     BlockPos pos = new BlockPos(x, y, z);
     if (!SpatialBehaviorHelper.isChunkLoaded(world, x, z)) {
-      return;
+      return false;
     }
     Block existing = world.getBlockState(pos).getBlock();
     if (existing == Blocks.STONE || existing == Blocks.DEEPSLATE) {
       Block ore = selectOreType(potential);
+      BlockState oldState = world.getBlockState(pos);
       world.setBlockState(pos, ore.getDefaultState());
-      ExperimentLogger.logActuatorDecision(world.getTime(), world, chunkPos, getId(), substrate,
-          "ORE_CRYSTALLIZATION", "mining memory + depth along transport bias",
-          "setBlockState(" + ore.getTranslationKey() + ")", ore.getTranslationKey(), pos, 0L,
-          ActuatorOutcome.SUCCESS);
+      BlockState newState = world.getBlockState(pos);
+      boolean changed = !newState.equals(oldState);
+      if (changed) {
+        ExperimentLogger.logActuatorDecision(world.getTime(), world, chunkPos, getId(), substrate,
+            "ORE_CRYSTALLIZATION", "mining memory + depth along transport bias",
+            "setBlockState(" + ore.getTranslationKey() + ")", ore.getTranslationKey(), pos, 0L,
+            ActuatorOutcome.SUCCESS);
+      }
+      return changed;
     }
+    return false;
   }
 
   private Block selectOreType(double potential) {
@@ -93,10 +104,11 @@ public final class ResourceRegenerationActuator implements FieldActuator {
     return Blocks.IRON_ORE;
   }
 
-  private void regenerateCrops(ServerWorld world, ChunkPos chunkPos, double potential, SubstrateState substrate) {
+  private boolean regenerateCrops(ServerWorld world, ChunkPos chunkPos, double potential, SubstrateState substrate) {
     int baseX = chunkPos.getStartX();
     int baseZ = chunkPos.getStartZ();
     int growthSteps = Math.min(5, Math.max(1, (int) Math.floor(potential * 10)));
+    boolean changed = false;
     for (int dx = 0; dx < 4; dx++) {
       for (int dz = 0; dz < 4; dz++) {
         BlockPos surface = new BlockPos(baseX + dx, world.getTopY(), baseZ + dz);
@@ -112,8 +124,12 @@ public final class ResourceRegenerationActuator implements FieldActuator {
             for (int step = 0; step < growthSteps; step++) {
               int age = state.get(ageProperty);
               if (age < 7) {
+                BlockState oldState = state;
                 state = state.with(ageProperty, Math.min(7, age + 1));
                 world.setBlockState(below, state);
+                if (!state.equals(oldState)) {
+                  changed = true;
+                }
               }
             }
             break;
@@ -121,21 +137,25 @@ public final class ResourceRegenerationActuator implements FieldActuator {
         }
       }
     }
+    return changed;
   }
 
-  private void regenerateSurfaceRecovery(ServerWorld world, ChunkPos chunkPos, SubstrateSemantics semantics) {
+  private boolean regenerateSurfaceRecovery(ServerWorld world, ChunkPos chunkPos, SubstrateSemantics semantics) {
     if (semantics.recoveryState < 0.5) {
-      return;
+      return false;
     }
     int x = chunkPos.getStartX() + 4;
     int z = chunkPos.getStartZ() + 4;
     for (int y = 60; y < 100; y++) {
       BlockPos pos = new BlockPos(x, y, z);
       if (world.getBlockState(pos).getBlock() == Blocks.COARSE_DIRT) {
+        BlockState oldState = world.getBlockState(pos);
         world.setBlockState(pos, Blocks.GRASS_BLOCK.getDefaultState());
-        break;
+        BlockState newState = world.getBlockState(pos);
+        return !newState.equals(oldState);
       }
     }
+    return false;
   }
 
   @SuppressWarnings("unchecked")

@@ -925,7 +925,9 @@ public final class ExperimentLogger {
         config.put("substrate_field_depth_decay", UTDConfig.substrateFieldDepthDecay);
         config.put("substrate_field_depth_radius", UTDConfig.substrateFieldDepthRadius);
         config.put("substrate_field_depth_effect_k", UTDConfig.substrateFieldDepthEffectK);
-        config.put("substrate_clamp_max", UTDConfig.substrateClampMax);
+        config.put("configured_substrate_clamp_max", UTDConfig.substrateClampMax);
+        config.put("effective_v2_clamp_max", com.utdmod.tension.ParameterSet.runtime().v2ClampMax);
+        config.put("substrate_gameplay_tuning_enabled", UTDConfig.substrateGameplayTuningEnabled);
         config.put("substrate_field_depth_readiness_scale", UTDConfig.substrateFieldDepthReadinessScale);
         return config;
     }

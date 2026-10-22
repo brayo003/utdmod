@@ -24,7 +24,7 @@ public class RuntimeFidelityTest {
         ParameterSet.resetRuntimeCache();
 
         ParameterSet runtime = ParameterSet.runtime();
-        assertEquals(1.5, runtime.v2ClampMax, 1e-9);
+        assertEquals(4.0, runtime.v2ClampMax, 1e-9);
         assertEquals(0.0, runtime.v3FieldDepthRadius, 1e-9);
         assertEquals(1.0, runtime.readinessMemoryScale, 1e-9);
     }
